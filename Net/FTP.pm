@@ -22,7 +22,7 @@ use Net::Config;
 use Fcntl qw(O_WRONLY O_RDONLY O_APPEND O_CREAT O_TRUNC);
 # use AutoLoader qw(AUTOLOAD);
 
-$VERSION = "2.68"; # $Id: //depot/libnet/Net/FTP.pm#72 $
+$VERSION = "2.68"; # $Id: //depot/libnet/Net/FTP.pm#73 $
 @ISA     = qw(Exporter Net::Cmd IO::Socket::INET);
 
 # Someday I will "use constant", when I am not bothered to much about
@@ -629,7 +629,7 @@ sub mkdir
      $path = $ftp->_extract_path($path);
     }
 
-   # If the creation of the last element was not sucessful, see if we
+   # If the creation of the last element was not successful, see if we
    # can cd to it, if so then return path
 
    unless($ftp->ok)
@@ -1729,6 +1729,6 @@ under the same terms as Perl itself.
 
 =for html <hr>
 
-I<$Id: //depot/libnet/Net/FTP.pm#72 $>
+I<$Id: //depot/libnet/Net/FTP.pm#73 $>
 
 =cut

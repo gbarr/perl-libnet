@@ -14,7 +14,7 @@ use Carp;
 use Time::Local;
 use Net::Config;
 
-$VERSION = "2.22"; # $Id: //depot/libnet/Net/NNTP.pm#17 $
+$VERSION = "2.22"; # $Id: //depot/libnet/Net/NNTP.pm#18 $
 @ISA     = qw(Net::Cmd IO::Socket::INET);
 
 sub new
@@ -748,8 +748,8 @@ Retrieve the header, a blank line, then the body (text) of the
 specified article. 
 
 If C<FH> is specified then it is expected to be a valid filehandle
-and the result will be printed to it, on sucess a true value will be
-returned. If C<FH> is not specified then the return value, on sucess,
+and the result will be printed to it, on success a true value will be
+returned. If C<FH> is not specified then the return value, on success,
 will be a reference to an array containg the article requested, each
 entry in the array will contain one line of the article.
 
@@ -1117,6 +1117,6 @@ it under the same terms as Perl itself.
 
 =for html <hr>
 
-I<$Id: //depot/libnet/Net/NNTP.pm#17 $>
+I<$Id: //depot/libnet/Net/NNTP.pm#18 $>
 
 =cut
