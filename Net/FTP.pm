@@ -22,7 +22,7 @@ use Net::Config;
 use Fcntl qw(O_WRONLY O_RDONLY O_APPEND O_CREAT O_TRUNC);
 # use AutoLoader qw(AUTOLOAD);
 
-$VERSION = "2.74"; # $Id: //depot/libnet/Net/FTP.pm#82 $
+$VERSION = "2.74"; # $Id: //depot/libnet/Net/FTP.pm#83 $
 @ISA     = qw(Exporter Net::Cmd IO::Socket::INET);
 
 # Someday I will "use constant", when I am not bothered to much about
@@ -938,7 +938,7 @@ sub _dataconn
 
  if(defined ${*$ftp}{'net_ftp_pasv'})
   {
-   my @port = split(/,/,${*$ftp}{'net_ftp_pasv'});
+   my @port = map { 0+$_ } split(/,/,${*$ftp}{'net_ftp_pasv'});
 
    $data = $pkg->new(PeerAddr => join(".",@port[0..3]),
     	    	     PeerPort => $port[4] * 256 + $port[5],
