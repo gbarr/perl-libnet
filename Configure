@@ -384,7 +384,7 @@ if(ref($oldcfg{'local_netmask'}))
  {
   $def = $oldcfg{'local_netmask'};
    print "Your current netmasks are :\n\n\t",
-	join("\n\t",@{$def}),"\n\n;
+	join("\n\t",@{$def}),"\n\n";
  }
 
 print "Enter one netmask at each prompt, prefix with a - to remove
