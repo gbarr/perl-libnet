@@ -21,8 +21,14 @@ use Net::Cmd;
 use Net::Config;
 use AutoLoader qw(AUTOLOAD);
 
-$VERSION = "2.27"; # $Id: //depot/libnet/Net/FTP.pm#11 $
+$VERSION = "2.28"; # $Id: //depot/libnet/Net/FTP.pm#12 $
 @ISA     = qw(Exporter Net::Cmd IO::Socket::INET);
+
+# Someday I will "use constant", when I am not bothered to much about
+# compatability with older releases of perl
+
+use vars qw($TELNET_IAC $TELNET_IP $TELNET_DM);
+($TELNET_IAC,$TELNET_IP,$TELNET_DM) = (255,244,242);
 
 1;
 
@@ -269,8 +275,6 @@ sub type
 
  $oldval;
 }
-
-my($TELNET_IAC,$TELNET_IP,$TELNET_DM) = (255,244,242);
 
 sub abort
 {
@@ -807,6 +811,26 @@ sub pasv_xfer
  my $port = $sftp->pasv or
     return undef;
 
+ unless($dftp->port($port) && $sftp->retr($sfile) && $dftp->stor($dfile))
+  {
+   $sftp->abort;
+   $dftp->abort;
+   return undef;
+  }
+
+ $dftp->pasv_wait($sftp);
+}
+
+sub pasv_xfer_unique
+{
+ my($sftp,$sfile,$dftp,$dfile) = @_;
+
+ ($dfile = $sfile) =~ s#.*/##
+    unless(defined $dfile);
+
+ my $port = $sftp->pasv or
+    return undef;
+
  unless($dftp->port($port) && $sftp->retr($sfile) && $dftp->stou($dfile))
   {
    $sftp->abort;
@@ -887,6 +911,8 @@ sub _SYST { shift->unsupported(@_) }
 sub _STAT { shift->unsupported(@_) }
 sub _STRU { shift->unsupported(@_) }
 sub _REIN { shift->unsupported(@_) }
+
+1;
 
 __END__
 
@@ -1111,7 +1137,13 @@ Returns the I<modification time> of the given file
 
 =item size ( FILE )
 
-Returns the size in bytes for the given file.
+Returns the size in bytes for the given file as stored on the remote server.
+
+B<NOTE>: The size reported is the size of the stored file on the remote server.
+If the file is subsequently transfered from the server in ASCII mode
+and the remote server and local machine have different ideas about
+"End Of Line" then the size of file on the local machine after transfer
+may be different.
 
 =item supported ( CMD )
 
@@ -1191,6 +1223,11 @@ servers, providing that these two servers can connect directly to each other.
 
 This method will do a file transfer between two remote ftp servers. If
 C<DEST_FILE> is omitted then the leaf name of C<SRC_FILE> will be used.
+
+=item pasv_xfer_unique ( SRC_FILE, DEST_SERVER [, DEST_FILE ] )
+
+Like C<pasv_xfer> but the file is stored on the remote server using
+the STOU command.
 
 =item pasv_wait ( NON_PASV_SERVER )
 

@@ -1,5 +1,5 @@
 #
-# Copyright (c) 1995-1997 Graham Barr <gbarr@ti.com> and
+# Copyright (c) 1995-1997 Graham Barr <gbarr@pobox.com> and
 # Alex Hristov <hristov@slb.com>. All rights reserved. This program is free
 # software; you can redistribute it and/or modify it under the same terms
 # as Perl itself.
@@ -17,7 +17,7 @@ use IO::Socket;
 use Net::Cmd;
 use Net::Config;
 
-$VERSION = "2.20"; # $Id: //depot/libnet/Net/PH.pm#5 $
+$VERSION = "2.20"; # $Id: //depot/libnet/Net/PH.pm#6 $
 @ISA     = qw(Exporter Net::Cmd IO::Socket::INET);
 
 sub new
@@ -574,7 +574,8 @@ The alternative syntax is to pass strings instead of references, for example
 		    'name email schedule');
 
 The C<SEARCH> argument is a string that is passed to the Nameserver as the 
-search criteria.
+search criteria. The strings being passed should B<not> contain any carriage
+returns, or else the query command might fail or return invalid data.
 
 C<RETURN> is optional, but if given it should be a string which will
 contain field names to be returned.
@@ -606,7 +607,9 @@ The alternative syntax is to pass strings instead of references, for example
                      'schedule="busy"');
 
 The C<SEARCH> argument is a string to be passed to the Nameserver as the 
-search criteria.
+search criteria. The strings being passed should B<not> contain any carriage
+returns, or else the query command might fail or return invalid data.
+
 
 The C<MAKE> argument is a string to be passed to the Nameserver that
 will set new values to designated fields.
@@ -672,7 +675,9 @@ The alternative syntax is to pass a string instead of a reference, for example
     $r = $ph->add('name=myname phone=myphone');
 
 C<FIELD_VALUES> is a string that consists of field/value pairs which the
-new entry will contain.
+new entry will contain. The strings being passed should B<not> contain any
+carriage returns, or else the query command might fail or return invalid data.
+
 
 =item delete( FIELD_VALUES )
 
@@ -751,7 +756,7 @@ L<Net::Cmd>
 
 =head1 AUTHORS
 
-Graham Barr <gbarr@ti.com>
+Graham Barr <gbarr@pobox.com>
 Alex Hristov <hristov@slb.com>
 
 =head1 ACKNOWLEDGMENTS
@@ -771,7 +776,7 @@ The encryption code is based upon cryptit.c, Copyright (C) 1988 by
 Steven Dorner, and Paul Pomes, and the University of Illinois Board
 of Trustees, and by CSNET.
 
-All other code is Copyright (c) 1996-1997 Graham Barr <gbarr@ti.com>
+All other code is Copyright (c) 1996-1997 Graham Barr <gbarr@pobox.com>
 and Alex Hristov <hristov@slb.com>. All rights reserved. This program is
 free software; you can redistribute it and/or modify it under the same
 terms as Perl itself.

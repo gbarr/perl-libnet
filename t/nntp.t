@@ -17,19 +17,22 @@ $nntp = Net::NNTP->new(Debug => 0)
 
 print "ok 1\n";
 
-@grp = $nntp->group('test');
-@grp = $nntp->group('control') unless @grp;
-@grp = $nntp->group('news.announce.newusers') unless @grp;
+my $grp;
+foreach $grp (qw(test alt.test control news.announce.newusers)) {
+    @grp = $nntp->group($grp);
+    last if @grp;
+}
 print "not " unless @grp;
 print "ok 2\n";
 
 
-if($grp[2] > $grp[1]) {
+if(@grp && $grp[2] > $grp[1]) {
     $nntp->head($grp[1]) or print "not ";
 }
 print "ok 3\n";
 
-
-$nntp->quit or print "not ";
+if(@grp) {
+    $nntp->quit or print "not ";
+}
 print "ok 4\n";
 

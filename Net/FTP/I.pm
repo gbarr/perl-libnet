@@ -4,12 +4,13 @@
 
 package Net::FTP::I;
 
-use vars qw(@ISA $buf);
+use vars qw(@ISA $buf $VERSION);
 use Carp;
 
 require Net::FTP::dataconn;
 
 @ISA = qw(Net::FTP::dataconn);
+$VERSION = sprintf("1.%02d",(q$Id: //depot/libnet/Net/FTP/I.pm#4 $ =~ /#(\d+)/)[0]);
 
 sub read
 {
@@ -24,6 +25,7 @@ sub read
  my $n = sysread($data, $buf, $size);
 
  ${*$data}{'net_ftp_bytesread'} += $n if $n > 0;
+ ${*$data}{'net_ftp_eof'} = 1 unless $n;
 
  $n;
 }
@@ -42,8 +44,15 @@ sub write
  # when we write. This can happen if the disk on the remote server fills up
 
  local $SIG{PIPE} = 'IGNORE';
-
- syswrite($data, $buf, $size);
+ my $sent = $size;
+ my $off = 0;
+ while($sent > 0) {
+   my $n = syswrite($data, $buf, $sent,$off);
+   return $n if $n < 0;
+   $sent -= $n;
+   $off += $n;
+ }
+ $size;
 }
 
 1;

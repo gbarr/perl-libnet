@@ -4,12 +4,13 @@
 
 package Net::FTP::A;
 
-use vars qw(@ISA $buf);
+use vars qw(@ISA $buf $VERSION);
 use Carp;
 
 require Net::FTP::dataconn;
 
 @ISA = qw(Net::FTP::dataconn);
+$VERSION = sprintf("1.%02d",(q$Id: //depot/libnet/Net/FTP/A.pm#5 $ =~ /#(\d+)/)[0]);
 
 sub read
 {
