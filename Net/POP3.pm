@@ -13,7 +13,7 @@ use Net::Cmd;
 use Carp;
 use Net::Config;
 
-$VERSION = "2.21"; # $Id: //depot/libnet/Net/POP3.pm#18 $
+$VERSION = "2.22"; # $Id: //depot/libnet/Net/POP3.pm#19 $
 
 @ISA = qw(Net::Cmd IO::Socket::INET);
 
@@ -118,7 +118,7 @@ sub apop
               : "";
   }
 
- my $md = new MD5;
+ my $md = MD5->new;
  $md->add($banner,$pass);
 
  return undef
@@ -520,6 +520,6 @@ it under the same terms as Perl itself.
 
 =for html <hr>
 
-I<$Id: //depot/libnet/Net/POP3.pm#18 $>
+I<$Id: //depot/libnet/Net/POP3.pm#19 $>
 
 =cut
