@@ -1,0 +1,19 @@
+#!/usr/local/bin/perl
+
+use lib '..';
+use Net::SNMP::MIB ($ARGV[0]);
+
+
+sub dump_tree {
+    my($node,$depth) = @_;
+    my $indent = " " x $depth;
+    print $indent,".",$node->name,"\n";
+    if(defined($desc = $node->description)) {
+	$desc =~ s/(.*)/$indent    $1/g;
+	print $desc;
+    }
+    map { dump_tree($_,$depth+1) } $node->children;
+}
+
+
+dump_tree(Net::SNMP::MIB->root, 0);

@@ -1,0 +1,36 @@
+ChangeLog
+Configure
+Hostname.pm.eg			Example replacement for Hostname.pm
+MANIFEST
+Makefile.PL
+Net/Cmd.pm                  (v2.07) 
+Net/Domain.pm               (v2.01) DNS Domain name lookup
+Net/DummyInetd.pm           (v1.03) 
+Net/FTP.pm                  (v2.12) File Transfer Protocol Client
+Net/FTP/A.pm
+Net/FTP/E.pm
+Net/FTP/I.pm
+Net/FTP/L.pm
+Net/FTP/dataconn.pm
+Net/NNTP.pm                 (v2.08) Network News Transfer Protocol
+Net/Netrc.pm                (v2.03) .netrc lookup routines
+Net/PH.pm                   (v2.09) CCSO Nameserver Client class
+Net/POP3.pm                 (v2.03) Post Office Protocol
+Net/SMTP.pm                 (v2.03) Simple Mail Transfer Protocol Client
+Net/SNPP.pm                 (v1.03) Simple Network Pager Protocol Client
+Net/Time.pm                 (v2.01) time & nettime protocols
+README
+demos/ftp
+demos/inetd
+demos/nntp
+demos/nntp.mirror
+demos/pop3
+demos/smtp.self
+demos/snpp
+demos/time
+t/ftp.t
+t/hostname.t
+t/nntp.t
+t/ph.t
+t/require.t
+t/smtp.t
