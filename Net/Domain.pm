@@ -16,7 +16,7 @@ use Net::Config;
 @ISA = qw(Exporter);
 @EXPORT_OK = qw(hostname hostdomain hostfqdn domainname);
 
-$VERSION = "2.09"; # $Id: //depot/libnet/Net/Domain.pm#7 $
+$VERSION = "2.10"; # $Id: //depot/libnet/Net/Domain.pm#8 $
 
 my($host,$domain,$fqdn) = (undef,undef,undef);
 
@@ -33,7 +33,7 @@ sub _hostname {
         my ($name,$alias,$type,$len,@addr) =  gethostbyname($ENV{'COMPUTERNAME'}||'localhost');
         while (@addr)
          {
-          my $a = pop(@addr);
+          my $a = shift(@addr);
           $host = gethostbyaddr($a,Socket::AF_INET());
           last if defined $host;
          } 
