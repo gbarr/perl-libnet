@@ -1,4 +1,4 @@
-# Net::Cmd.pm
+# Net::Cmd.pm $Id: //depot/libnet/Net/Cmd.pm#19 $
 #
 # Copyright (c) 1995-1997 Graham Barr <gbarr@pobox.com>. All rights reserved.
 # This program is free software; you can redistribute it and/or
@@ -13,7 +13,7 @@ use strict;
 use vars qw(@ISA @EXPORT $VERSION);
 use Carp;
 
-$VERSION = "2.18"; # $Id: //depot/libnet/Net/Cmd.pm#18 $
+$VERSION = "2.18";
 @ISA     = qw(Exporter);
 @EXPORT  = qw(CMD_INFO CMD_OK CMD_MORE CMD_REJECT CMD_ERROR CMD_PENDING);
 
@@ -166,7 +166,7 @@ sub command
 
  if (scalar(@_))
   {
-   local $SIG{PIPE} = 'IGNORE';
+   local $SIG{PIPE} = 'IGNORE' unless $^O eq 'MacOS';
 
    my $str =  join(" ", map { /\n/ ? do { my $n = $_; $n =~ tr/\n/ /; $n } : $_; } @_) . "\015\012";
    my $len = length $str;
@@ -587,5 +587,9 @@ Graham Barr <gbarr@pobox.com>
 Copyright (c) 1995-1997 Graham Barr. All rights reserved.
 This program is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
+
+=head1 VERSION
+
+$Id: //depot/libnet/Net/Cmd.pm#19 $
 
 =cut
