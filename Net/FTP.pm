@@ -22,7 +22,7 @@ use Net::Config;
 use Fcntl qw(O_WRONLY O_RDONLY O_APPEND O_CREAT O_TRUNC);
 # use AutoLoader qw(AUTOLOAD);
 
-$VERSION = "2.75";
+$VERSION = "2.76";
 @ISA     = qw(Exporter Net::Cmd IO::Socket::INET);
 
 # Someday I will "use constant", when I am not bothered to much about
@@ -1118,7 +1118,7 @@ sub response
 sub parse_response
 {
  return ($1, $2 eq "-")
-    if $_[1] =~ s/^(\d\d\d)(.?)//o;
+    if $_[1] =~ s/^(\d\d\d)([- ]?)//o;
 
  my $ftp = shift;
 
