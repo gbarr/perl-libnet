@@ -1,4 +1,4 @@
-# Net::Cmd.pm
+# Net::Cmd.pm $Id: //depot/libnet/Net/Cmd.pm#23 $
 #
 # Copyright (c) 1995-1997 Graham Barr <gbarr@pobox.com>. All rights reserved.
 # This program is free software; you can redistribute it and/or
@@ -20,7 +20,7 @@ BEGIN {
   }
 }
 
-$VERSION = "2.18"; # $Id: //depot/libnet/Net/Cmd.pm#22 $
+$VERSION = "2.18";
 @ISA     = qw(Exporter);
 @EXPORT  = qw(CMD_INFO CMD_OK CMD_MORE CMD_REJECT CMD_ERROR CMD_PENDING);
 
@@ -39,14 +39,14 @@ sub toebcdic
 {
  my $cmd = shift;
 
- unless (exists {*$cmd}{'net_cmd_asciipeer'})
+ unless (exists ${*$cmd}{'net_cmd_asciipeer'})
   {
    my $string = $_[0];
    my $ebcdicstr = $tr->toebcdic($string);
    ${*$cmd}{'net_cmd_asciipeer'} = $string !~ /^\d+/ && $ebcdicstr =~ /^\d+/;
   }
 
-  $cmd->{'net_cmd_asciipeer'}
+  ${*$cmd}{'net_cmd_asciipeer'}
     ? $tr->toebcdic($_[0])
     : $_[0];
 }
@@ -634,6 +634,6 @@ it under the same terms as Perl itself.
 
 =for html <hr>
 
-I<$Id: //depot/libnet/Net/Cmd.pm#22 $>
+I<$Id: //depot/libnet/Net/Cmd.pm#23 $>
 
 =cut
