@@ -22,7 +22,7 @@ use Net::Config;
 use Fcntl qw(O_WRONLY O_RDONLY O_APPEND O_CREAT O_TRUNC);
 # use AutoLoader qw(AUTOLOAD);
 
-$VERSION = "2.60"; # $Id: //depot/libnet/Net/FTP.pm#60 $
+$VERSION = "2.61"; # $Id: //depot/libnet/Net/FTP.pm#61 $
 @ISA     = qw(Exporter Net::Cmd IO::Socket::INET);
 
 # Someday I will "use constant", when I am not bothered to much about
@@ -122,28 +122,16 @@ sub new
 
 sub hash {
     my $ftp = shift;		# self
-    my $prev = ${*$ftp}{'net_ftp_hash'} || [\*STDERR, 0];
 
-    unless(@_) {
-      return $prev;
-    }
     my($h,$b) = @_;
-    if(@_ == 1) {
-      unless($h) {
-        delete ${*$ftp}{'net_ftp_hash'};
-        return $prev;
-      }
-      elsif(ref($h)) {
-        $b = 1024;
-      }
-      else {
-        ($h,$b) = (\*STDERR,$h);
-      }
+    unless($h) {
+      delete ${*$ftp}{'net_ftp_hash'};
+      return [\*STDERR,0];
     }
+    ($h,$b) = (ref($h)? $h : \*STDERR, $b || 1024);
     select((select($h), $|=1)[0]);
     $b = 512 if $b < 512;
     ${*$ftp}{'net_ftp_hash'} = [$h, $b];
-    $prev;
 }        
 
 sub quit
@@ -1730,6 +1718,6 @@ under the same terms as Perl itself.
 
 =for html <hr>
 
-I<$Id: //depot/libnet/Net/FTP.pm#60 $>
+I<$Id: //depot/libnet/Net/FTP.pm#61 $>
 
 =cut
