@@ -836,8 +836,11 @@ sub read {
    return $n
 	unless($n >= 0);
 
-   my $lf = substr(${*$fd},-1,1) eq "\r" ? chop(${*$fd})
-					 : "";
+#   my $lf = substr(${*$fd},-1,1) eq "\r" ? chop(${*$fd})
+#					 : "";
+
+   my $lf = (length ${*$fd} > 0 && substr(${*$fd},-1,1) eq "\r") ? chop(${*$fd})
+                     : "";
 
    ${*$fd} =~ s/\r\n/\n/go;
 

@@ -8,6 +8,7 @@
 #--- End User Configuration - You should not have to change anything below this line
 
 $NAME     = 'Net::FTP';
+$RELTYPE = "_2";
 
 $lib_only = 0;
 
