@@ -22,7 +22,7 @@ use Net::Config;
 use Fcntl qw(O_WRONLY O_RDONLY O_APPEND O_CREAT O_TRUNC);
 # use AutoLoader qw(AUTOLOAD);
 
-$VERSION = "2.62"; # $Id: //depot/libnet/Net/FTP.pm#62 $
+$VERSION = "2.62"; # $Id: //depot/libnet/Net/FTP.pm#63 $
 @ISA     = qw(Exporter Net::Cmd IO::Socket::INET);
 
 # Someday I will "use constant", when I am not bothered to much about
@@ -142,11 +142,7 @@ sub quit
  $ftp->close;
 }
 
-sub DESTROY
-{
- my $ftp = shift;
- defined(fileno($ftp)) && $ftp->quit
-}
+sub DESTROY {}
 
 sub ascii  { shift->type('A',@_); }
 sub binary { shift->type('I',@_); }
@@ -1718,6 +1714,6 @@ under the same terms as Perl itself.
 
 =for html <hr>
 
-I<$Id: //depot/libnet/Net/FTP.pm#62 $>
+I<$Id: //depot/libnet/Net/FTP.pm#63 $>
 
 =cut
