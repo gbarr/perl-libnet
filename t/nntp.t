@@ -18,6 +18,8 @@ $nntp = Net::NNTP->new(Debug => 0)
 print "ok 1\n";
 
 @grp = $nntp->group('test');
+@grp = $nntp->group('control') unless @grp;
+@grp = $nntp->group('news.announce.newusers') unless @grp;
 print "not " unless @grp;
 print "ok 2\n";
 
