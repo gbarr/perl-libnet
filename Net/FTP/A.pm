@@ -10,7 +10,7 @@ use Carp;
 require Net::FTP::dataconn;
 
 @ISA = qw(Net::FTP::dataconn);
-$VERSION = "1.11"; # $Id: //depot/libnet/Net/FTP/A.pm#11 $
+$VERSION = "1.12"; # $Id: //depot/libnet/Net/FTP/A.pm#12 $
 
 sub read {
   my    $data 	 = shift;
@@ -27,7 +27,7 @@ sub read {
 
     READ:
     {
-      my $readbuf = defined(${*$data}{'net_ftp_cr'}) ? '\015' : '';
+      my $readbuf = defined(${*$data}{'net_ftp_cr'}) ? "\015" : '';
 
       $data->can_read($timeout) or
 	   croak "Timeout";
