@@ -21,7 +21,7 @@ use Net::Cmd;
 use Net::Config;
 # use AutoLoader qw(AUTOLOAD);
 
-$VERSION = "2.57"; # $Id: //depot/libnet/Net/FTP.pm#54 $
+$VERSION = "2.58"; # $Id: //depot/libnet/Net/FTP.pm#55 $
 @ISA     = qw(Exporter Net::Cmd IO::Socket::INET);
 
 # Someday I will "use constant", when I am not bothered to much about
@@ -792,11 +792,12 @@ sub port
    ${*$ftp}{'net_ftp_listen'} ||= IO::Socket::INET->new(Listen    => 5,
 				    	    	        Proto     => 'tcp',
 							Timeout   => $ftp->timeout,
+							LocalAddr => $ftp->sockhost,
 				    	    	       );
 
    my $listen = ${*$ftp}{'net_ftp_listen'};
 
-   my($myport, @myaddr) = ($listen->sockport, split(/\./,$ftp->sockhost));
+   my($myport, @myaddr) = ($listen->sockport, split(/\./,$listen->sockhost));
 
    $port = join(',', @myaddr, $myport >> 8, $myport & 0xff);
 
@@ -1715,6 +1716,6 @@ under the same terms as Perl itself.
 
 =for html <hr>
 
-I<$Id: //depot/libnet/Net/FTP.pm#54 $>
+I<$Id: //depot/libnet/Net/FTP.pm#55 $>
 
 =cut
