@@ -21,7 +21,7 @@ use Net::Cmd;
 use Net::Config;
 # use AutoLoader qw(AUTOLOAD);
 
-$VERSION = "2.33"; # $Id: //depot/libnet/Net/FTP.pm#17 $
+$VERSION = "2.34"; # $Id: //depot/libnet/Net/FTP.pm#18 $
 @ISA     = qw(Exporter Net::Cmd IO::Socket::INET);
 
 # Someday I will "use constant", when I am not bothered to much about
@@ -757,9 +757,16 @@ sub _data_cmd
  return $ok 
     unless exists ${*$ftp}{'net_ftp_intern_port'};
 
- return $ftp->_dataconn()
-	if $ok;
+ if($ok) {
+   my $data = $ftp->_dataconn();
 
+   $data->reading
+         if $data && $cmd =~ /RETR|LIST|NLST/;
+
+   return $data;
+ }
+
+ 
  close(delete ${*$ftp}{'net_ftp_listen'});
  
  return undef;
