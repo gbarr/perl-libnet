@@ -6,7 +6,7 @@ use strict;
 
 @EXPORT  = qw(%NetConfig);
 @ISA     = qw(Net::LocalCfg Exporter);
-$VERSION = "1.02";
+$VERSION = "1.03";
 
 eval { local $SIG{__DIE__}; require Net::LocalCfg };
 
@@ -67,7 +67,7 @@ sub requires_firewall {
 	foreach (@$list) {
 	    my($net,$bits) = (m#^(\d+\.\d+\.\d+\.\d+)/(\d+)$#) or next;
 	    my $mask = ~0 << (32 - $bits);
-	    my $addr = unpack("N",pack("C*",split(".",$host)));
+	    my $addr = unpack("N",pack("C*",split(/\./,$host)));
 
 	    return 0 if (($addr & $mask) == ($quad & $mask));
 	}
