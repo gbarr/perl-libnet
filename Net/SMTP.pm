@@ -16,7 +16,7 @@ use IO::Socket;
 use Net::Cmd;
 use Net::Config;
 
-$VERSION = "2.20"; # $Id: //depot/libnet/Net/SMTP.pm#21 $
+$VERSION = "2.21"; # $Id: //depot/libnet/Net/SMTP.pm#22 $
 
 @ISA = qw(Net::Cmd IO::Socket::INET);
 
@@ -346,6 +346,12 @@ sub data
 	   : $ok;
 }
 
+sub datafh {
+  my $me = shift;
+  return unless $me->_DATA();
+  return $me->tied_fh;
+}
+
 sub expand
 {
  my $me = shift;
@@ -641,6 +647,6 @@ it under the same terms as Perl itself.
 
 =for html <hr>
 
-I<$Id: //depot/libnet/Net/SMTP.pm#21 $>
+I<$Id: //depot/libnet/Net/SMTP.pm#22 $>
 
 =cut

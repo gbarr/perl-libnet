@@ -13,7 +13,7 @@ use Net::Cmd;
 use Carp;
 use Net::Config;
 
-$VERSION = "2.22"; # $Id: //depot/libnet/Net/POP3.pm#20 $
+$VERSION = "2.23"; # $Id: //depot/libnet/Net/POP3.pm#21 $
 
 @ISA = qw(Net::Cmd IO::Socket::INET);
 
@@ -234,6 +234,17 @@ sub get
 
  $me->read_until_dot(@_);
 }
+
+sub getfh
+{
+ @_ == 2 or croak 'usage: $pop3->getfh( MSGNUM )';
+ my $me = shift;
+
+ return unless $me->_RETR(shift);
+ return        $me->tied_fh;
+}
+
+
 
 sub delete
 {
@@ -459,6 +470,12 @@ then get returns a reference to an array which contains the lines of
 text read from the server. If C<FH> is given then the lines returned
 from the server are printed to the filehandle C<FH>.
 
+=item getfh ( MSGNUM )
+
+As per get(), but returns a tied filehandle.  Reading from this
+filehandle returns the requested message.  The filehandle will return
+EOF at the end of the message and should not be reused.
+
 =item last ()
 
 Returns the highest C<MSGNUM> of all the messages accessed.
@@ -520,6 +537,6 @@ it under the same terms as Perl itself.
 
 =for html <hr>
 
-I<$Id: //depot/libnet/Net/POP3.pm#20 $>
+I<$Id: //depot/libnet/Net/POP3.pm#21 $>
 
 =cut
