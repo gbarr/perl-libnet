@@ -19,9 +19,10 @@ use IO::Socket;
 use Time::Local;
 use Net::Cmd;
 use Net::Config;
+use Fcntl qw(O_WRONLY O_RDONLY O_APPEND O_CREAT O_TRUNC);
 # use AutoLoader qw(AUTOLOAD);
 
-$VERSION = "2.58"; # $Id: //depot/libnet/Net/FTP.pm#57 $
+$VERSION = "2.58"; # $Id: //depot/libnet/Net/FTP.pm#58 $
 @ISA     = qw(Exporter Net::Cmd IO::Socket::INET);
 
 # Someday I will "use constant", when I am not bothered to much about
@@ -448,7 +449,7 @@ sub get
   {
    $loc = \*FD;
 
-   unless(($where) ? open($loc,">>$local") : open($loc,">$local"))
+   unless(sysopen($loc, $local, O_CREAT | O_WRONLY | ($where ? O_APPEND : O_TRUNC)))
     {
      carp "Cannot open Local file $local: $!\n";
      $data->abort;
@@ -706,7 +707,7 @@ sub _store_cmd
   {
    $loc = \*FD;
 
-   unless(open($loc,"<$local"))
+   unless(sysopen($loc, $local, O_RDONLY))
     {
      carp "Cannot open Local file $local: $!\n";
      return undef;
@@ -1717,6 +1718,6 @@ under the same terms as Perl itself.
 
 =for html <hr>
 
-I<$Id: //depot/libnet/Net/FTP.pm#57 $>
+I<$Id: //depot/libnet/Net/FTP.pm#58 $>
 
 =cut
