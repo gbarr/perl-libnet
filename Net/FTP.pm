@@ -22,7 +22,7 @@ use Net::Config;
 use Fcntl qw(O_WRONLY O_RDONLY O_APPEND O_CREAT O_TRUNC);
 # use AutoLoader qw(AUTOLOAD);
 
-$VERSION = "2.68"; # $Id: //depot/libnet/Net/FTP.pm#73 $
+$VERSION = "2.68"; # $Id: //depot/libnet/Net/FTP.pm#74 $
 @ISA     = qw(Exporter Net::Cmd IO::Socket::INET);
 
 # Someday I will "use constant", when I am not bothered to much about
@@ -466,6 +466,7 @@ sub get
    if($ref = ${*$ftp}{'net_ftp_hash'});
 
  my $blksize = ${*$ftp}{'net_ftp_blksize'};
+ local $\; # Just in case
 
  while(1)
   {
@@ -482,8 +483,7 @@ sub get
     print $hashh "#" x (int($count / $hashb));
     $count %= $hashb;
    }
-   my $written = syswrite($loc,$buf,$len);
-   unless(defined($written) && $written == $len)
+   unless(print $loc $buf)
     {
      carp "Cannot write to Local file $local: $!\n";
      $data->abort;
@@ -730,7 +730,7 @@ sub _store_cmd
 
  while(1)
   {
-   last unless $len = sysread($loc,$buf="",$blksize);
+   last unless $len = read($loc,$buf="",$blksize);
 
    if (trEBCDIC && $ftp->type ne 'I')
     {
@@ -1729,6 +1729,6 @@ under the same terms as Perl itself.
 
 =for html <hr>
 
-I<$Id: //depot/libnet/Net/FTP.pm#73 $>
+I<$Id: //depot/libnet/Net/FTP.pm#74 $>
 
 =cut
