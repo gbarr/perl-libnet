@@ -276,6 +276,9 @@ sub response
   {
    my $str = $cmd->getline();
 
+   return CMD_ERROR
+	unless defined($str);
+
    $cmd->debug_print(0,$str)
      if ($cmd->debug);
 
