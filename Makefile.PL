@@ -1,11 +1,10 @@
 # This -*- perl -*- script makes the Makefile
-# $Id: Makefile.PL,v 1.5 1997/02/05 22:23:03 gbarr Exp $
 
 #--- Distribution section ---
 
 $NAME     = 'Net';
 $DISTNAME = "libnet";
-$VERSION  = "1.17";
+$VERSION  = "1.18";
 
 BEGIN { require 5.002 }
 

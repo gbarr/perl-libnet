@@ -1,0 +1,26 @@
+libnet 1.18  -- Wed Feb 18 15:22:35 GMT 2004
+
+Bug Fixes
+  * Fixed bug in CRLF translation in Net::Cmd datasend/dataend methods
+  * Fixed bug in converting numbers returned by PASV command into a
+    packed IP address
+  * Fixed bug that caused Net::FTP->get to truncate the local file after
+    the restart method had been called
+
+Enhancements
+  * Added support for POP3 CAPA command
+  * Added Net::POP3->banner method to return the banner received from
+    the server during connect
+  * Added Net::POP3->auth method for performaing authentication using
+    SASL, requires Authen::SASL
+  * Added Host option to ->new constructor of FTP, NNTP, SMTP and POP3
+    which can be used instead of passing the host as the first argument
+  * Added ->host imethod to FTP, NNTP, SMTP and POP3 to return the host
+    string used for the connect. This is useful to determine which host
+    was connected to when multiple hosts are specified
+  * Added support for more non-standard responses to Net::FTP->size
+  * Updated POD for Net::SMTP wrt. not passing a Hello parameter to the
+    constructor. (Jeff Macdonald)
+
+ChangeLogs for releases prior to 1.18 may be found at
+http://svn.mutatus.co.uk/browse/libnet/tags/libnet-1.17/ChangeLog

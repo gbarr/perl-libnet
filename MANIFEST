@@ -1,4 +1,4 @@
-ChangeLog
+Changes
 Config.eg
 Configure
 Hostname.pm.eg			Example replacement for Hostname.pm
@@ -37,3 +37,4 @@ t/netrc.t
 t/nntp.t
 t/require.t
 t/smtp.t
+t/datasend.t
