@@ -21,7 +21,7 @@ use Net::Cmd;
 use Net::Config;
 # use AutoLoader qw(AUTOLOAD);
 
-$VERSION = "2.49"; # $Id: //depot/libnet/Net/FTP.pm#34 $
+$VERSION = "2.50"; # $Id: //depot/libnet/Net/FTP.pm#35 $
 @ISA     = qw(Exporter Net::Cmd IO::Socket::INET);
 
 # Someday I will "use constant", when I am not bothered to much about
@@ -504,10 +504,10 @@ sub mkdir
      my($status,$message) = ($ftp->status,$ftp->message);
      my $pwd = $ftp->pwd;
      
-     if($pwd && $ftp->cd($dir))
+     if($pwd && $ftp->cwd($dir))
       {
        $path = $dir;
-       $ftp->cd($pwd);
+       $ftp->cwd($pwd);
       }
      else
       {
