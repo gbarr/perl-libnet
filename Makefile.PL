@@ -111,3 +111,31 @@ dist : ppd
 ESQ
 }
 
+sub MY::postamble {
+
+  my $ppd = $] >= 5.00503 ? 'ppd' : '';
+  my $mkhtml = "../bin/mkhtml";
+  my $html = '';
+
+  if ( -x $mkhtml ) {
+    $mkhtml = <<EDQ;
+mkhtml :
+	$mkhtml .
+	../bin/mkindex >htdocs/index.html
+
+EDQ
+    $html = 'mkhtml';
+  }
+  else { $mkhtml = '' }
+
+  return '' unless length($ppd.$html);
+
+<<"EDQ";
+
+distdir : $ppd $html
+
+$mkhtml
+
+EDQ
+}
+
