@@ -16,7 +16,7 @@ use IO::Socket;
 use Net::Cmd;
 use Net::Config;
 
-$VERSION = "2.26"; # $Id: //depot/libnet/Net/SMTP.pm#31 $
+$VERSION = "2.27"; # $Id: //depot/libnet/Net/SMTP.pm#32 $
 
 @ISA = qw(Net::Cmd IO::Socket::INET);
 
@@ -24,8 +24,14 @@ sub new
 {
  my $self = shift;
  my $type = ref($self) || $self;
- my $host = shift if @_ % 2;
- my %arg  = @_; 
+ my ($host,%arg);
+ if (@_ % 2) {
+   $host = shift ;
+   %arg  = @_;
+ } else {
+   %arg = @_;
+   $host=delete $arg{Host};
+ }
  my $hosts = defined $host ? $host : $NetConfig{smtp_hosts};
  my $obj;
 
@@ -69,6 +75,11 @@ sub new
   }
 
  $obj;
+}
+
+sub host {
+ my $me = shift;
+ ${*$me}{'net_smtp_host'};
 }
 
 ##
@@ -570,11 +581,9 @@ known as mailhost:
 This is the constructor for a new Net::SMTP object. C<HOST> is the
 name of the remote host to which an SMTP connection is required.
 
-If C<HOST> is an array reference then each value will be attempted
-in turn until a connection is made.
-
-If C<HOST> is not given, then the C<SMTP_Host> specified in C<Net::Config>
-will be used.
+C<HOST> is optional. If C<HOST> is not given then it may instead be
+passed as the C<Host> option described below. If neither is given then
+the C<SMTP_Hosts> specified in C<Net::Config> will be used.
 
 C<OPTIONS> are passed in a hash like fashion, using key and value pairs.
 Possible options are:
@@ -582,6 +591,11 @@ Possible options are:
 B<Hello> - SMTP requires that you identify yourself. This option
 specifies a string to pass as your mail domain. If not
 given a guess will be taken.
+
+B<Host> - SMTP host to connect to. It may be a single scalar, as defined for
+the C<PeerAddr> option in L<IO::Socket::INET>, or a reference to
+an array with hosts to try in turn. The L</host> method will return the value
+which was used to connect to the host.
 
 B<LocalAddr> and B<LocalPort> - These parameters are passed directly
 to IO::Socket to allow binding the socket to a local port.
@@ -603,6 +617,20 @@ Example:
 			   Hello => 'my.mail.domain'
 			   Timeout => 30,
                            Debug   => 1,
+			  );
+
+    # the same
+    $smtp = Net::SMTP->new(
+			   Host => 'mailhost',
+			   Hello => 'my.mail.domain'
+			   Timeout => 30,
+                           Debug   => 1,
+			  );
+
+    # Connect to the default server from Net::config
+    $smtp = Net::SMTP->new(
+			   Hello => 'my.mail.domain'
+			   Timeout => 30,
 			  );
 
 =back
@@ -632,6 +660,11 @@ Tell the remote server the mail domain which you are in using the EHLO
 command (or HELO if EHLO fails).  Since this method is invoked
 automatically when the Net::SMTP object is constructed the user should
 normally not have to call it manually.
+
+=item host ()
+
+Returns the value used by the constructor, and passed to IO::Socket::INET,
+to connect to the host.
 
 =item etrn ( DOMAIN )
 
@@ -765,6 +798,6 @@ it under the same terms as Perl itself.
 
 =for html <hr>
 
-I<$Id: //depot/libnet/Net/SMTP.pm#31 $>
+I<$Id: //depot/libnet/Net/SMTP.pm#32 $>
 
 =cut
