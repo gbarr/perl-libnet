@@ -21,7 +21,7 @@ use Net::Cmd;
 use Net::Config;
 # use AutoLoader qw(AUTOLOAD);
 
-$VERSION = "2.55"; # $Id: //depot/libnet/Net/FTP.pm#44 $
+$VERSION = "2.55"; # $Id: //depot/libnet/Net/FTP.pm#45 $
 @ISA     = qw(Exporter Net::Cmd IO::Socket::INET);
 
 # Someday I will "use constant", when I am not bothered to much about
@@ -497,7 +497,7 @@ sub get
 
 sub cwd
 {
- @_ == 2 || @_ == 3 or croak 'usage: $ftp->cwd( [ DIR ] )';
+ @_ == 1 || @_ == 2 or croak 'usage: $ftp->cwd( [ DIR ] )';
 
  my($ftp,$dir) = @_;
 
