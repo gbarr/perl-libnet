@@ -589,8 +589,8 @@ C<OPTIONS> are passed in a hash like fashion, using key and value pairs.
 Possible options are:
 
 B<Hello> - SMTP requires that you identify yourself. This option
-specifies a string to pass as your mail domain. If not
-given a guess will be taken.
+specifies a string to pass as your mail domain. If not given localhost.localdomain
+will be used.
 
 B<Host> - SMTP host to connect to. It may be a single scalar, as defined for
 the C<PeerAddr> option in L<IO::Socket::INET>, or a reference to
