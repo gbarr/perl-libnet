@@ -207,11 +207,11 @@ sub new {
     $opts->{'Mode'} = "netascii"
 	unless $opts->{'Mode'} eq "octet";
     $opts->{'ascii'} = lc($opts->{'Mode'}) eq "netascii";
-    
+
     my $host = $opts->{'Host'};
     my $port = $host =~ s/:(\d+)$// ? $1 : $opts->{'Port'};
     my $addr = inet_aton($host);
-    
+
     unless($addr) {
 	$tftp->{'error'} = "Bad hostname '$host'";
 	return undef;
@@ -276,7 +276,7 @@ sub WRITE {
 
     $buf =~ s/([\n\r])/$1 eq "\n" ? "\015\012" : "\015\0"/soge
 	if ($self->{'ascii'});
-    
+
     $self->{'obuf'} .= substr($buf,$offset);
 
     while(length($self->{'obuf'}) >= $self->{'blksize'}) {
@@ -706,7 +706,7 @@ sub _dumppkt {
 	while(($k,$v) = each %a) {
 	    printf STDERR "%s      %s=%s\n",$send,$k,$v;
 	}
-	
+
     }
     printf STDERR "%s      %s\n",$send,substr($_[2],4)
 	if $code == Net::TFTP::ERROR;
@@ -723,28 +723,26 @@ Net::TFTP - TFTP Client class
 =head1 SYNOPSIS
 
     use Net::TFTP;
-    
+
     $tftp = Net::TFTP->new("some.host.name", BlockSize => 1024);
-    
+
     $tftp->ascii;
-    
+
     $tftp->get("remotefile", "localfile");
-    
+
     $tftp->get("remotefile", \*STDOUT);
-    
+
     $fh = $tftp->get("remotefile");
-    
+
     $tftp->binary;
-    
+
     $tftp->put("localfile", "remotefile");
-    
+
     $tftp->put(\*STDOUT, "remotefile");
-    
+
     $fh = $tftp->put("remotefile");
-    
+
     $err = $tftp->error
-    
-    $tftp->quit;
 
 =head1 DESCRIPTION
 
