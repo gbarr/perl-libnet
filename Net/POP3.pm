@@ -13,7 +13,7 @@ use Net::Cmd;
 use Carp;
 use Net::Config;
 
-$VERSION = "2.25";
+$VERSION = "2.26";
 
 @ISA = qw(Net::Cmd IO::Socket::INET);
 
@@ -21,8 +21,14 @@ sub new
 {
  my $self = shift;
  my $type = ref($self) || $self;
- my $host = shift if @_ % 2;
- my %arg  = @_; 
+ my ($host,%arg);
+ if (@_ % 2) {
+   $host = shift ;
+   %arg  = @_;
+ } else {
+   %arg = @_;
+   $host=delete $arg{Host};
+ }
  my $hosts = defined $host ? [ $host ] : $NetConfig{pop3_hosts};
  my $obj;
  my @localport = exists $arg{ResvPort} ? ( LocalPort => $arg{ResvPort} ): ();
@@ -57,6 +63,11 @@ sub new
  ${*$obj}{'net_pop3_banner'} = $obj->message;
 
  $obj;
+}
+
+sub host {
+ my $me = shift;
+ ${*$me}{'net_pop3_host'};
 }
 
 ##
@@ -483,16 +494,22 @@ on the object.
 
 =over 4
 
-=item new ( [ HOST, ] [ OPTIONS ] )
+=item new ( [ HOST ] [, OPTIONS ] 0
 
 This is the constructor for a new Net::POP3 object. C<HOST> is the
-name of the remote host to which a POP3 connection is required.
+name of the remote host to which an POP3 connection is required.
 
-If C<HOST> is not given, then the C<POP3_Host> specified in C<Net::Config>
-will be used.
+C<HOST> is optional. If C<HOST> is not given then it may instead be
+passed as the C<Host> option described below. If neither is given then
+the C<POP3_Hosts> specified in C<Net::Config> will be used.
 
 C<OPTIONS> are passed in a hash like fashion, using key and value pairs.
 Possible options are:
+
+B<Host> - POP3 host to connect to. It may be a single scalar, as defined for
+the C<PeerAddr> option in L<IO::Socket::INET>, or a reference to
+an array with hosts to try in turn. The L</host> method will return the value
+which was used to connect to the host.
 
 B<ResvPort> - If given then the socket for the C<Net::POP3> object
 will be bound to the local port given using C<bind> when the socket is

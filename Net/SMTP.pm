@@ -576,7 +576,7 @@ known as mailhost:
 
 =over 4
 
-=item new Net::SMTP [ HOST, ] [ OPTIONS ]
+=item new ( [ HOST ] [, OPTIONS ] )
 
 This is the constructor for a new Net::SMTP object. C<HOST> is the
 name of the remote host to which an SMTP connection is required.

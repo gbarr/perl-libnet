@@ -50,8 +50,14 @@ BEGIN {
 sub new
 {
  my $pkg  = shift;
- my $peer = shift;
- my %arg  = @_; 
+ my ($peer,%arg);
+ if (@_ % 2) {
+   $peer = shift ;
+   %arg  = @_;
+ } else {
+   %arg = @_;
+   $peer=delete $arg{Host};
+ }
 
  my $host = $peer;
  my $fire = undef;
@@ -123,6 +129,13 @@ sub new
 ##
 ## User interface methods
 ##
+
+
+sub host {
+ my $me = shift;
+ ${*$me}{'net_ftp_host'};
+}
+
 
 sub hash {
     my $ftp = shift;		# self
@@ -1279,13 +1292,22 @@ this if you really know what you're doing).
 
 =over 4
 
-=item new (HOST [,OPTIONS])
+=item new ([ HOST ] [, OPTIONS ])
 
 This is the constructor for a new Net::FTP object. C<HOST> is the
 name of the remote host to which an FTP connection is required.
 
+C<HOST> is optional. If C<HOST> is not given then it may instead be
+passed as the C<Host> option described below. 
+
 C<OPTIONS> are passed in a hash like fashion, using key and value pairs.
 Possible options are:
+
+B<Host> - FTP host to connect to. It may be a single scalar, as defined for
+the C<PeerAddr> option in L<IO::Socket::INET>, or a reference to
+an array with hosts to try in turn. The L</host> method will return the value
+which was used to connect to the host.
+
 
 B<Firewall> - The name of a machine which acts as an FTP firewall. This can be
 overridden by an environment variable C<FTP_FIREWALL>. If specified, and the
