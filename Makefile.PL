@@ -100,3 +100,16 @@ WriteMakefile(
   @ppd,
 );
 
+sub MY::postamble {
+                                                                                                    
+<<EOS;
+                                                                                                    
+distdir : run_cpansign
+                                                                                                    
+run_cpansign :
+	cpansign -s
+                                                                                                    
+EOS
+                                                                                                    
+}
+
