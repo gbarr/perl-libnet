@@ -5,6 +5,9 @@ BEGIN {
 	chdir 't' if -d 't';
 	@INC = '../lib';
     }
+    if (!eval "require Socket") {
+	print "1..0 # no Socket\n"; exit 0;
+    }
     undef *{Socket::inet_aton};
     undef *{Socket::inet_ntoa};
     if (ord('A') == 193 && !eval "require Convert::EBCDIC") {
