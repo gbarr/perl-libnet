@@ -1,4 +1,4 @@
-# Net::FTP.pm
+# Net::FTP.pm $Id: //depot/libnet/Net/FTP.pm#48 $
 #
 # Copyright (c) 1995-8 Graham Barr <gbarr@pobox.com>. All rights reserved.
 # This program is free software; you can redistribute it and/or
@@ -21,7 +21,7 @@ use Net::Cmd;
 use Net::Config;
 # use AutoLoader qw(AUTOLOAD);
 
-$VERSION = "2.56"; # $Id: //depot/libnet/Net/FTP.pm#47 $
+$VERSION = "2.56";
 @ISA     = qw(Exporter Net::Cmd IO::Socket::INET);
 
 # Someday I will "use constant", when I am not bothered to much about
@@ -1624,6 +1624,19 @@ L<Net::Cmd>
 ftp(1), ftpd(8), RFC 959
 http://www.cis.ohio-state.edu/htbin/rfc/rfc959.html
 
+=head1 USE EXAMPLES
+
+For an example of the use of Net::FTP see
+
+=over 4
+
+=item http://www.csh.rit.edu/~adam/Progs/autoftp-2.0.tar.gz
+
+C<autoftp> is a program that can retrieve, send, or list files via
+the FTP protocol in a non-interactive manner.
+
+=back
+
 =head1 CREDITS
 
 Henry Gabryjelski <henryg@WPI.EDU> - for the suggestion of creating directories
@@ -1638,5 +1651,7 @@ Roderick Schertler <roderick@gate.net> - for various inputs
 Copyright (c) 1995-1998 Graham Barr. All rights reserved.
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.
+
+$Id: //depot/libnet/Net/FTP.pm#48 $
 
 =cut
