@@ -31,6 +31,7 @@ demos/pop3
 demos/smtp.self
 demos/snpp
 demos/time
+libnet.ppd
 t/ftp.t
 t/hostname.t
 t/nntp.t
