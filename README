@@ -24,10 +24,6 @@ Protocol
 
 FUTURE WORK
 
-Work in progress includes
-
- Net::SNMP	RFC 1157	Simple Network Management Protocol
-
 AVAILABILITY
 
 The latest version of libnet is available from the Comprehensive Perl
