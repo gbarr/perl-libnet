@@ -40,7 +40,10 @@ sub check {
     $cmd->datasend($line);
   }
   $cmd->dataend;
-  is($cmd->output, $expect);
+  is(
+    unpack("H*",$cmd->output),
+    unpack("H*",$expect)
+  );
 }
 
 my $cmd;
