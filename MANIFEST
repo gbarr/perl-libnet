@@ -21,7 +21,6 @@ Net/POP3.pm			Post Office Protocol
 Net/SMTP.pm			Simple Mail Transfer Protocol Client
 Net/SNPP.pm			Simple Network Pager Protocol Client
 Net/SNPP/HylaFAX.pm
-Net/TFTP.pm
 Net/Time.pm			time & nettime protocols
 Net/libnetFAQ.pod
 README
