@@ -78,10 +78,15 @@ sub write
  my $tmp;
  ($tmp = $buf) =~ s/(?!\015)\012/\015\012/sg;
 
+ # If the remote server has closed the connection we will be signal'd
+ # when we write. This can happen if the disk on the remote server fills up
+
+ local $SIG{PIPE} = 'IGNORE';
+
  my $len = $size + length($tmp) - length($buf);
  my $wrote = syswrite($data, $tmp, $len);
 
- if($wrote >= 0)
+ if($wrote > 0)
   {
    $wrote = $wrote == $len ? $size
 			   : $len - $wrote

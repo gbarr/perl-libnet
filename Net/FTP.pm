@@ -607,6 +607,8 @@ sub _dataconn
  my $data = undef;
  my $pkg = "Net::FTP::" . $ftp->type;
 
+ eval "require " . $pkg;
+
  $pkg =~ s/ /_/g;
 
  delete ${*$ftp}{'net_ftp_dataconn'};

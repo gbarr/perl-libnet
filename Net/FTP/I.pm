@@ -36,6 +36,11 @@ sub write
  $data->can_write($timeout) or
 	croak "Timeout";
 
+ # If the remote server has closed the connection we will be signal'd
+ # when we write. This can happen if the disk on the remote server fills up
+
+ local $SIG{PIPE} = 'IGNORE';
+
  syswrite($data, $buf, $size);
 }
 
