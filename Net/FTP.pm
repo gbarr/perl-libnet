@@ -22,7 +22,7 @@ use Net::Config;
 use Fcntl qw(O_WRONLY O_RDONLY O_APPEND O_CREAT O_TRUNC);
 # use AutoLoader qw(AUTOLOAD);
 
-$VERSION = "2.73"; # $Id: //depot/libnet/Net/FTP.pm#81 $
+$VERSION = "2.74"; # $Id: //depot/libnet/Net/FTP.pm#82 $
 @ISA     = qw(Exporter Net::Cmd IO::Socket::INET);
 
 # Someday I will "use constant", when I am not bothered to much about
@@ -206,7 +206,7 @@ sub size {
   my $io;
   if($ftp->supported("SIZE")) {
     return $ftp->_SIZE($file)
-	? ($ftp->message =~ /(\d+)\s*$/)[0]
+	? ($ftp->message =~ /(\d+)\s*(bytes?\s*)?$/)[0]
 	: undef;
  }
  elsif($ftp->supported("STAT")) {
