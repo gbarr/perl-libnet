@@ -16,7 +16,7 @@ use IO::Socket;
 use Net::Cmd;
 use Net::Config;
 
-$VERSION = "2.13"; # $Id: //depot/libnet/Net/SMTP.pm#9 $
+$VERSION = "2.14"; # $Id: //depot/libnet/Net/SMTP.pm#10 $
 
 @ISA = qw(Net::Cmd IO::Socket::INET);
 
@@ -340,8 +340,7 @@ sub quit
 
 sub DESTROY
 {
- my $me = shift;
- defined(fileno($me)) && $me->quit
+# ignore
 }
 
 ##
