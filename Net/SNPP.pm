@@ -16,7 +16,7 @@ use IO::Socket;
 use Net::Cmd;
 use Net::Config;
 
-$VERSION = "1.10"; # $Id: //depot/libnet/Net/SNPP.pm#4 $
+$VERSION = "1.11"; # $Id: //depot/libnet/Net/SNPP.pm#5 $
 @ISA     = qw(Net::Cmd IO::Socket::INET);
 @EXPORT  = (qw(CMD_2WAYERROR CMD_2WAYOK CMD_2WAYQUEUED), @Net::Cmd::EXPORT);
 
@@ -146,6 +146,24 @@ sub help
 		     : undef;
 }
 
+sub xwho
+{
+ @_ == 1 or croak 'usage: $snpp->xwho()';
+ my $me = shift;
+
+ $me->_XWHO or return undef;
+
+ my(%hash,$line);
+ my @msg = $me->message;
+ pop @msg; # Remove command complete line
+
+ foreach $line (@msg) {
+   $line =~ /^\s*(\S+)\s*(.*)/ and $hash{$1} = $2;
+ }
+
+ \%hash;
+}
+
 sub service_level
 {
  @_ == 2 or croak 'usage: $snpp->service_level( LEVEL )';
@@ -273,6 +291,9 @@ sub _HOLD { shift->command("HOLD", @_)->response()  == CMD_OK }
 sub _CALL { shift->command("CALL", @_)->response()  == CMD_OK }   
 sub _SUBJ { shift->command("SUBJ", @_)->response()  == CMD_OK }   
 
+# NonStandard
+
+sub _XWHO { shift->command("XWHO")->response()  == CMD_OK }   
 
 1;
 __END__
