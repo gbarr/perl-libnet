@@ -21,7 +21,7 @@ use Net::Cmd;
 use Net::Config;
 use AutoLoader qw(AUTOLOAD);
 
-$VERSION = "2.30"; # $Id: //depot/libnet/Net/FTP.pm#15 $
+$VERSION = "2.31"; # $Id: //depot/libnet/Net/FTP.pm#16 $
 @ISA     = qw(Exporter Net::Cmd IO::Socket::INET);
 
 # Someday I will "use constant", when I am not bothered to much about
@@ -819,7 +819,8 @@ sub pasv_xfer
     return undef;
 
  unless($dftp->port($port) && $sftp->retr($sfile) &&
-        ($unique ? $dftp->stou($dfile) : $dftp->stor($dfile)))
+        ($unique ? $dftp->stou($dfile) : $dftp->stor($dfile)) &&
+	$sftp->response() == CMD_INFO)
   {
    $sftp->abort;
    $dftp->abort;
