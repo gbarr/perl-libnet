@@ -16,7 +16,7 @@ use Net::Config;
 @ISA = qw(Exporter);
 @EXPORT_OK = qw(hostname hostdomain hostfqdn domainname);
 
-$VERSION = "2.11"; # $Id: //depot/libnet/Net/Domain.pm#9 $
+$VERSION = "2.12"; # $Id: //depot/libnet/Net/Domain.pm#10 $
 
 my($host,$domain,$fqdn) = (undef,undef,undef);
 
@@ -216,6 +216,9 @@ sub domainname {
 
     return $fqdn = $host . "." . $domain
 	if($host !~ /\./ && $domain =~ /\./);
+
+    # For hosts that have no name, just an IP address
+    return $fqdn = $host if $host =~ /^\d+(\.\d+){3}$/;
 
     my @host   = split(/\./, $host);
     my @domain = split(/\./, $domain);
