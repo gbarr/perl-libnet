@@ -1,6 +1,6 @@
 # Net::FTP.pm
 #
-# Copyright (c) 1995-8 Graham Barr <gbarr@pobox.com>. All rights reserved.
+# Copyright (c) 1995-2003 Graham Barr <gbarr@pobox.com>. All rights reserved.
 # This program is free software; you can redistribute it and/or
 # modify it under the same terms as Perl itself.
 #
@@ -22,7 +22,7 @@ use Net::Config;
 use Fcntl qw(O_WRONLY O_RDONLY O_APPEND O_CREAT O_TRUNC);
 # use AutoLoader qw(AUTOLOAD);
 
-$VERSION = "2.72"; # $Id: //depot/libnet/Net/FTP.pm#80 $
+$VERSION = "2.73"; # $Id: //depot/libnet/Net/FTP.pm#81 $
 @ISA     = qw(Exporter Net::Cmd IO::Socket::INET);
 
 # Someday I will "use constant", when I am not bothered to much about
@@ -443,8 +443,7 @@ sub get
  croak("Bad remote filename '$remote'\n")
 	if $remote =~ /[\r\n]/s;
 
- ${*$ftp}{'net_ftp_rest'} = $where
-	if ($where);
+ ${*$ftp}{'net_ftp_rest'} = $where if defined $where;
 
  delete ${*$ftp}{'net_ftp_port'};
  delete ${*$ftp}{'net_ftp_pasv'};
@@ -460,7 +459,7 @@ sub get
   {
    $loc = \*FD;
 
-   unless(sysopen($loc, $local, O_CREAT | O_WRONLY | ($where ? O_APPEND : O_TRUNC)))
+   unless(sysopen($loc, $local, O_CREAT | O_WRONLY | (${*$ftp}{'net_ftp_rest'} ? O_APPEND : O_TRUNC)))
     {
      carp "Cannot open Local file $local: $!\n";
      $data->abort;
@@ -1761,12 +1760,8 @@ Roderick Schertler <roderick@gate.net> - for various inputs
 
 =head1 COPYRIGHT
 
-Copyright (c) 1995-1998 Graham Barr. All rights reserved.
+Copyright (c) 1995-2003 Graham Barr. All rights reserved.
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.
-
-=for html <hr>
-
-I<$Id: //depot/libnet/Net/FTP.pm#80 $>
 
 =cut
