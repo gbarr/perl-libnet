@@ -16,7 +16,7 @@ use IO::Socket;
 use Net::Cmd;
 use Net::Config;
 
-$VERSION = "2.26"; # $Id: //depot/libnet/Net/SMTP.pm#27 $
+$VERSION = "2.26"; # $Id: //depot/libnet/Net/SMTP.pm#28 $
 
 @ISA = qw(Net::Cmd IO::Socket::INET);
 
@@ -230,7 +230,7 @@ sub mail
       {
        if(exists $esmtp->{DSN})
         {
-	 $opts .= " RET=" . uc $v
+	 $opts .= " RET=" . ((uc($v) eq "FULL") ? "FULL" : "HDRS");
         }
        else
         {
@@ -589,11 +589,13 @@ The C<mail> method can some additional ESMTP OPTIONS which is passed
 in hash like fashion, using key and value pairs.  Possible options are:
 
  Size        => <bytes>
- Return      => <???>
+ Return      => "FULL" | "HDRS"
  Bits        => "7" | "8"
  Transaction => <ADDRESS>
  Envelope    => <ENVID>
 
+The C<Return> and C<Envelope> parameters are used for DSN (Delivery
+Status Notification).
 
 =item reset ()
 
@@ -694,6 +696,6 @@ it under the same terms as Perl itself.
 
 =for html <hr>
 
-I<$Id: //depot/libnet/Net/SMTP.pm#27 $>
+I<$Id: //depot/libnet/Net/SMTP.pm#28 $>
 
 =cut
