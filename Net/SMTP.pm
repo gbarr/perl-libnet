@@ -1,6 +1,6 @@
 # Net::SMTP.pm
 #
-# Copyright (c) 1995-1997 Graham Barr <gbarr@pobox.com>. All rights reserved.
+# Copyright (c) 1995-2004 Graham Barr <gbarr@pobox.com>. All rights reserved.
 # This program is free software; you can redistribute it and/or
 # modify it under the same terms as Perl itself.
 
@@ -16,7 +16,7 @@ use IO::Socket;
 use Net::Cmd;
 use Net::Config;
 
-$VERSION = "2.27"; # $Id: //depot/libnet/Net/SMTP.pm#32 $
+$VERSION = "2.28";
 
 @ISA = qw(Net::Cmd IO::Socket::INET);
 
@@ -307,6 +307,18 @@ sub mail
        else
         {
 	 carp 'Net::SMTP::mail: DSN option not supported by host';
+        }
+      }
+
+     if(defined($v = delete $opt{XVERP}))
+      {
+       if(exists $esmtp->{'XVERP'})
+        {
+	 $opts .= " XVERP"
+        }
+       else
+        {
+	 carp 'Net::SMTP::mail: XVERP option not supported by host';
         }
       }
 
@@ -695,6 +707,7 @@ in hash like fashion, using key and value pairs.  Possible options are:
  Bits        => "7" | "8" | "binary"
  Transaction => <ADDRESS>
  Envelope    => <ENVID>
+ XVERP       => 1
 
 The C<Return> and C<Envelope> parameters are used for DSN (Delivery
 Status Notification).
@@ -831,12 +844,8 @@ Graham Barr <gbarr@pobox.com>
 
 =head1 COPYRIGHT
 
-Copyright (c) 1995-1997 Graham Barr. All rights reserved.
+Copyright (c) 1995-2004 Graham Barr. All rights reserved.
 This program is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
-
-=for html <hr>
-
-I<$Id: //depot/libnet/Net/SMTP.pm#32 $>
 
 =cut
