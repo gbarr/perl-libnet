@@ -21,7 +21,7 @@ use Net::Cmd;
 use Net::Config;
 use AutoLoader qw(AUTOLOAD);
 
-$VERSION = "2.29"; # $Id: //depot/libnet/Net/FTP.pm#14 $
+$VERSION = "2.30"; # $Id: //depot/libnet/Net/FTP.pm#15 $
 @ISA     = qw(Exporter Net::Cmd IO::Socket::INET);
 
 # Someday I will "use constant", when I am not bothered to much about
@@ -94,6 +94,7 @@ sub new
  unless ($ftp->response() == CMD_OK)
   {
    $ftp->close();
+   $@ = $ftp->message;
    undef $ftp;
   }
 
@@ -982,6 +983,9 @@ B<Passive> - If set to I<true> then all data transfers will be done using
 passive mode. This is required for some I<dumb> servers, and some
 firewall configurations.  This can also be set by the environment
 variable C<FTP_PASSIVE>.
+
+If the constructor fails undef will be returned and an error message will
+be in $@
 
 =back
 
