@@ -1,7 +1,7 @@
 ChangeLog
 Configure
 Config.eg
-FAQ
+Net/libnetFAQ.pod
 Hostname.pm.eg			Example replacement for Hostname.pm
 MANIFEST
 Makefile.PL
