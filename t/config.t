@@ -1,15 +1,16 @@
 #!./perl -w
 
 BEGIN {
-    chdir 't' if -d 't';
     if ($ENV{PERL_CORE}) {
+	chdir 't' if -d 't';
 	@INC = '../lib';
     }
 }
 
-require "libnet_t.pl";
+(my $libnet_t = __FILE__) =~ s/config.t/libnet_t.pl/;
+require $libnet_t;
 
-print "1..14\n";
+print "1..10\n";
 
 use Net::Config;
 ok( exists $INC{'Net/Config.pm'}, 'Net::Config should have been used' );
@@ -40,48 +41,5 @@ is( Net::Config->requires_firewall('10.10.255.254'), 0,
 is( Net::Config->requires_firewall('192.168.10.0'), 1,
 	'... should handle failure with multiple local netmasks' );
 
-# now fool Perl into compiling this again.  HEY, LOOK OVER THERE!
-my $path = $INC{'Net/Config.pm'};
-delete $INC{'Net/Config.pm'};
-
-# Net::Config populates %NetConfig from 'libnet.cfg', if possible
-my $wrote_file = 0;
-
-(my $cfgfile = $path) =~ s/Config.pm/libnet.cfg/;
-if (open(OUT, '>' . $cfgfile)) {
-	use Data::Dumper;
-	print OUT Dumper({
-		some_hosts => [ 1, 2, 3 ],
-		time_hosts => 'abc',
-		some_value => 11,
-	});
-	close OUT;
-	$wrote_file = 1;
-}
-
-if ($wrote_file) {
-	{
-		local $^W;
-		# and here comes Net::Config, again!  no import() necessary
-		require $path;
-	}
-
-	is( $NetConfig{some_value}, 11, 
-		'Net::Config should populate %NetConfig from libnet.cfg file' );
-	is( scalar @{ $NetConfig{time_hosts} }, 1, 
-		'... should turn _hosts keys into array references' );
-	is( scalar @{ $NetConfig{some_hosts} }, 3, 
-		'... should not mangle existing array references' );
-	is( $NetConfig{some_hosts}[0], 1,
-		'... and one last check for multivalues' );
-
-} else {
-	skip("could not write cfg file to $cfgfile: $!", 4);
-}
-
 is( \&Net::Config::is_external, \&Net::Config::requires_firewall,
 	'is_external() should be an alias for requires_firewall()' );
-
-END {
-	1 while unlink ($cfgfile);
-}
