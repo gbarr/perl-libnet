@@ -13,7 +13,7 @@ use Net::Cmd;
 use Carp;
 use Net::Config;
 
-$VERSION = "2.12"; # $Id: //depot/libnet/Net/POP3.pm#6 $
+$VERSION = "2.13"; # $Id: //depot/libnet/Net/POP3.pm#7 $
 
 @ISA = qw(Net::Cmd IO::Socket::INET);
 
@@ -142,9 +142,8 @@ sub pass
  return undef
    unless($me->_PASS($pass));
 
- $me->message =~ /(\d+)\s+message/io;
-
- ${*$me}{'net_pop3_count'} = $1 || 0;
+ ${*$me}{'net_pop3_count'} = ($me->message =~ /(\d+)\s+message/io)
+	? $1 : ($me->popstat)[0];
 }
 
 sub reset
