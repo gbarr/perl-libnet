@@ -22,7 +22,7 @@ use Net::Config;
 use Fcntl qw(O_WRONLY O_RDONLY O_APPEND O_CREAT O_TRUNC);
 # use AutoLoader qw(AUTOLOAD);
 
-$VERSION = "2.67"; # $Id: //depot/libnet/Net/FTP.pm#70 $
+$VERSION = "2.68"; # $Id: //depot/libnet/Net/FTP.pm#71 $
 @ISA     = qw(Exporter Net::Cmd IO::Socket::INET);
 
 # Someday I will "use constant", when I am not bothered to much about
@@ -70,6 +70,7 @@ sub new
      delete $arg{Port};
 	 $fire_type = $arg{FirewallType}
 	 || $ENV{FTP_FIREWALL_TYPE}
+	 || $NetConfig{firewall_type}
 	 || undef;
     }
   }
@@ -1720,6 +1721,6 @@ under the same terms as Perl itself.
 
 =for html <hr>
 
-I<$Id: //depot/libnet/Net/FTP.pm#70 $>
+I<$Id: //depot/libnet/Net/FTP.pm#71 $>
 
 =cut
