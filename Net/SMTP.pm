@@ -16,7 +16,7 @@ use IO::Socket;
 use Net::Cmd;
 use Net::Config;
 
-$VERSION = "2.15"; # $Id: //depot/libnet/Net/SMTP.pm#13 $
+$VERSION = "2.15"; # $Id: //depot/libnet/Net/SMTP.pm#14 $
 
 @ISA = qw(Net::Cmd IO::Socket::INET);
 
@@ -109,7 +109,7 @@ sub hello
    my $h = ${*$me}{'net_smtp_esmtp'} = {};
    my $ln;
    foreach $ln (@msg) {
-     $h->{$1} = $2
+     $h->{uc $1} = $2
 	if $ln =~ /(\S+)\b[ \t]*([^\n]*)/;
     }
   }
@@ -597,6 +597,6 @@ it under the same terms as Perl itself.
 
 =for html <hr>
 
-I<$Id: //depot/libnet/Net/SMTP.pm#13 $>
+I<$Id: //depot/libnet/Net/SMTP.pm#14 $>
 
 =cut
