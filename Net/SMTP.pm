@@ -16,7 +16,7 @@ use IO::Socket;
 use Net::Cmd;
 use Net::Config;
 
-$VERSION = "2.13"; # $Id: //depot/libnet/Net/SMTP.pm#8 $
+$VERSION = "2.13"; # $Id: //depot/libnet/Net/SMTP.pm#9 $
 
 @ISA = qw(Net::Cmd IO::Socket::INET);
 
@@ -127,7 +127,7 @@ sub hello
 sub supports {
     my $self = shift;
     my $cmd = uc shift;
-    return ${*$self}{'net_smtp_esmtp'}->{$cmd};
+    return ${*$self}{'net_smtp_esmtp'}->{$cmd}
 	if exists ${*$self}{'net_smtp_esmtp'}->{$cmd};
     $self->set_status(@_)
 	if @_;
