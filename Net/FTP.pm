@@ -21,7 +21,7 @@ use Net::Cmd;
 use Net::Config;
 # use AutoLoader qw(AUTOLOAD);
 
-$VERSION = "2.58"; # $Id: //depot/libnet/Net/FTP.pm#55 $
+$VERSION = "2.58"; # $Id: //depot/libnet/Net/FTP.pm#56 $
 @ISA     = qw(Exporter Net::Cmd IO::Socket::INET);
 
 # Someday I will "use constant", when I am not bothered to much about
@@ -211,7 +211,7 @@ sub size {
   my $io;
   if($ftp->supported("SIZE")) {
     return $ftp->_SIZE($file)
-	? ($ftp->message =~ /(\d+)/)[0]
+	? ($ftp->message =~ /(\d+)$/)[0]
 	: undef;
  }
  elsif($ftp->supported("STAT")) {
@@ -1716,6 +1716,6 @@ under the same terms as Perl itself.
 
 =for html <hr>
 
-I<$Id: //depot/libnet/Net/FTP.pm#55 $>
+I<$Id: //depot/libnet/Net/FTP.pm#56 $>
 
 =cut
