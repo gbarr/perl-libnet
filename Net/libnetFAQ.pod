@@ -219,7 +219,7 @@ some examples how you can implement these yourself.
 
 sub mput {
   my($ftp,$pattern) = @_;
-  foreach my $file (<$pattern>) {
+  foreach my $file (glob($pattern)) {
     $ftp->put($file) or warn $ftp->message;
   }
 }
@@ -319,5 +319,5 @@ All rights reserved.
 
 =head1 DOCUMENT VERSION
 
-$Id: //depot/libnet/Net/libnetFAQ.pod#2 $
+$Id: //depot/libnet/Net/libnetFAQ.pod#3 $
 
