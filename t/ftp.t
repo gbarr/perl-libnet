@@ -15,11 +15,19 @@ $ftp = Net::FTP->new($NetConfig{ftp_testhost}, Debug => 0)
 
 print "ok 1\n";
 
-$ftp->login('anonymous') or print "not ";
+$ftp->login('anonymous') or die($ftp->message . "\n");
 print "ok 2\n";
 
-$ftp->pwd or print "not ";
+$ftp->pwd  or do {
+  print STDERR $ftp->message,"\n";
+  print "not ";
+};
+
 print "ok 3\n";
 
-$ftp->quit or print "not ";
+$ftp->quit  or do {
+  print STDERR $ftp->message,"\n";
+  print "not ";
+};
+
 print "ok 4\n";
