@@ -16,14 +16,7 @@ sub read
  my    $data 	= shift;
  local *buf 	= \$_[0]; shift;
  my    $size 	= shift || croak 'read($buf,$size,[$offset])';
- my    $offset 	= shift || 0;
- my    $timeout = $data->timeout;
-
- croak "Bad offset"
-	if($offset < 0);
-
- $offset = length $buf
-	if($offset > length $buf);
+ my    $timeout = @_ ? shift : $data->timeout;
 
  ${*$data} ||= "";
  my $l = 0;
@@ -33,30 +26,30 @@ sub read
    $data->can_read($timeout) or
 	croak "Timeout";
 
-   my $n = sysread($data, ${*$data}, $size, length ${*$data});
+   $buf = ${*$data};
+   ${*$data} = "";
+   my $n = sysread($data, $buf, $size, length $buf);
 
    return $n
-	unless($n >= 0);
+     if($n < 0);
 
-   ${*$data} =~ s/(\015)?(?!\012)\Z//so;
-   my $lf = $1 || "";
+   ${*$data}{'net_ftp_bytesread'} += $n;
+   ${*$data}{'net_ftp_eof'} = 1 unless $n;
 
-   ${*$data} =~ s/\015\012/\n/sgo;
+   $buf =~ s/(\015)?(?!\012)\Z//so;
 
-   substr($buf,$offset) = ${*$data};
-
-   $l += length(${*$data});
-   $offset += length(${*$data});
-
-   ${*$data} = $lf;
+   ${*$data} = $1 || "";
+   $buf =~ s/\015\012/\n/sgo;
+   $l = length($buf);
    
    redo READ
      if($l == 0 && $n > 0);
 
    if($n == 0 && $l == 0)
     {
-     substr($buf,$offset) = ${*$data};
+     $buf = ${*$data};
      ${*$data} = "";
+     $l = length($buf);
     }
   }
 

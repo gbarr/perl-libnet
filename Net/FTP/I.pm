@@ -23,6 +23,8 @@ sub read
 
  my $n = sysread($data, $buf, $size);
 
+ ${*$data}{'net_ftp_bytesread'} += $n if $n > 0;
+
  $n;
 }
 

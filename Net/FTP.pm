@@ -21,7 +21,7 @@ use Net::Cmd;
 use Net::Config;
 use AutoLoader qw(AUTOLOAD);
 
-$VERSION = "2.23";
+$VERSION = "2.24";
 @ISA     = qw(Exporter Net::Cmd IO::Socket::INET);
 
 1;
@@ -92,24 +92,18 @@ sub new
 ## User interface methods
 ##
 
-sub quit
-{
- my $ftp = shift;
-
- $ftp->_QUIT
-    && $ftp->close;
-}
-
 sub close
 {
  my $ftp = shift;
 
- ref($ftp) 
-    && defined fileno($ftp)
-    && $ftp->SUPER::close;
+ return 1
+   unless (ref($ftp) && defined fileno($ftp));
+
+ $ftp->_QUIT && $ftp->SUPER::close;
 }
 
 sub DESTROY { shift->close }
+sub quit    { shift->close }
 
 sub ascii  { shift->type('A',@_); }
 sub binary { shift->type('I',@_); }
@@ -282,17 +276,19 @@ sub abort
  my $ftp = shift;
 
  send($ftp,pack("CC",$TELNET_IAC,$TELNET_IP),0);
- send($ftp,pack("C", $TELNET_IAC),MSG_OOB);
- send($ftp,pack("C", $TELNET_DM),0);
+ send($ftp,pack("CC", $TELNET_IAC, $TELNET_DM),MSG_OOB);
 
  $ftp->command("ABOR");
 
- defined ${*$ftp}{'net_ftp_dataconn'}
-    ? ${*$ftp}{'net_ftp_dataconn'}->close()
-    : $ftp->response();
+# defined ${*$ftp}{'net_ftp_dataconn'}
+#    ? ${*$ftp}{'net_ftp_dataconn'}->close()
+#    : $ftp->response();
+ 
+ ${*$ftp}{'net_ftp_dataconn'}->close()
+    if defined ${*$ftp}{'net_ftp_dataconn'};
 
- $ftp->response()
-    if $ftp->status == CMD_REJECT;
+ $ftp->response();
+#    if $ftp->status == CMD_REJECT;
 
  $ftp->status == CMD_OK;
 }
@@ -661,6 +657,7 @@ sub _list_cmd
  return undef
 	unless(defined $data);
 
+ require Net::FTP::A;
  bless $data, "Net::FTP::A"; # Force ASCII mode
 
  my $databuf = '';
@@ -701,8 +698,12 @@ sub _data_cmd
      $ftp->command($cmd,@_);
      $data = $ftp->_dataconn();
      $ok = CMD_INFO == $ftp->response();
-     return $data
-	if $ok;
+     if($ok) 
+      {
+       $data->reading
+         if $data && $cmd =~ /RETR|LIST|NLST/;
+       return $data
+      }
      $data->_close
 	if $data;
     }
@@ -1041,11 +1042,15 @@ Get a directory listing of C<DIR>, or the current directory in long format.
 
 Returns a reference to a list of lines returned from the server.
 
-=item get ( REMOTE_FILE [, LOCAL_FILE ] )
+=item get ( REMOTE_FILE [, LOCAL_FILE [, WHERE]] )
 
 Get C<REMOTE_FILE> from the server and store locally. C<LOCAL_FILE> may be
 a filename or a filehandle. If not specified the the file will be stored in
 the current directory with the same leafname as the remote file.
+
+If C<WHERE> is given then the first C<WHERE> bytes of the file will
+not be transfered, and the remaining bytes will be appended to
+the local file if it already exists.
 
 Returns C<LOCAL_FILE>, or the generated local file name if C<LOCAL_FILE>
 is not given.

@@ -10,10 +10,33 @@ use Net::Cmd;
 
 @ISA = qw(IO::Socket::INET);
 
+sub reading
+{
+ my $data = shift;
+ ${*$data}{'net_ftp_bytesread'} = 0;
+}
+
 sub abort
 {
  my $data = shift;
  my $ftp  = ${*$data}{'net_ftp_cmd'};
+
+ # no need to abort if we have finished the xfer
+ return $data->close
+    if ${*$data}{'net_ftp_eof'};
+
+ # for some reason if we continously open RETR connections and not
+ # read a single byte, then abort them after a while the server will
+ # close our connection, this prevents the unexpected EOF on the
+ # command channel -- GMB
+ if(exists ${*$data}{'net_ftp_bytesread'}
+	&& (${*$data}{'net_ftp_bytesread'} == 0)) {
+   my $buf="";
+   my $timeout = $data->timeout;
+   $data->can_read($timeout) && sysread($data,$buf,1);
+ }
+
+ ${*$data}{'net_ftp_eof'} = 1; # fake
 
  $ftp->abort; # this will close me
 }
@@ -34,6 +57,9 @@ sub close
 {
  my $data = shift;
  my $ftp  = ${*$data}{'net_ftp_cmd'};
+
+ return $data->abort
+   unless(${*$data}{'net_ftp_eof'});
 
  $data->_close;
 
