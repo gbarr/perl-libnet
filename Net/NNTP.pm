@@ -14,7 +14,7 @@ use Carp;
 use Time::Local;
 use Net::Config;
 
-$VERSION = "2.17"; # $Id: //depot/libnet/Net/NNTP.pm#6 $
+$VERSION = "2.18"; # $Id: //depot/libnet/Net/NNTP.pm#7 $
 @ISA     = qw(Net::Cmd IO::Socket::INET);
 
 sub new
@@ -61,18 +61,20 @@ sub new
  my $c = $obj->code;
  my @m = $obj->message;
  
- # if server is INN and we have transfer rights the we are currently
- # talking to innd not nnrpd
- if($obj->reader)
-  {
-   # If reader suceeds the we need to consider this code to determine postok
-   $c = $obj->code;
-  }
- else
-  {
-   # I want to ignore this failure, so restore the previous status.
-   $obj->set_status($c,\@m);
-  }
+ unless(exists $arg{Reader} && $arg{Reader} == 0) {
+   # if server is INN and we have transfer rights the we are currently
+   # talking to innd not nnrpd
+   if($obj->reader)
+    {
+     # If reader suceeds the we need to consider this code to determine postok
+     $c = $obj->code;
+    }
+   else
+    {
+     # I want to ignore this failure, so restore the previous status.
+     $obj->set_status($c,\@m);
+    }
+ }
 
  ${*$obj}{'net_nntp_post'} = $c == 200 ? 1 : 0;
 
@@ -678,6 +680,12 @@ NNTP server, a value of zero will cause all IO operations to block.
 (default: 120)
 
 B<Debug> - Enable the printing of debugging information to STDERR
+
+B<Reader> - If the remote server is INN then initially the connection
+will be to nnrpd, by default C<Net::NNTP> will issue a C<MODE READER> command
+so that the remote server becomes innd. If the C<Reader> option is given
+with a value of zero, then this command will not be sent and the
+connection will be left talking to nnrpd.
 
 =back
 
