@@ -47,23 +47,9 @@ sub chk_version
  $vnum >= $wanted;
 }
 
-#--- Check for Socket
-
-chk_version(Socket => '1.30') or
-    warn  "\n"
-	. "*** For Net::Cmd to work you require version 1.30, or later, of\n"
-	. "    Socket.pm from CPAN/modules/by-module/Socket/Socket-x.x.tar.gz\n\n";
-
-chk_version(IO::Socket => '1.05') or
-    warn  "\n"
-	. "*** For Net::Cmd to work you require version 1.05, or later, of\n"
-	. "    IO/Socket.pm from CPAN/modules/by-module/IO/IO-x.x.tar.gz\n\n";
-
-chk_version(Data::Dumper => '0.01') or
-    die  "\n"
-	. "*** To be able to use the libnet modules you *MUST* have\n"
-	. "    Data::Dumper installed. You can obtain this from\n"
-	. "    CPAN/modules/by-module/Data/Data-Dumper-x.x.tar.gz\n\n";
+sub MY::post_initialize
+{
+ my ($self) = @_;
 
 #--- Create Net::Config
 
@@ -81,6 +67,29 @@ foreach (keys %INC) {
 
 system($^X, 'Configure')
 	unless -f $libnet_cfg;
+
+ $self->{PM}->{$libnet_cfg} = $self->catfile('$(INST_ARCHLIBDIR)',$config_pm);
+
+ "";
+}
+
+#--- Check for Socket
+
+chk_version(Socket => '1.30') or
+    warn  "\n"
+	. "*** For Net::Cmd to work you require version 1.30, or later, of\n"
+	. "    Socket.pm from CPAN/modules/by-module/Socket/Socket-x.x.tar.gz\n\n";
+
+chk_version(IO::Socket => '1.05') or
+    warn  "\n"
+	. "*** For Net::Cmd to work you require version 1.05, or later, of\n"
+	. "    IO/Socket.pm from CPAN/modules/by-module/IO/IO-x.x.tar.gz\n\n";
+
+chk_version(Data::Dumper => '0.01') or
+    die  "\n"
+	. "*** To be able to use the libnet modules you *MUST* have\n"
+	. "    Data::Dumper installed. You can obtain this from\n"
+	. "    CPAN/modules/by-module/Data/Data-Dumper-x.x.tar.gz\n\n";
 
 #--- Write the Makefile
 
