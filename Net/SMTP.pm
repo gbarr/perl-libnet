@@ -16,7 +16,7 @@ use IO::Socket;
 use Net::Cmd;
 use Net::Config;
 
-$VERSION = "2.22"; # $Id: //depot/libnet/Net/SMTP.pm#23 $
+$VERSION = "2.23"; # $Id: //depot/libnet/Net/SMTP.pm#24 $
 
 @ISA = qw(Net::Cmd IO::Socket::INET);
 
@@ -156,19 +156,12 @@ sub supports {
     return;
 }
 
-sub _addr
-{
- my $addr = shift || "";
-
- return $1
-    if $addr =~ /(<[^>]+>)/so;
-
- $addr =~ s/\n/ /sog;
- $addr =~ s/(\A\s+|\s+\Z)//sog;
-
- return "<" . $addr . ">";
+sub _addr {
+  my $addr = shift;
+  $addr = "" unless defined $addr;
+  $addr =~ s/^\s*<?\s*|\s*>?\s*$//sg;
+  "<$addr>";
 }
-
 
 sub mail
 {
@@ -647,6 +640,6 @@ it under the same terms as Perl itself.
 
 =for html <hr>
 
-I<$Id: //depot/libnet/Net/SMTP.pm#23 $>
+I<$Id: //depot/libnet/Net/SMTP.pm#24 $>
 
 =cut
