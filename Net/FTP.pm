@@ -1,4 +1,4 @@
-# Net::FTP.pm $Id: //depot/libnet/Net/FTP.pm#51 $
+# Net::FTP.pm $Id: //depot/libnet/Net/FTP.pm#52 $
 #
 # Copyright (c) 1995-8 Graham Barr <gbarr@pobox.com>. All rights reserved.
 # This program is free software; you can redistribute it and/or
@@ -34,6 +34,12 @@ use vars qw($TELNET_IAC $TELNET_IP $TELNET_DM);
 sub pasv_xfer_unique {
     my($sftp,$sfile,$dftp,$dfile) = @_;
     $sftp->pasv_xfer($sfile,$dftp,$dfile,1);
+}
+
+BEGIN {
+  # make a constant so code is fast'ish
+  my $is_os390 = $^O eq 'os390';
+  *trEBCDIC = sub () { $is_os390 }
 }
 
 1;
@@ -469,6 +475,13 @@ sub get
  while(1)
   {
    last unless $len = $data->read($buf,$blksize);
+
+   if (trEBCDIC && $ftp->type ne 'I')
+    {
+     $buf = $ftp->toebcdic($buf);
+     $len = length($buf);
+    }
+
    if($hashh) {
     $count += $len;
     print $hashh "#" x (int($count / $hashb));
@@ -711,6 +724,12 @@ sub _store_cmd
   {
    last unless $len = sysread($loc,$buf="",$blksize);
 
+   if (trEBCDIC)
+    {
+     $buf = $ftp->toascii($buf); 
+     $len = length($buf);
+    }
+
    if($hashh) {
     $count += $len;
     print $hashh "#" x (int($count / $hashb));
@@ -936,6 +955,11 @@ sub _list_cmd
  my $list = [ split(/\n/,$buf) ];
 
  $data->close();
+
+ if (trEBCDIC)
+  {
+   for (@$list) { $_ = $ftp->toebcdic($_) }
+  }
 
  wantarray ? @{$list}
            : $list;
@@ -1666,6 +1690,6 @@ Copyright (c) 1995-1998 Graham Barr. All rights reserved.
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.
 
-$Id: //depot/libnet/Net/FTP.pm#51 $
+$Id: //depot/libnet/Net/FTP.pm#52 $
 
 =cut

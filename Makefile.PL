@@ -68,6 +68,15 @@ chk_version(IO::Socket => '1.05') or
 	. "*** For Net::Cmd to work you require version 1.05, or later, of\n"
 	. "    IO/Socket.pm from CPAN/modules/by-module/IO/IO-x.x.tar.gz\n\n";
 
+if ($^O eq 'os390')
+{
+  chk_version(Convert::EBCDIC => '0.06') or
+   warn  "\n"
+   . "*** For Net::Cmd to work on $^O version 0.06, or later, of\n"
+   . "    Convert::EBCDIC is required, which can be found at"
+   . "    CPAN/modules/by-module/Convert/Convert-EBCDIC-x.x.tar.gz\n\n";
+}
+
 #--- Write the Makefile
 
 my @ppd;

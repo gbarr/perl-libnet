@@ -11,7 +11,7 @@ unless(defined($NetConfig{ftp_testhost}) && $NetConfig{test_hosts}) {
 my $t = 1;
 print "1..7\n";
 
-$ftp = Net::FTP->new($NetConfig{ftp_testhost}, Debug => 0)
+$ftp = Net::FTP->new($NetConfig{ftp_testhost})
 	or (print("not ok 1\n"), exit);
 
 printf "ok %d\n",$t++;
