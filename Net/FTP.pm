@@ -22,7 +22,7 @@ use Net::Config;
 use Fcntl qw(O_WRONLY O_RDONLY O_APPEND O_CREAT O_TRUNC);
 # use AutoLoader qw(AUTOLOAD);
 
-$VERSION = "2.62"; # $Id: //depot/libnet/Net/FTP.pm#64 $
+$VERSION = "2.62"; # $Id: //depot/libnet/Net/FTP.pm#65 $
 @ISA     = qw(Exporter Net::Cmd IO::Socket::INET);
 
 # Someday I will "use constant", when I am not bothered to much about
@@ -1301,8 +1301,8 @@ Log into the remote FTP server with the given login information. If
 no arguments are given then the C<Net::FTP> uses the C<Net::Netrc>
 package to lookup the login information for the connected host.
 If no information is found then a login of I<anonymous> is used.
-If no password is given and the login is I<anonymous> then the users
-Email address will be used for a password.
+If no password is given and the login is I<anonymous> then I<anonymous@>
+will be used for password.
 
 If the connection is via a firewall then the C<authorize> method will
 be called with no arguments.
@@ -1714,6 +1714,6 @@ under the same terms as Perl itself.
 
 =for html <hr>
 
-I<$Id: //depot/libnet/Net/FTP.pm#64 $>
+I<$Id: //depot/libnet/Net/FTP.pm#65 $>
 
 =cut
