@@ -10,7 +10,7 @@ use Carp;
 require Net::FTP::dataconn;
 
 @ISA = qw(Net::FTP::dataconn);
-$VERSION = "1.07"; # $Id: //depot/libnet/Net/FTP/I.pm#7 $
+$VERSION = "1.08"; # $Id: //depot/libnet/Net/FTP/I.pm#8 $
 
 sub read {
   my    $data 	 = shift;
@@ -30,7 +30,7 @@ sub read {
    last unless $b;
   }
 
-  $n = $size < ($l = length(${*$data}) ? $size : $l;
+  $n = $size < ($l = length(${*$data})) ? $size : $l;
 
   $buf = substr(${*$data},0,$n);
   substr(${*$data},0,$n) = '';
