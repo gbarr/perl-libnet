@@ -16,7 +16,7 @@ use Net::Config;
 @ISA = qw(Exporter);
 @EXPORT_OK = qw(hostname hostdomain hostfqdn domainname);
 
-$VERSION = "2.14"; # $Id: //depot/libnet/Net/Domain.pm#14 $
+$VERSION = "2.14"; # $Id: //depot/libnet/Net/Domain.pm#15 $
 
 my($host,$domain,$fqdn) = (undef,undef,undef);
 
@@ -199,7 +199,7 @@ sub _hostdomain {
 
     # Look for environment variable
 
-    $domain ||= $ENV{LOCALDOMAIN} ||= $ENV{DOMAIN} || undef;
+    $domain ||= $ENV{LOCALDOMAIN} || $ENV{DOMAIN};
 
     if(defined $domain) {
     	$domain =~ s/[\r\n\0]+//g;
@@ -330,6 +330,6 @@ it under the same terms as Perl itself.
 
 =for html <hr>
 
-I<$Id: //depot/libnet/Net/Domain.pm#14 $>
+I<$Id: //depot/libnet/Net/Domain.pm#15 $>
 
 =cut
