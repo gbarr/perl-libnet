@@ -1,3 +1,81 @@
+Change 458 on 2000/03/29 by <gbarr@pobox.com> (Graham Barr)
+
+	Net::Cmd, Net::FTP
+	- Support for os390, modified from a patch from Dan Campbell
+
+Change 455 on 2000/03/29 by <gbarr@pobox.com> (Graham Barr)
+
+	Net::Domain
+	- silence warnings on Win32 that domainname does not exist
+
+Change 454 on 2000/03/29 by <gbarr@pobox.com> (Graham Barr)
+
+	Net::FTP
+	- More error checking in ->get()
+
+Change 453 on 2000/03/29 by <gbarr@pobox.com> (Graham Barr)
+
+	Net::FTP
+	- update pattern to dig out unique filename from stou
+
+Change 452 on 2000/03/29 by <gbarr@pobox.com> (Graham Barr)
+
+	t/ftp.t
+	- silently pass if the stor to /pub fails
+
+Change 451 on 2000/03/29 by <gbarr@pobox.com> (Graham Barr)
+
+	Net::FTP
+	- Add Timeout to listen socket
+
+Change 450 on 2000/03/29 by <gbarr@pobox.com> (Graham Barr)
+
+	Makefile.PL
+	- only add ppd conditional on perl version
+
+Change 449 on 2000/03/29 by <gbarr@pobox.com> (Graham Barr)
+
+	Fixed mput example in FAQ to use glob()
+
+Change 448 on 2000/03/29 by <gbarr@pobox.com> (Graham Barr)
+
+	Update README to reflect new way Configure works
+
+Change 447 on 2000/03/29 by <gbarr@pobox.com> (Graham Barr)
+
+	Net::Config
+	- Check that $home is defined before we use it
+
+Change 446 on 2000/03/29 by <gbarr@pobox.com> (Graham Barr)
+
+	Net::FTP
+	- add link to autoftp example
+
+Change 445 on 2000/03/29 by <gbarr@pobox.com> (Graham Barr)
+
+	Net::FTP::A, Net::FTP::I
+	- Move the timeout check into the loop to prevent hanging
+	  on write.
+
+Change 444 on 2000/03/29 by <gbarr@pobox.com> (Graham Barr)
+
+	Net::Cmd, Net::FTP::A, Net::FTP::I
+	- MacOS does not like the setting of $SIG{PIPE} so check $^O
+
+Change 432 on 2000/03/29 by <gbarr@pobox.com> (Graham Barr)
+
+	POD cleanup
+
+Change 431 on 2000/03/29 by <gbarr@pobox.com> (Graham Barr)
+
+	Net::NNTP
+	- Allow a filehandle to be passed to article, head and body
+
+Change 430 on 2000/03/29 by <gbarr@pobox.com> (Graham Barr)
+
+	Net::TFTP
+	- There is no quit method, so don't document one
+
 Change 402 on 2000/03/23 by <gbarr@pobox.com> (Graham Barr)
 
 	Net::Config

@@ -1,11 +1,11 @@
 ChangeLog
-Configure
 Config.eg
-Net/libnetFAQ.pod
+Configure
 Hostname.pm.eg			Example replacement for Hostname.pm
 MANIFEST
 Makefile.PL
 Net/Cmd.pm
+Net/Config.pm
 Net/Domain.pm			DNS Domain name lookup
 Net/DummyInetd.pm		
 Net/FTP.pm			File Transfer Protocol Client
@@ -20,9 +20,11 @@ Net/PH.pm			CCSO Nameserver Client class
 Net/POP3.pm			Post Office Protocol
 Net/SMTP.pm			Simple Mail Transfer Protocol Client
 Net/SNPP.pm			Simple Network Pager Protocol Client
+Net/SNPP/HylaFAX.pm
+Net/TFTP.pm
 Net/Time.pm			time & nettime protocols
+Net/libnetFAQ.pod
 README
-README.config
 demos/ftp
 demos/inetd
 demos/nntp
@@ -38,4 +40,3 @@ t/nntp.t
 t/ph.t
 t/require.t
 t/smtp.t
-Net/Config.pm
