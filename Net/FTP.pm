@@ -21,7 +21,7 @@ use Net::Cmd;
 use Net::Config;
 use AutoLoader qw(AUTOLOAD);
 
-$VERSION = "2.22";
+$VERSION = "2.23";
 @ISA     = qw(Exporter Net::Cmd IO::Socket::INET);
 
 1;
@@ -37,10 +37,11 @@ sub new
  my $host = $peer;
  my $fire = undef;
 
- unless(defined inet_aton($peer)) # GMB: Should I use Net::Ping here ??
+ # Should I use Net::Ping here ?? --GMB
+ if(exists($arg{Firewall}) || !defined(inet_aton($peer)))
   {
-   $fire = $ENV{FTP_FIREWALL}
-	|| $arg{Firewall}
+   $fire = $arg{Firewall}
+	|| $ENV{FTP_FIREWALL}
 	|| $NetConfig{ftp_firewall}
 	|| undef;
 
