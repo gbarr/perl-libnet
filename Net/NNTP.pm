@@ -857,6 +857,12 @@ that it will allow posting.
 
 =item authinfo ( USER, PASS )
 
+Authenticates to the server (using AUTHINFO USER / AUTHINFO PASS)
+using the supplied username and password.  Please note that the
+password is sent in clear text to the server.  This command should not
+be used with valuable passwords unless the connection to the server is
+somehow protected.
+
 =item list ()
 
 Obtain information about all the active newsgroups. The results is a reference
