@@ -5,6 +5,9 @@ BEGIN {
 	chdir 't' if -d 't';
 	@INC = '../lib';
     }
+    if (ord('A') == 193 && !eval "require Convert::EBCDIC") {
+        print "1..0 # EBCDIC but no Convert::EBCDIC\n"; exit 0;
+    }
 }
 
 use strict;
@@ -41,7 +44,7 @@ ok( exists $INC{'Net/Netrc.pm'}, 'should be able to use Net::Netrc' );
 
 SKIP: {
 	skip('incompatible stat() handling for OS', 4), next SKIP 
-		if ($^O =~ /os2|win32|macos|cygwin/i);
+		if ($^O =~ /os2|win32|macos|cygwin/i or $] < 5.005);
 	
 	my $warn;
 	local $SIG{__WARN__} = sub {
@@ -125,7 +128,7 @@ sub new {
 }
 
 sub TIEHANDLE {
-	my ($class, undef, $file, $mode) = @_;
+	my ($class, $file, $mode) = @_[0,2,3];
 	bless({ file => $file, mode => $mode }, $class);
 }
 
