@@ -182,6 +182,23 @@ must be taken, eg
     $ftp->login($firewall_user, $firewall_passwd) or die $ftp->message;
     $ftp->login($ext_user . '@' . $ext_host, $ext_passwd) or die $ftp->message.
 
+=head2 My fto proxy firewall does not listen on port 21
+
+FTP servers usually listen on the same port number, port 21, as any other
+FTP server. But there is no reason why thi has to be the case.
+
+If you pass a port number to Net::FTP then it assumes this is the port
+number of the final destination. By default Net::FTP will always try
+to connect to the firewall on port 21.
+
+Net::FTP uses IO::Socket to open the connection and IO::Socket allows
+the port number to be specified as part of the hostname. So this problem
+can be resolved by either passing a Firewall option like C<"hostname:1234">
+or by setting the C<ftp_firewall> option in Net::Config to be a string
+in in the same form.
+
+
+
 =head2 I have seen scripts call a method message, but cannot find it documented ?
 
 Net::FTP, like several other packages in libnet, inherits from Net::Cmd, so

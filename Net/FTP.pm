@@ -21,7 +21,7 @@ use Net::Cmd;
 use Net::Config;
 # use AutoLoader qw(AUTOLOAD);
 
-$VERSION = "2.48"; # $Id: //depot/libnet/Net/FTP.pm#33 $
+$VERSION = "2.49"; # $Id: //depot/libnet/Net/FTP.pm#34 $
 @ISA     = qw(Exporter Net::Cmd IO::Socket::INET);
 
 # Someday I will "use constant", when I am not bothered to much about
@@ -995,7 +995,6 @@ sub _MKD  { shift->command("MKD", @_)->response() == CMD_OK }
 sub _PWD  { shift->command("PWD", @_)->response() == CMD_OK }
 sub _TYPE { shift->command("TYPE",@_)->response() == CMD_OK }
 sub _RNTO { shift->command("RNTO",@_)->response() == CMD_OK }
-sub _ACCT { shift->command("ACCT",@_)->response() == CMD_OK }
 sub _RESP { shift->command("RESP",@_)->response() == CMD_OK }
 sub _MDTM { shift->command("MDTM",@_)->response() == CMD_OK }
 sub _SIZE { shift->command("SIZE",@_)->response() == CMD_OK }
@@ -1011,6 +1010,7 @@ sub _RNFR { shift->command("RNFR",@_)->response() == CMD_MORE }
 sub _REST { shift->command("REST",@_)->response() == CMD_MORE }
 sub _USER { shift->command("user",@_)->response() } # A certain brain dead firewall :-)
 sub _PASS { shift->command("PASS",@_)->response() }
+sub _ACCT { shift->command("ACCT",@_)->response() }
 sub _AUTH { shift->command("AUTH",@_)->response() }
 
 sub _ALLO { shift->unsupported(@_) }

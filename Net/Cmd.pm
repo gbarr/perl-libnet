@@ -209,7 +209,8 @@ sub getline
  return shift @{${*$cmd}{'net_cmd_lines'}}
     if scalar(@{${*$cmd}{'net_cmd_lines'}});
 
- my $partial = ${*$cmd}{'net_cmd_partial'} || "";
+ my $partial = defined(${*$cmd}{'net_cmd_partial'})
+		? ${*$cmd}{'net_cmd_partial'} : || "";
  my $fd = fileno($cmd);
  
  return undef
@@ -228,7 +229,7 @@ sub getline
     {
      unless (sysread($cmd, $buf="", 1024))
       {
-       carp ref($cmd) . ": Unexpected EOF on command channel"
+       carp(ref($cmd) . ": Unexpected EOF on command channel")
 		if $cmd->debug;
        $cmd->close;
        return undef;
@@ -249,7 +250,7 @@ sub getline
     }
    else
     {
-     carp "$cmd: Timeout" if($cmd->debug);
+     carp("$cmd: Timeout") if($cmd->debug);
      return undef;
     }
   }
@@ -355,9 +356,33 @@ sub datasend
  ${*$cmd}{'net_cmd_lastch'} = substr($line,-1,1);
 
  my $len = length($line) - 1;
+ my $offset = 1;
+ my $win = "";
+ vec($win,$fd,1) = 1;
+ my $timeout = $cmd->timeout || undef;
 
- return $len == 0 ||
-	syswrite($cmd, $line, $len, 1) == $len;
+ while($len)
+  {
+   my $wout;
+   if (select(undef,$wout=$win, undef, $timeout) > 0)
+    {
+     my $w = syswrite($cmd, $line, $len, $offset);
+     unless (defined($w))
+      {
+       carp("$cmd: $!") if $cmd->debug;
+       return undef;
+      }
+     $len -= $w;
+     $offset += $w;
+    }
+   else
+    {
+     carp("$cmd: Timeout") if($cmd->debug);
+     return undef;
+    }
+  }
+
+ 1;
 }
 
 sub dataend
