@@ -16,7 +16,7 @@ use IO::Socket;
 use Net::Cmd;
 use Net::Config;
 
-$VERSION = "2.15"; # $Id: //depot/libnet/Net/SMTP.pm#14 $
+$VERSION = "2.15"; # $Id: //depot/libnet/Net/SMTP.pm#15 $
 
 @ISA = qw(Net::Cmd IO::Socket::INET);
 
@@ -308,7 +308,11 @@ sub recipient
  return $skip_bad ? @ok : 1;
 }
 
-sub to { shift->recipient(@_) }
+BEGIN {
+  *to  = \&recipient;
+  *cc  = \&recipient;
+  *bcc = \&recipient;
+}
 
 sub data
 {
@@ -546,9 +550,17 @@ If C<SkipBad> is true the C<recipient> will not return an error when a
 bad address is encountered and it will return an array of addresses
 that did succeed.
 
+  $smtp->recipient($recipient1,$recipient2);  # Good
+  $smtp->recipient($recipient1,$recipient2, { SkipBad => 1 });  # Good
+  $smtp->recipient("$recipient,$recipient2"); # BAD   
+
 =item to ( ADDRESS [, ADDRESS [...]] )
 
-A synonym for C<recipient>.
+=item cc ( ADDRESS [, ADDRESS [...]] )
+
+=item bcc ( ADDRESS [, ADDRESS [...]] )
+
+Synonyms for C<recipient>.
 
 =item data ( [ DATA ] )
 
@@ -597,6 +609,6 @@ it under the same terms as Perl itself.
 
 =for html <hr>
 
-I<$Id: //depot/libnet/Net/SMTP.pm#14 $>
+I<$Id: //depot/libnet/Net/SMTP.pm#15 $>
 
 =cut
