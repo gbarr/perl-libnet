@@ -16,7 +16,7 @@ use IO::Socket;
 use Net::Cmd;
 use Net::Config;
 
-$VERSION = "2.19"; # $Id: //depot/libnet/Net/SMTP.pm#20 $
+$VERSION = "2.20"; # $Id: //depot/libnet/Net/SMTP.pm#21 $
 
 @ISA = qw(Net::Cmd IO::Socket::INET);
 
@@ -34,6 +34,8 @@ sub new
   {
    $obj = $type->SUPER::new(PeerAddr => ($host = $h), 
 			    PeerPort => $arg{Port} || 'smtp(25)',
+			    LocalAddr => $arg{LocalAddr},
+			    LocalPort => $arg{LocalPort},
 			    Proto    => 'tcp',
 			    Timeout  => defined $arg{Timeout}
 						? $arg{Timeout}
@@ -477,6 +479,9 @@ B<Hello> - SMTP requires that you identify yourself. This option
 specifies a string to pass as your mail domain. If not
 given a guess will be taken.
 
+B<LocalAddr> and B<LocalPort> - These parameters are passed directly
+to IO::Socket to allow binding the socket to a local port.
+
 B<Timeout> - Maximum time, in seconds, to wait for a response from the
 SMTP server (default: 120)
 
@@ -636,6 +641,6 @@ it under the same terms as Perl itself.
 
 =for html <hr>
 
-I<$Id: //depot/libnet/Net/SMTP.pm#20 $>
+I<$Id: //depot/libnet/Net/SMTP.pm#21 $>
 
 =cut
