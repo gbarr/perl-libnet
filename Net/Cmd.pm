@@ -1,4 +1,4 @@
-# Net::Cmd.pm $Id: //depot/libnet/Net/Cmd.pm#32 $
+# Net::Cmd.pm $Id: //depot/libnet/Net/Cmd.pm#33 $
 #
 # Copyright (c) 1995-1997 Graham Barr <gbarr@pobox.com>. All rights reserved.
 # This program is free software; you can redistribute it and/or
@@ -420,6 +420,8 @@ sub datasend
  vec($win,fileno($cmd),1) = 1;
  my $timeout = $cmd->timeout || undef;
 
+ local $SIG{PIPE} = 'IGNORE' unless $^O eq 'MacOS';
+
  while($len)
   {
    my $wout;
@@ -467,6 +469,7 @@ sub rawdatasend
  vec($win,fileno($cmd),1) = 1;
  my $timeout = $cmd->timeout || undef;
 
+ local $SIG{PIPE} = 'IGNORE' unless $^O eq 'MacOS';
  while($len)
   {
    my $wout;
@@ -500,6 +503,7 @@ sub dataend
  return 1
     unless(exists ${*$cmd}{'net_cmd_need_crlf'});
 
+ local $SIG{PIPE} = 'IGNORE' unless $^O eq 'MacOS';
  syswrite($cmd,"\015\012",2)
     if ${*$cmd}{'net_cmd_need_crlf'};
 
@@ -508,7 +512,7 @@ sub dataend
 
  syswrite($cmd,".\015\012",3);
 
- delete ${*$cmd}{'net_cmd_lastch'};
+ delete ${*$cmd}{'net_cmd_need_crlf'};
 
  $cmd->response() == CMD_OK;
 }
@@ -755,6 +759,6 @@ it under the same terms as Perl itself.
 
 =for html <hr>
 
-I<$Id: //depot/libnet/Net/Cmd.pm#32 $>
+I<$Id: //depot/libnet/Net/Cmd.pm#33 $>
 
 =cut
