@@ -21,7 +21,7 @@ use Net::Cmd;
 use Net::Config;
 use AutoLoader qw(AUTOLOAD);
 
-$VERSION = "2.24";
+$VERSION = "2.25"; # $Id$
 @ISA     = qw(Exporter Net::Cmd IO::Socket::INET);
 
 1;
@@ -564,6 +564,21 @@ sub unique_name
  ${*$ftp}{'net_ftp_unique'} || undef;
 }
 
+sub supported {
+    @_ == 2 or croak 'usage: $ftp->supported( CMD )';
+    my $ftp = shift;
+    my $cmd = uc shift;
+    my $hash = ${*$ftp}{'net_ftp_supported'} ||= {};
+
+    return $hash->{$cmd}
+        if exists $hash->{$cmd};
+
+    my $ok = $ftp->_HELP($cmd) &&
+        $ftp->message !~ /unimplemented/i;
+
+    $hash->{$cmd} = $ok;
+}
+
 ##
 ## Depreciated methods
 ##
@@ -850,6 +865,7 @@ sub _ACCT { shift->command("ACCT",@_)->response() == CMD_OK }
 sub _RESP { shift->command("RESP",@_)->response() == CMD_OK }
 sub _MDTM { shift->command("MDTM",@_)->response() == CMD_OK }
 sub _SIZE { shift->command("SIZE",@_)->response() == CMD_OK }
+sub _HELP { shift->command("HELP",@_)->response() == CMD_OK }
 sub _APPE { shift->command("APPE",@_)->response() == CMD_INFO }
 sub _LIST { shift->command("LIST",@_)->response() == CMD_INFO }
 sub _NLST { shift->command("NLST",@_)->response() == CMD_INFO }
@@ -864,7 +880,6 @@ sub _AUTH { shift->command("AUTH",@_)->response() }
 
 sub _ALLO { shift->unsupported(@_) }
 sub _SMNT { shift->unsupported(@_) }
-sub _HELP { shift->unsupported(@_) }
 sub _MODE { shift->unsupported(@_) }
 sub _SITE { shift->unsupported(@_) }
 sub _SYST { shift->unsupported(@_) }
@@ -1094,6 +1109,10 @@ Returns the I<modification time> of the given file
 =item size ( FILE )
 
 Returns the size in bytes for the given file.
+
+=item supported ( CMD )
+
+Returns TRUE if the remote server supports the given command.
 
 =back
 
