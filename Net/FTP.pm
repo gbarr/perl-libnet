@@ -22,7 +22,7 @@ use Net::Config;
 use Fcntl qw(O_WRONLY O_RDONLY O_APPEND O_CREAT O_TRUNC);
 # use AutoLoader qw(AUTOLOAD);
 
-$VERSION = "2.58"; # $Id: //depot/libnet/Net/FTP.pm#59 $
+$VERSION = "2.60"; # $Id: //depot/libnet/Net/FTP.pm#60 $
 @ISA     = qw(Exporter Net::Cmd IO::Socket::INET);
 
 # Someday I will "use constant", when I am not bothered to much about
@@ -228,14 +228,14 @@ sub size {
    my $line;
    foreach $line (@msg) {
      return (split(/\s+/,$line))[4]
-	 if $line =~ /^[-rw]{10}/
+	 if $line =~ /^[-rwx]{10}/
    }
  }
  else {
    my @files = $ftp->dir($file);
    if(@files) {
      return (split(/\s+/,$1))[4]
-	 if $files[0] =~ /^([-rw]{10}.*)$/;
+	 if $files[0] =~ /^([-rwx]{10}.*)$/;
    }
  }
  undef;
@@ -857,10 +857,9 @@ sub supported {
     my $text = $ftp->message;
     if($text =~ /following\s+commands/i) {
 	$text =~ s/^.*\n//;
-	$text =~ s/\n/ /sog;
-	while($text =~ /(\w+)([* ])/g) {
-	    $hash->{"\U$1"} = $2 eq " " ? 1 : 0;
-	}
+        while($text =~ /(\*?)(\w+)(\*?)/sg) {
+            $hash->{"\U$2"} = !length("$1$3");
+        }
     }
     else {
 	$hash->{$cmd} = $text !~ /unimplemented/i;
@@ -1731,6 +1730,6 @@ under the same terms as Perl itself.
 
 =for html <hr>
 
-I<$Id: //depot/libnet/Net/FTP.pm#59 $>
+I<$Id: //depot/libnet/Net/FTP.pm#60 $>
 
 =cut
