@@ -89,6 +89,7 @@ if ($] >= 5.00503) {
 }
 
 WriteMakefile(
+  INSTALLDIRS => ($] >= 5.008 ? 'perl' : 'site'),
   VERSION     => $VERSION,
   DISTNAME    => $DISTNAME,
   NAME        => $NAME,
