@@ -11,7 +11,7 @@ use strict;
 use FileHandle;
 use vars qw($VERSION);
 
-$VERSION = "2.10"; # $Id: //depot/libnet/Net/Netrc.pm#9 $
+$VERSION = "2.11"; # $Id: //depot/libnet/Net/Netrc.pm#10 $
 
 my %netrc = ();
 
@@ -37,7 +37,10 @@ sub _readrc
  $netrc{default} = undef;
 
  # OS/2 and Win32 do not handle stat in a way compatable with this check :-(
- unless($^O eq 'os2' || $^O eq 'MSWin32' || $^O eq 'MacOS')
+ unless($^O eq 'os2'
+     || $^O eq 'MSWin32'
+     || $^O eq 'MacOS'
+     || $^O =~ /^cygwin/)
   { 
    my @stat = stat($file);
 
@@ -325,6 +328,6 @@ it under the same terms as Perl itself.
 
 =for html <hr>
 
-$Id: //depot/libnet/Net/Netrc.pm#9 $
+$Id: //depot/libnet/Net/Netrc.pm#10 $
 
 =cut
