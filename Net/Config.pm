@@ -6,9 +6,9 @@ use strict;
 
 @EXPORT  = qw(%NetConfig);
 @ISA     = qw(Net::LocalCfg Exporter);
-$VERSION = "1.01";
+$VERSION = "1.02";
 
-eval { require Net::LocalCfg };
+eval { local $SIG{__DIE__}; require Net::LocalCfg };
 
 %NetConfig = (
     nntp_hosts => [],
