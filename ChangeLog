@@ -1,3 +1,54 @@
+*** Patch 1.0603
+
+Tue Nov 25 1997 <gbarr@pobox.com> (Graham Barr)
+
+	Net::FTP::I
+	- Fix to prevent ABOR being sent when xfer is complete
+	- Change to write() to ensure whole packet is sent
+	
+	Net::FTP
+	- Moved $TELNET_ vars to top of file so that  autosplit does not place them
+	  in the wrong file and cause "Use of undefined ...."
+	- Clarification on the result from ->size() added to docs.
+	- pasv_xfer changed to use stor as stou is not a "MUST-have" command
+	- added pasv_xfer_unique
+	
+	Net::PH
+	- Documentation updates.
+	
+Mon Nov 17 1997 <gbarr@pobox.com> (Graham Barr)
+
+	t/nntp.t
+	- Modified to check for more groups before failure
+
+
+	Net::SMTP
+	- Corrected documentation for ->expand()
+
+*** Patch 1.0602
+
+Mon Nov 17 1997 <gbarr@pobox.com> (Graham Barr)
+
+	Makefile.PL
+	- change to code for creating Net::Config
+	
+	Net::FTP::A
+	- Change to write() to ensure whole packet is sent
+	- Documentation correction to dir() and ls()
+	
+	Net::FTP::dataconn
+	- Stop abort be called when a write socket is being closed.
+	
+	Net::NNTP
+	- Changes to postok logic
+	
+	Net::PH
+	- fields() now also returns a reference to an ordered array of tag names
+	  if called in an array context.
+	
+	Net::Cmd
+	- Catch added for SIGPIPE while in ->command()
+
 *** Patch 1.0601
 
 Tue Nov  4 1997 <gbarr@pobox.com> (Graham Barr)
