@@ -1,6 +1,6 @@
 # Net::POP3.pm
 #
-# Copyright (c) 1995-1997 Graham Barr <gbarr@pobox.com>. All rights reserved.
+# Copyright (c) 1995-2003 Graham Barr <gbarr@pobox.com>. All rights reserved.
 # This program is free software; you can redistribute it and/or
 # modify it under the same terms as Perl itself.
 
@@ -13,7 +13,7 @@ use Net::Cmd;
 use Carp;
 use Net::Config;
 
-$VERSION = "2.24"; # $Id: //depot/libnet/Net/POP3.pm#24 $
+$VERSION = "2.25";
 
 @ISA = qw(Net::Cmd IO::Socket::INET);
 
@@ -310,6 +310,8 @@ sub _PING { shift->command('PING',$_[0])->response() == CMD_OK }
 sub _RPOP { shift->command('RPOP',$_[0])->response() == CMD_OK }
 sub _LAST { shift->command('LAST')->response() == CMD_OK }
 
+sub _CAPA { shift->command('CAPA')->response() == CMD_OK }
+
 sub quit
 {
  my $me = shift;
@@ -333,28 +335,111 @@ sub DESTROY
 ## POP3 has weird responses, so we emulate them to look the same :-)
 ##
 
-sub response
-{
- my $cmd = shift;
- my $str = $cmd->getline() || return undef;
- my $code = "500";
+sub response {
+  my $cmd  = shift;
+  my $str  = $cmd->getline() or return undef;
+  my $code = "500";
 
- $cmd->debug_print(0,$str)
-   if ($cmd->debug);
+  $cmd->debug_print(0, $str)
+    if ($cmd->debug);
 
- if($str =~ s/^\+OK\s*//io)
-  {
-   $code = "200"
+  if ($str =~ s/^\+OK\s*//io) {
+    $code = "200";
   }
- else
-  {
-   $str =~ s/^-ERR\s*//io;
+  elsif ($str =~ s/^\+\s*//io) {
+    $code = "300";
+  }
+  else {
+    $str =~ s/^-ERR\s*//io;
   }
 
- ${*$cmd}{'net_cmd_resp'} = [ $str ];
- ${*$cmd}{'net_cmd_code'} = $code;
+  ${*$cmd}{'net_cmd_resp'} = [$str];
+  ${*$cmd}{'net_cmd_code'} = $code;
 
- substr($code,0,1);
+  substr($code, 0, 1);
+}
+
+
+sub capa {
+    my $this = shift;
+    my ($capa, %capabilities);
+
+    # Fake a capability here
+    $capabilities{APOP} = '' if ($this->banner() =~ /<.*>/);
+
+    return \%capabilities unless $this->_CAPA();
+
+    $capa = $this->read_until_dot();
+    %capabilities = map { /^\s*(\S+)\s*(.*)/ } @$capa;
+    $capabilities{APOP} = '' if ($this->banner() =~ /<.*>/);
+
+    return ${*$this}{'net_pop3e_capabilities'} = \%capabilities;
+}
+
+sub capabilities {
+    my $this = shift;
+
+    ${*$this}{'net_pop3e_capabilities'} || $this->capa;
+}
+    
+sub auth {
+    my ($self, $username, $password) = @_;
+
+    eval {
+	require MIME::Base64;
+	require Authen::SASL;
+    } or return $self->set_error(500,["Need MIME::Base64 and Authen::SASL todo auth"]);
+
+    my $capa = $self->capa;
+    my $mechanisms = $capa->{SASL} || 'CRAM-MD5';
+
+    my $sasl;
+
+    if (ref($username) and UNIVERSAL::isa($username,'Authen::SASL')) {
+      $sasl = $username;
+      $sasl->mechanism($mechanisms);
+    }
+    else {
+      die "auth(username, password)" if not length $username;
+      $sasl = Authen::SASL->new(mechanism=> $mechanisms,
+				callback => { user => $username,
+                                              pass => $password,
+					      authname => $username,
+                                            });
+    }
+
+    # We should probably allow the user to pass the host, but I don't
+    # currently know and SASL mechanisms that are used by smtp that need it
+    my $client = $sasl->client_new('pop3',${*$self}{'net_pop3_host'},0);
+    my $str    = $client->client_start;
+
+    # We dont support sasl mechanisms that encrypt the socket traffic.
+    # todo that we would really need to change the ISA hierarchy
+    # so we dont inherit from IO::Socket, but instead hold it in an attribute
+
+    my @cmd = ("AUTH", $client->mechanism);
+    my $code;
+
+    push @cmd, MIME::Base64::encode_base64($str,'')
+      if defined $str and length $str;
+
+    while (($code = $self->command(@cmd)->response()) == CMD_MORE) {
+      @cmd = (MIME::Base64::encode_base64(
+	$client->client_step(
+	  MIME::Base64::decode_base64(
+	    ($self->message)[0]
+	  )
+	), ''
+      ));
+    }
+
+    $code == CMD_OK;
+}
+
+sub banner {
+    my $this = shift;
+
+    return ${*$this}{'net_pop3_banner'};
 }
 
 1;
@@ -429,6 +514,10 @@ empty list.
 
 =over 4
 
+=item auth ( USERNAME, PASSWORD )
+
+Attempt SASL authentication.
+
 =item user ( USER )
 
 Send the USER command.
@@ -457,6 +546,23 @@ Similar to L</login>, but the password is not sent in clear text.
 
 To use this method you must have the Digest::MD5 or the MD5 module installed,
 otherwise this method will return I<undef>.
+
+=item banner ()
+
+Return the sever's connection banner
+
+=item capa ()
+
+Return a reference to a hash of the capabilties of the server.  APOP
+is added as a pseudo capability.  Note that I've been unable to
+find a list of the standard capability values, and some appear to
+be multi-word and some are not.  We make an attempt at intelligently
+parsing them, but it may not be correct.
+
+=item  capabilities ()
+
+Just like capa, but only uses a cache from the last time we asked
+the server, so as to avoid asking more than once.
 
 =item top ( MSGNUM [, NUMLINES ] )
 
@@ -541,12 +647,8 @@ Graham Barr <gbarr@pobox.com>
 
 =head1 COPYRIGHT
 
-Copyright (c) 1995-1997 Graham Barr. All rights reserved.
+Copyright (c) 1995-2003 Graham Barr. All rights reserved.
 This program is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
-
-=for html <hr>
-
-I<$Id: //depot/libnet/Net/POP3.pm#24 $>
 
 =cut
