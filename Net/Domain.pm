@@ -1,6 +1,6 @@
 # Net::Domain.pm
 #
-# Copyright (c) 1995-1997 Graham Barr <gbarr@pobox.com>. All rights reserved.
+# Copyright (c) 1995-1998 Graham Barr <gbarr@pobox.com>. All rights reserved.
 # This program is free software; you can redistribute it and/or
 # modify it under the same terms as Perl itself.
 
@@ -16,7 +16,7 @@ use Net::Config;
 @ISA = qw(Exporter);
 @EXPORT_OK = qw(hostname hostdomain hostfqdn domainname);
 
-$VERSION = "2.07"; # $Id: //depot/libnet/Net/Domain.pm#5 $
+$VERSION = "2.08"; # $Id: //depot/libnet/Net/Domain.pm#6 $
 
 my($host,$domain,$fqdn) = (undef,undef,undef);
 
@@ -43,50 +43,53 @@ sub _hostname {
          }
         return $host;
     }
-
-    local $SIG{__DIE__};
-
-
-    # syscall is preferred since it avoids tainting problems
-    eval {
-    	my $tmp = "\0" x 256; ## preload scalar
-    	eval {
-    	    package main;
-     	    require "syscall.ph";
-    	}
-    	|| eval {
-    	    package main;
-     	    require "sys/syscall.ph";
-    	}
-        and $host = (syscall(&main::SYS_gethostname, $tmp, 256) == 0)
-		? $tmp
-		: undef;
+    elsif ($^O eq 'MacOS') {
+	chomp ($host = `hostname`);
     }
+    else {
+	local $SIG{__DIE__};
 
-    # POSIX
-    || eval {
-	require POSIX;
-	$host = (POSIX::uname())[1];
+	# syscall is preferred since it avoids tainting problems
+	eval {
+    	    my $tmp = "\0" x 256; ## preload scalar
+    	    eval {
+    		package main;
+     		require "syscall.ph";
+    	    }
+    	    || eval {
+    		package main;
+     		require "sys/syscall.ph";
+    	    }
+            and $host = (syscall(&main::SYS_gethostname, $tmp, 256) == 0)
+		    ? $tmp
+		    : undef;
+	}
+
+	# POSIX
+	|| eval {
+	    require POSIX;
+	    $host = (POSIX::uname())[1];
+	}
+
+	# trusty old hostname command
+	|| eval {
+    	    chop($host = `(hostname) 2>/dev/null`); # BSD'ish
+	}
+
+	# sysV/POSIX uname command (may truncate)
+	|| eval {
+    	    chop($host = `uname -n 2>/dev/null`); ## SYSV'ish && POSIX'ish
+	}
+
+	# Apollo pre-SR10
+	|| eval {
+    	    $host = (split(/[:\. ]/,`/com/host`,6))[0];
+	}
+
+	|| eval {
+    	    $host = "";
+	};
     }
-
-    # trusty old hostname command
-    || eval {
-    	chop($host = `(hostname) 2>/dev/null`); # BSD'ish
-    }
-
-    # sysV/POSIX uname command (may truncate)
-    || eval {
-    	chop($host = `uname -n 2>/dev/null`); ## SYSV'ish && POSIX'ish
-    }
-
-    # Apollo pre-SR10
-    || eval {
-    	$host = (split(/[:\. ]/,`/com/host`,6))[0];
-    }
-
-    || eval {
-    	$host = "";
-    };
  
     # remove garbage 
     $host =~ s/[\0\r\n]+//go;
@@ -307,7 +310,7 @@ Adapted from Sys::Hostname by David Sundstrom <sunds@asictest.sc.ti.com>
 
 =head1 COPYRIGHT
 
-Copyright (c) 1995-1997 Graham Barr. All rights reserved.
+Copyright (c) 1995-1998 Graham Barr. All rights reserved.
 This program is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
 

@@ -16,7 +16,7 @@ use IO::Socket;
 use Net::Cmd;
 use Net::Config;
 
-$VERSION = "2.10"; # $Id: //depot/libnet/Net/SMTP.pm#5 $
+$VERSION = "2.11"; # $Id: //depot/libnet/Net/SMTP.pm#6 $
 
 @ISA = qw(Net::Cmd IO::Socket::INET);
 
@@ -58,7 +58,11 @@ sub new
 
  (${*$obj}{'net_smtp_domain'}) = $obj->message =~ /\A\s*(\S+)/;
 
- $obj->hello($arg{Hello} || "");
+ unless($obj->hello($arg{Hello} || ""))
+  {
+   $obj->close();
+   return undef;
+  }
 
  $obj;
 }
@@ -98,10 +102,10 @@ sub hello
 	if $msg =~ /\b${ext}\b/;
     }
   }
- else
+ elsif($me->status == CMD_ERROR) 
   {
    $msg = $me->message
-	if $me->_HELO($domain);
+	if $ok = $me->_HELO($domain);
   }
 
  $ok && $msg =~ /\A(\S+)/

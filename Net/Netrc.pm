@@ -1,6 +1,6 @@
 # Net::Netrc.pm
 #
-# Copyright (c) 1995-1997 Graham Barr <gbarr@pobox.com>. All rights reserved.
+# Copyright (c) 1995-1998 Graham Barr <gbarr@pobox.com>. All rights reserved.
 # This program is free software; you can redistribute it and/or
 # modify it under the same terms as Perl itself.
 
@@ -11,17 +11,24 @@ use strict;
 use FileHandle;
 use vars qw($VERSION);
 
-$VERSION = "2.07"; # $Id: //depot/libnet/Net/Netrc.pm#4$
+$VERSION = "2.08"; # $Id: //depot/libnet/Net/Netrc.pm#4$
 
 my %netrc = ();
 
 sub _readrc
 {
  my $host = shift;
-
- # Some OS's don't have `getpwuid', so we default to $ENV{HOME}
- my $home = eval { (getpwuid($>))[7] } || $ENV{HOME};
- my $file = $home . "/.netrc";
+ my($home,$file);
+ 
+ if($^O eq "MacOS") {
+   $home = $ENV{HOME} || `pwd`;
+   chomp($home);
+   $file = ($home =~ /:$/ ? $home . "netrc" : $home . ":netrc");
+ } else {
+   # Some OS's don't have `getpwuid', so we default to $ENV{HOME}
+   $home = eval { (getpwuid($>))[7] } || $ENV{HOME};
+   $file = $home . "/.netrc";
+ }
 
  my($login,$pass,$acct) = (undef,undef,undef);
  my $fh;
@@ -30,7 +37,7 @@ sub _readrc
  $netrc{default} = undef;
 
  # OS/2 and Win32 do not handle stat in a way compatable with this check :-(
- unless($^O eq 'os2' || $^O eq 'MSWin32')
+ unless($^O eq 'os2' || $^O eq 'MSWin32' || $^O eq 'MacOS')
   { 
    my @stat = stat($file);
 
@@ -307,7 +314,7 @@ L<Net::Cmd>
 
 =head1 COPYRIGHT
 
-Copyright (c) 1995-1997 Graham Barr. All rights reserved.
+Copyright (c) 1995-1998 Graham Barr. All rights reserved.
 This program is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
 

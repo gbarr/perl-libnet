@@ -1,6 +1,6 @@
 # Net::FTP.pm
 #
-# Copyright (c) 1995 Graham Barr <gbarr@pobox.com>. All rights reserved.
+# Copyright (c) 1995-8 Graham Barr <gbarr@pobox.com>. All rights reserved.
 # This program is free software; you can redistribute it and/or
 # modify it under the same terms as Perl itself.
 #
@@ -21,7 +21,7 @@ use Net::Cmd;
 use Net::Config;
 # use AutoLoader qw(AUTOLOAD);
 
-$VERSION = "2.35"; # $Id: //depot/libnet/Net/FTP.pm#19 $
+$VERSION = "2.36"; # $Id: //depot/libnet/Net/FTP.pm#20 $
 @ISA     = qw(Exporter Net::Cmd IO::Socket::INET);
 
 # Someday I will "use constant", when I am not bothered to much about
@@ -287,20 +287,14 @@ sub abort
 {
  my $ftp = shift;
 
- send($ftp,pack("CC",$TELNET_IAC,$TELNET_IP),0);
- send($ftp,pack("CC", $TELNET_IAC, $TELNET_DM),MSG_OOB);
+ send($ftp,pack("CCC", $TELNET_IAC, $TELNET_IP, $TELNET_IAC),MSG_OOB);
 
- $ftp->command("ABOR");
-
-# defined ${*$ftp}{'net_ftp_dataconn'}
-#    ? ${*$ftp}{'net_ftp_dataconn'}->close()
-#    : $ftp->response();
+ $ftp->command(pack("C",$TELNET_DM) . "ABOR");
  
  ${*$ftp}{'net_ftp_dataconn'}->close()
     if defined ${*$ftp}{'net_ftp_dataconn'};
 
  $ftp->response();
-#    if $ftp->status == CMD_REJECT;
 
  $ftp->status == CMD_OK;
 }
@@ -469,7 +463,8 @@ sub _store_cmd
    croak 'Must specify remote filename with stream input'
 	if defined $localfd;
 
-   ($remote = $local) =~ s%.*/%%;
+   require File::Basename;
+   $remote = File::Basename::basename($local);
   }
 
  croak("Bad remote filename '$remote'\n")
@@ -1399,7 +1394,7 @@ Roderick Schertler <roderick@gate.net> - for various inputs
 
 =head1 COPYRIGHT
 
-Copyright (c) 1995-1997 Graham Barr. All rights reserved.
+Copyright (c) 1995-1998 Graham Barr. All rights reserved.
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.
 
