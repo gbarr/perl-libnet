@@ -13,7 +13,7 @@ use Net::Cmd;
 use Carp;
 use Net::Config;
 
-$VERSION = "2.14"; # $Id: //depot/libnet/Net/POP3.pm#8 $
+$VERSION = "2.15"; # $Id: //depot/libnet/Net/POP3.pm#9 $
 
 @ISA = qw(Net::Cmd IO::Socket::INET);
 
@@ -73,7 +73,7 @@ sub login
   {
    require Net::Netrc;
 
-   $user ||= (getpwuid($>))[0];
+   $user ||= eval { (getpwuid($>))[0] } || $ENV{NAME};
 
    my $m = Net::Netrc->lookup(${*$me}{'net_pop3_host'},$user);
 
@@ -106,7 +106,7 @@ sub apop
   {
    require Net::Netrc;
 
-   $user ||= (getpwuid($>))[0];
+   $user ||= eval { (getpwuid($>))[0] } || $ENV{NAME};
 
    my $m = Net::Netrc->lookup(${*$me}{'net_pop3_host'},$user);
 

@@ -21,7 +21,7 @@ use Net::Cmd;
 use Net::Config;
 # use AutoLoader qw(AUTOLOAD);
 
-$VERSION = "2.39"; # $Id: //depot/libnet/Net/FTP.pm#24 $
+$VERSION = "2.40"; # $Id: //depot/libnet/Net/FTP.pm#25 $
 @ISA     = qw(Exporter Net::Cmd IO::Socket::INET);
 
 # Someday I will "use constant", when I am not bothered to much about
@@ -233,7 +233,7 @@ sub login
      ($ruser,$pass,$acct) = $rc->lpa()
 	if ($rc);
 
-     $pass = eval { "-" . (getpwuid($>))[0] . "@" }
+     $pass = "-" . (eval { (getpwuid($>))[0] } || $ENV{NAME} ) . '@'
         if (!defined $pass && (!defined($ruser) || $ruser =~ /^anonymous/o));
     }
 
@@ -267,7 +267,7 @@ sub authorize
   {
    require Net::Netrc;
 
-   $auth ||= eval { (getpwuid($>))[0] };
+   $auth ||= eval { (getpwuid($>))[0] } || $ENV{NAME};
 
    my $rc = Net::Netrc->lookup(${*$ftp}{'net_ftp_firewall'}, $auth)
         || Net::Netrc->lookup(${*$ftp}{'net_ftp_firewall'});
