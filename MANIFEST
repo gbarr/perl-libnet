@@ -28,8 +28,10 @@ demos/pop3
 demos/smtp.self
 demos/time
 install-nomake
+t/config.t
 t/ftp.t
 t/hostname.t
+t/libnet_t.pl
 t/nntp.t
 t/require.t
 t/smtp.t
