@@ -22,7 +22,7 @@ use Net::Config;
 use Fcntl qw(O_WRONLY O_RDONLY O_APPEND O_CREAT O_TRUNC);
 # use AutoLoader qw(AUTOLOAD);
 
-$VERSION = "2.68"; # $Id: //depot/libnet/Net/FTP.pm#74 $
+$VERSION = "2.69"; # $Id: //depot/libnet/Net/FTP.pm#75 $
 @ISA     = qw(Exporter Net::Cmd IO::Socket::INET);
 
 # Someday I will "use constant", when I am not bothered to much about
@@ -392,6 +392,23 @@ sub type
 
  ${*$ftp}{'net_ftp_type'} = join(" ",$type,@_);
 
+sub alloc
+{
+ my $ftp = shift;
+ my $size = shift;
+ my $oldval = ${*$ftp}{'net_ftp_allo'};
+
+ return $oldval
+	unless (defined $size);
+
+ return undef
+	unless ($ftp->_ALLO($size,@_));
+
+ ${*$ftp}{'net_ftp_allo'} = join(" ",$size,@_);
+
+ $oldval;
+}
+
  $oldval;
 }
 
@@ -687,7 +704,17 @@ sub _store_cmd
    require File::Basename;
    $remote = File::Basename::basename($local);
   }
-
+ if( defined ${*$ftp}{'net_ftp_allo'} ) 
+  {
+   delete ${*$ftp}{'net_ftp_allo'};
+  } else 
+  {
+   # if the user hasn't already invoked the alloc method since the last 
+   # _store_cmd call, figure out if the local file is a regular file(not
+   # a pipe, or device) and if so get the file size from stat, and send
+   # an ALLO command before sending the STOR, STOU, or APPE command.
+   $ftp->_ALLO(-s _) if -f $loc; # no ALLO if sending data from a pipe
+  }
  croak("Bad remote filename '$remote'\n")
 	if $remote =~ /[\r\n]/s;
 
@@ -1150,6 +1177,7 @@ sub cmd { shift->command(@_)->response() }
 #
 
 sub _ABOR { shift->command("ABOR")->response()	 == CMD_OK }
+sub _ALLO { shift->command("ALLO",@_)->response() == CMD_OK}
 sub _CDUP { shift->command("CDUP")->response()	 == CMD_OK }
 sub _NOOP { shift->command("NOOP")->response()	 == CMD_OK }
 sub _PASV { shift->command("PASV")->response()	 == CMD_OK }
@@ -1180,7 +1208,6 @@ sub _PASS { shift->command("PASS",@_)->response() }
 sub _ACCT { shift->command("ACCT",@_)->response() }
 sub _AUTH { shift->command("AUTH",@_)->response() }
 
-sub _ALLO { shift->unsupported(@_) }
 sub _SMNT { shift->unsupported(@_) }
 sub _MODE { shift->unsupported(@_) }
 sub _SYST { shift->unsupported(@_) }
@@ -1389,6 +1416,20 @@ C<mkdir> will attempt to create all the directories in the given path.
 Returns the full pathname to the new directory.
 
 =item ls ( [ DIR ] )
+
+=item alloc ( SIZE [, RECORD_SIZE] )
+
+The alloc command allows you to give the ftp server a hint about the size
+of the file about to be transfered using the ALLO ftp command. Some storage
+systems use this to make intelligent decisions about how to store the file.
+The C<SIZE> argument represents the size of the file in bytes. The
+C<RECORD_SIZE> argument indicates a mazimum record or page size for files
+sent with a record or page structure.
+
+The size of the file will be determined, and sent to the server
+automatically for normal files so that this method need only be called if
+you are transfering data from a socket, named pipe, or other stream not
+associated with a normal file.
 
 Get a directory listing of C<DIR>, or the current directory.
 
@@ -1638,10 +1679,6 @@ The following RFC959 commands have not been implemented:
 
 =over 4
 
-=item B<ALLO>
-
-Allocates storage for the file to be transferred.
-
 =item B<SMNT>
 
 Mount a different file system structure without changing login or
@@ -1729,6 +1766,6 @@ under the same terms as Perl itself.
 
 =for html <hr>
 
-I<$Id: //depot/libnet/Net/FTP.pm#74 $>
+I<$Id: //depot/libnet/Net/FTP.pm#75 $>
 
 =cut
