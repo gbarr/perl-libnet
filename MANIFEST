@@ -7,7 +7,6 @@ Makefile.PL
 Net/Cmd.pm
 Net/Config.pm
 Net/Domain.pm			DNS Domain name lookup
-Net/DummyInetd.pm		
 Net/FTP.pm			File Transfer Protocol Client
 Net/FTP/A.pm
 Net/FTP/E.pm
@@ -31,7 +30,6 @@ demos/time
 htdocs/Net/Cmd.html
 htdocs/Net/Config.html
 htdocs/Net/Domain.html
-htdocs/Net/DummyInetd.html
 htdocs/Net/FTP.html
 htdocs/Net/NNTP.html
 htdocs/Net/Netrc.html
