@@ -593,14 +593,14 @@ sub rmdir
 
     # Try to delete the contents
     # Get a list of all the files in the directory
-    my $filelist = $ftp->ls($dir);
+    my @filelist = grep { !/^\.{1,2}$/ } $ftp->ls($dir);
 
     return undef
-	unless $filelist && @$filelist; # failed, it is probably not a directory
+	unless @filelist; # failed, it is probably not a directory
 
     # Go thru and delete each file or the directory
     my $file;
-    foreach $file (map { m,/, ? $_ : "$dir/$_" } @$filelist)
+    foreach $file (map { m,/, ? $_ : "$dir/$_" } @filelist)
     {
 	next  # successfully deleted the file
 	    if $ftp->delete($file);
