@@ -1,4 +1,4 @@
-# Net::FTP.pm $Id: //depot/libnet/Net/FTP.pm#49 $
+# Net::FTP.pm $Id: //depot/libnet/Net/FTP.pm#50 $
 #
 # Copyright (c) 1995-8 Graham Barr <gbarr@pobox.com>. All rights reserved.
 # This program is free software; you can redistribute it and/or
@@ -726,8 +726,11 @@ sub _store_cmd
  $sock->close() or
 	return undef;
 
- ($remote) = $ftp->message =~ /unique file name:\s*(\S*)\s*\)/
-	if ('STOU' eq uc $cmd);
+ if ('STOU' eq uc $cmd and $ftp->message =~ m/unique\ file\ name:(.*)\)|"(.*)"/)
+  {
+   require File::Basename;
+   $remote = File::Basename::basename($+) 
+  }
 
  return $remote;
 }
@@ -1653,6 +1656,6 @@ Copyright (c) 1995-1998 Graham Barr. All rights reserved.
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.
 
-$Id: //depot/libnet/Net/FTP.pm#49 $
+$Id: //depot/libnet/Net/FTP.pm#50 $
 
 =cut
