@@ -16,7 +16,7 @@ use Net::Config;
 @ISA = qw(Exporter);
 @EXPORT_OK = qw(hostname hostdomain hostfqdn domainname);
 
-$VERSION = "2.12"; # $Id: //depot/libnet/Net/Domain.pm#10 $
+$VERSION = "2.13"; # $Id: //depot/libnet/Net/Domain.pm#11 $
 
 my($host,$domain,$fqdn) = (undef,undef,undef);
 
@@ -45,6 +45,15 @@ sub _hostname {
     }
     elsif ($^O eq 'MacOS') {
 	chomp ($host = `hostname`);
+    }
+    elsif ($^O eq 'VMS') {   ## multiple varieties of net s/w makes this hard
+        $host = $ENV{'UCX$INET_HOST'} if defined($ENV{'UCX$INET_HOST'});
+        $host = $ENV{'MULTINET_HOST_NAME'} if defined($ENV{'MULTINET_HOST_NAME'});
+        if (index($host,'.') > 0) {
+           $fqdn = $host;
+           ($host,$domain) = $fqdn =~ /^([^\.]+)\.(.*)$/;
+        }
+        return $host;
     }
     else {
 	local $SIG{'__DIE__'};
