@@ -13,7 +13,7 @@ use strict;
 use vars qw(@ISA @EXPORT $VERSION);
 use Carp;
 
-$VERSION = "2.13";
+$VERSION = "2.14";
 @ISA     = qw(Exporter);
 @EXPORT  = qw(CMD_INFO CMD_OK CMD_MORE CMD_REJECT CMD_ERROR CMD_PENDING);
 
@@ -53,7 +53,7 @@ sub _print_isa
    my $spc = $spc{$pkg};
    print STDERR "$cmd: ${spc}${pkg}${v}\n";
 
-   if(defined @{"${pkg}::ISA"})
+   if(@{"${pkg}::ISA"})
     {
      @spc{@{"${pkg}::ISA"}} = ("  " . $spc{$pkg}) x @{"${pkg}::ISA"};
      unshift(@do, @{"${pkg}::ISA"});
