@@ -1,0 +1,21 @@
+
+Hostname.pm.eg is an example module that can be use in place of Sys::Hostname
+it will cause Sys::Hostname to use Net::Domain and if used in a perl -w
+will inform of the use of Sys::Hostname
+
+This package only C<attempts> to locate the current hostname and DNS domainname
+I cannot gaurantee that it will. It has been found at least once where
+a machine had no way at all of locating its FQDN. If this is so you
+results from the tst script included may look something like
+
+Domainname = hostname
+Hostname   = hostname
+Hostdomain = 
+
+
+Copyright (c) 1995 Graham Barr <Graham.Barr@tiuk.ti.com>. All rights
+reserved. This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+Please report any bugs/suggestions to <Graham.Barr@tiuk.ti.com>.
+

@@ -1,0 +1,7 @@
+Domain.pm			The package
+Hostname.pm.eg			Example replacement for Sys::Hostname
+MANIFEST			This file
+Makefile.PL			MakeMaker source file
+README				Information/Copyright etc
+t/hostname.t
+tst				Test script
