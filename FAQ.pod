@@ -1,0 +1,198 @@
+=head1 NAME
+
+libnetFAQ - libnet Frequently Asked Questions
+
+=head2 Where to get this document
+
+This document is distributed with the libnet disribution, and is also
+avaliable on the libnet web page at
+
+    http://www.connect.net/gbarr/libnet/
+
+
+
+=head2 How to contribute to this document
+
+You may mail corrections, additions, and suggestions to me
+gbarr@pobox.com.
+
+
+=head1 Author and Copyright Information
+
+Copyright (c) 1997 Graham Barr.
+All rights reserved.
+
+=head2 Non-commercial Reproduction
+
+Permission is granted to distribute this document, in part or in full,
+via electronic means or printed copy providing that (1) that all credits
+and copyright notices be retained, (2) that no charges beyond reproduction
+be involved, and (3) that a reasonable attempt be made to use the most
+current version available.
+
+=head2 Disclaimer
+
+This information is offered in good faith and in the hope that it may
+be of use, but is not guaranteed to be correct, up to date, or suitable
+for any particular purpose whatsoever.  The authors accept no liability
+in respect of this information or its use.
+
+
+=head1 Obtaining and installing libnet
+
+=over 4
+
+=head2 What is libnet ?
+
+libnet is a collection of perl5 modules which all related to network
+programming. The majority of the modules avaliable provided the
+client side of popular server-client protocols that are used in
+the internet community.
+
+=head2 Which version of perl do I need ?
+
+libnet has been know to work with versions of perl from 5.002 onwards. However
+if your release of perl is prior to perl5.004 then you will need to
+obtain and install the IO distribution from CPAN. If you have perl5.004
+or later then you will have the IO modules in your installation already,
+but CPAN may contain updates.
+
+=head2 What other modules do I need ?
+
+The only modules you will need installed are the modules from the IO
+distribution. If you have perl5.004 or later you will already have
+these modules.
+
+=head2 What machines support libnet ?
+
+libnet itself is an entirly perl-code distribution so it should work
+on any machine that perl runs on. However IO may not work
+with some machines and earlier releases of perl. But this
+should not be the case with perl version 5.004 or later.
+
+=head2 Where can I get the latest libnet release
+
+The latest libnet release is always on CPAN, you will find it
+in 
+
+ http://www.perl.com/CPAN/modules/by-module/Net/
+ 
+The latest release and information is also avaliable on the libnet web page
+at
+
+ http://www.connect.net/gbarr/libnet/
+
+=back
+
+=head1 Using Net::FTP
+
+=over
+
+=head2 How do I download files from a FTP server
+
+An example taken from an articlt posted to comp.lang.perl.misc
+
+    #!/your/path/to/perl
+
+    # a module making life easier
+
+    use Net::FTP;
+
+    # for debuging: $ftp = Net::FTP->new('site','Debug',10);
+    # open a connection and log in!
+
+    $ftp = Net::FTP->new('target_site.somewhere.xxx');
+    $ftp->login('username','password');
+
+    # set transfer mode to binary
+
+    $ftp->binary();
+
+    # change the directory on the ftp site
+
+    $ftp->cwd('/some/path/to/somewhere/');
+
+    foreach $name ('file1', 'file2', 'file3') {
+
+    # get's arguments are in the following order:
+    # ftp server's filename
+    # filename to save the transfer to on the local machine
+    # can be simply used as get($name) if you want the same name
+
+      $ftp->get($name,$name);
+    }
+
+    # ftp done!
+
+    $ftp->quit;
+
+=head2 How do I transfer files in binary mode ?
+
+To transfer files without <LF><CR> translation Net::FTP provides
+the C<binary> method
+
+    $ftp->binary;
+
+=head2 How can I can the size of a file on a remote FTP server ?
+
+=head2 How can I can the modification time of a file on a remote FTP server ?
+
+=head2 Can I do a reget operation like the ftp command ?
+
+=head2 How do I get a directory listing from a FTP server ?
+
+=back
+
+=head1 Debugging scripts
+
+=over
+
+=head2 How can I debug my scripts that use Net::* modules ?
+
+Most of the libnet client classes allow options to be passed to the
+constructor, in most cases one option is called C<Debug>. Passing
+this option with a non-zero value will turn on a protocol trace, which
+will be sent to STDERR. This trace can be useful to see what commands
+are being sent to the remote server and what responces are being
+received back.
+
+    #!/your/path/to/perl
+    
+    use Net::FTP;
+    
+    my $ftp = new Net::FTP($host, Debug => 1);
+    $ftp->login('gbarr','password');
+    $ftp->quit;
+
+this script would output something like
+
+ Net::FTP: Net::FTP(2.22)
+ Net::FTP:   Exporter
+ Net::FTP:   Net::Cmd(2.0801)
+ Net::FTP:   IO::Socket::INET
+ Net::FTP:     IO::Socket(1.1603)
+ Net::FTP:       IO::Handle(1.1504)
+
+ Net::FTP=GLOB(0x8152974)<<< 220 imagine FTP server (Version wu-2.4(5) Tue Jul 29 11:17:18 CDT 1997) ready.
+ Net::FTP=GLOB(0x8152974)>>> user gbarr
+ Net::FTP=GLOB(0x8152974)<<< 331 Password required for gbarr.
+ Net::FTP=GLOB(0x8152974)>>> PASS ....
+ Net::FTP=GLOB(0x8152974)<<< 230 User gbarr logged in.  Access restrictions apply.
+ Net::FTP=GLOB(0x8152974)>>> QUIT
+ Net::FTP=GLOB(0x8152974)<<< 221 Goodbye.
+
+The first few lines tell you the modules that Net::FTP uses and thier versions,
+this is usefule data to me when a user reports a bug. The last seven lines
+show the communication with the server. Each line has three parts. The first
+part is the object itself, this is useful for separating the output
+if you are using mutiple objects. The second part is either C<<<<<> to
+show data coming from the server or C<&gt&gt&gt&gt> to show data
+going to the server. The remainder of the line is the command
+being sent or responce being received.
+
+=back
+
+=head1
+
+Copyright (c) 1997 Graham Barr.
+All rights reserved.
