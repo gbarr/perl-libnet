@@ -21,7 +21,7 @@ use Net::Cmd;
 use Net::Config;
 # use AutoLoader qw(AUTOLOAD);
 
-$VERSION = "2.55"; # $Id: //depot/libnet/Net/FTP.pm#45 $
+$VERSION = "2.56"; # $Id: //depot/libnet/Net/FTP.pm#46 $
 @ISA     = qw(Exporter Net::Cmd IO::Socket::INET);
 
 # Someday I will "use constant", when I am not bothered to much about
@@ -553,16 +553,16 @@ sub rmdir
 
     # Go thru and delete each file or the directory
     my $file;
-    foreach $file (@$filelist)
+    foreach $file (map { m,/, ? $_ : "$dir/$_" } @$filelist)
     {
 	next  # successfully deleted the file
-	    if $ftp->delete( $dir . '/' . $file);
+	    if $ftp->delete($file);
 
 	# Failed to delete it, assume its a directory
 	# Recurse and ignore errors, the final rmdir() will
 	# fail on any errors here
 	return $ok
-	    unless $ok = $ftp->rmdir($dir . '/' . $file, 1) ;
+	    unless $ok = $ftp->rmdir($file, 1) ;
     }
 
     # Directory should be empty
