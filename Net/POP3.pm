@@ -13,7 +13,7 @@ use Net::Cmd;
 use Carp;
 use Net::Config;
 
-$VERSION = "2.11"; # $Id: //depot/libnet/Net/POP3.pm#4 $
+$VERSION = "2.12"; # $Id: //depot/libnet/Net/POP3.pm#5 $
 
 @ISA = qw(Net::Cmd IO::Socket::INET);
 
@@ -212,7 +212,9 @@ sub list
    return $1 || undef;
   }
  
- my $info = $me->read_until_dot;
+ my $info = $me->read_until_dot
+	or return undef;
+
  my %hash = ();
  map { /(\d+)\D+(\d+)/; $hash{$1} = $2; } @$info;
 
@@ -250,7 +252,8 @@ sub uidl
   }
  else
   {
-   my $ref = $me->read_until_dot;
+   my $ref = $me->read_until_dot
+	or return undef;
    my $ln;
    $uidl = {};
    foreach $ln (@$ref) {
