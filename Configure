@@ -353,20 +353,68 @@ $cfg{'daytime_hosts'} = get_host_list($msg,$def);
 #---------------------------------------------------------------------------
 
 $msg = <<EDQ;
+Do you have a firewall/ftp proxy  between your machine and the internet 
 
-Some companies access the internet via a firewall machine, and all
-FTP access must be dove via this machine.
+If you use a SOCKS firewall answer no
 
-If to gain FTP access to a machine beyond a firewall, you have to use
-a FTP proxy machine and login as username\@remote.host then enter
-the name of that gateway here.
-
-FTP proxy hostname :
+(y|n) ?
 EDQ
 
-$def = $oldcfg{'ftp_firewall'} || $ENV{FTP_FIREWALL};
+if(get_bool($msg,0)) {
 
-$cfg{'ftp_firewall'} = get_hostname($msg,$def);
+  $msg = <<'EDQ';
+What series of FTP commands do you need to send to your
+firewall to connect to an external host.
+
+user/pass     => external user & password
+fwuser/fwpass => firewall user & password
+
+0) None
+1) -----------------------
+     USER user@remote.host
+     PASS pass
+2) -----------------------
+     USER fwuser
+     PASS fwpass
+     USER user@remote.host
+     PASS pass
+3) -----------------------
+     USER fwuser
+     PASS fwpass
+     SITE remote.site
+     USER user
+     PASS pass
+4) -----------------------
+     USER fwuser
+     PASS fwpass
+     OPEN remote.site
+     USER user
+     PASS pass
+5) -----------------------
+     USER user@fwuser@remote.site
+     PASS pass@fwpass
+6) -----------------------
+     USER fwuser@remote.site
+     PASS fwpass
+     USER user
+     PASS pass
+7) -----------------------
+     USER user@remote.host
+     PASS pass
+     AUTH fwuser
+     RESP fwpass
+EDQ
+ $def = exists $oldcfg{'ftp_firewall_type'}  ? $oldcfg{'ftp_firewall_type'} : 1;
+ $ans = Prompt($msg,$def);
+ $cfg{'ftp_firewall_type'} = 0+$ans;
+ $def = $oldcfg{'ftp_firewall'} || $ENV{FTP_FIREWALL};
+
+ $cfg{'ftp_firewall'} = get_hostname("FTP proxy hostname :", $def);
+}
+else {
+ delete $cfg{'ftp_firewall'};
+}
+
 
 #---------------------------------------------------------------------------
 
@@ -424,16 +472,21 @@ protocol. In these situations the client must make the connection to the
 server, this is called a passive transfer.
 EDQ
 
-$msg = "\nShould all FTP connections via a firewall/proxy be passive (y|n) ?";
+if (defined $cfg{'ftp_firewall'}) {
+  $msg = "\nShould all FTP connections via a firewall/proxy be passive (y|n) ?";
 
-$def = $oldcfg{'ftp_ext_passive'} || 0;
+  $def = $oldcfg{'ftp_ext_passive'} || 0;
 
-$cfg{'ftp_ext_passive'} = get_bool($msg,$def);
+  $cfg{'ftp_ext_passive'} = get_bool($msg,$def);
 
+  $msg = "\nShould all other FTP connections be passive (y|n) ?";
+
+}
+else {
+  $msg = "\nShould all FTP connections be passive (y|n) ?";
+}
 
 $def = $oldcfg{'ftp_int_passive'} || 0;
-
-$msg = "\nShould all other FTP connections be passive (y|n) ?";
 
 $cfg{'ftp_int_passive'} = get_bool($msg,$def);
 

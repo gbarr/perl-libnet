@@ -21,7 +21,7 @@ use Net::Cmd;
 use Net::Config;
 # use AutoLoader qw(AUTOLOAD);
 
-$VERSION = "2.53"; # $Id: //depot/libnet/Net/FTP.pm#40 $
+$VERSION = "2.53"; # $Id: //depot/libnet/Net/FTP.pm#41 $
 @ISA     = qw(Exporter Net::Cmd IO::Socket::INET);
 
 # Someday I will "use constant", when I am not bothered to much about
@@ -220,62 +220,101 @@ sub size {
  undef;
 }
 
-sub login
-{
- my($ftp,$user,$pass,$acct) = @_;
- my($ok,$ruser);
+sub login {
+  my($ftp,$user,$pass,$acct) = @_;
+  my($ok,$ruser,$fwtype);
 
- unless (defined $user)
-  {
-   require Net::Netrc;
+  unless (defined $user) {
+    require Net::Netrc;
 
-   my $rc = Net::Netrc->lookup(${*$ftp}{'net_ftp_host'});
+    my $rc = Net::Netrc->lookup(${*$ftp}{'net_ftp_host'});
 
-   ($user,$pass,$acct) = $rc->lpa()
-	if ($rc);
+    ($user,$pass,$acct) = $rc->lpa()
+	 if ($rc);
+   }
+
+  $user ||= "anonymous";
+  $ruser = $user;
+
+  $fwtype = $NetConfig{'ftp_firewall_type'} || 0;
+
+  if ($fwtype && defined ${*$ftp}{'net_ftp_firewall'}) {
+    if ($fwtype == 1 || $fwtype == 7) {
+      $user .= '@' . ${*$ftp}{'net_ftp_host'};
+    }
+    else {
+      require Net::Netrc;
+
+      my $rc = Net::Netrc->lookup(${*$ftp}{'net_ftp_firewall'});
+
+      my($fwuser,$fwpass,$fwacct) = $rc ? $rc->lpa() : ();
+
+      if ($fwtype == 5) {
+	$user = join('@',$user,$fwuser,${*$ftp}{'net_ftp_host'});
+	$pass = $pass . '@' . $fwpass;
+      }
+      else {
+	if ($fwtype == 2) {
+	  $user .= '@' . ${*$ftp}{'net_ftp_host'};
+	}
+	elsif ($fwtype == 6) {
+	  $fwuser .= '@' . ${*$ftp}{'net_ftp_host'};
+	}
+
+	$ok = $ftp->_USER($fwuser);
+
+	return 0 unless $ok == CMD_OK || $ok == CMD_MORE;
+
+	$ok = $ftp->_PASS($fwpass || "");
+
+	return 0 unless $ok == CMD_OK || $ok == CMD_MORE;
+
+	$ok = $ftp->_ACCT($fwacct)
+	  if defined($fwacct);
+
+	if ($fwtype == 3) {
+          $ok = $ftp->command("SITE",${*$ftp}{'net_ftp_host'})->response;
+	}
+	elsif ($fwtype == 4) {
+          $ok = $ftp->command("OPEN",${*$ftp}{'net_ftp_host'})->response;
+	}
+
+	return 0 unless $ok == CMD_OK || $ok == CMD_MORE;
+      }
+    }
   }
 
- $user ||= "anonymous";
- $ruser = $user;
+  $ok = $ftp->_USER($user);
 
- if(defined ${*$ftp}{'net_ftp_firewall'})
-  {
-   $user .= '@' . ${*$ftp}{'net_ftp_host'};
-  }
+  # Some dumb firewalls don't prefix the connection messages
+  $ok = $ftp->response()
+	 if ($ok == CMD_OK && $ftp->code == 220 && $user =~ /\@/);
 
- $ok = $ftp->_USER($user);
+  if ($ok == CMD_MORE) {
+    unless(defined $pass) {
+      require Net::Netrc;
 
- # Some dumb firewalls don't prefix the connection messages
- $ok = $ftp->response()
-	if($ok == CMD_OK && $ftp->code == 220 && $user =~ /\@/);
+      my $rc = Net::Netrc->lookup(${*$ftp}{'net_ftp_host'}, $ruser);
 
- if ($ok == CMD_MORE)
-  {
-   unless(defined $pass)
-    {
-     require Net::Netrc;
+      ($ruser,$pass,$acct) = $rc->lpa()
+	 if ($rc);
 
-     my $rc = Net::Netrc->lookup(${*$ftp}{'net_ftp_host'}, $ruser);
-
-     ($ruser,$pass,$acct) = $rc->lpa()
-	if ($rc);
-
-     $pass = "-" . (eval { (getpwuid($>))[0] } || $ENV{NAME} ) . '@'
-        if (!defined $pass && (!defined($ruser) || $ruser =~ /^anonymous/o));
+      $pass = "-" . (eval { (getpwuid($>))[0] } || $ENV{NAME} ) . '@'
+         if (!defined $pass && (!defined($ruser) || $ruser =~ /^anonymous/o));
     }
 
-   $ok = $ftp->_PASS($pass || "");
+    $ok = $ftp->_PASS($pass || "");
   }
 
- $ok = $ftp->_ACCT($acct)
-	if (defined($acct) && ($ok == CMD_MORE || $ok == CMD_OK));
+  $ok = $ftp->_ACCT($acct)
+	 if (defined($acct) && ($ok == CMD_MORE || $ok == CMD_OK));
 
- if($ok == CMD_OK && defined ${*$ftp}{'net_ftp_firewall'}) {
-   my($f,$auth,$resp) = _auth_id($ftp);
-   $ftp->authorize($auth,$resp) if defined($resp);
- }
+  if ($fwtype == 7 && $ok == CMD_OK && defined ${*$ftp}{'net_ftp_firewall'}) {
+    my($f,$auth,$resp) = _auth_id($ftp);
+    $ftp->authorize($auth,$resp) if defined($resp);
+  }
 
- $ok == CMD_OK;
+  $ok == CMD_OK;
 }
 
 sub account
@@ -299,7 +338,7 @@ sub _auth_id {
         || Net::Netrc->lookup(${*$ftp}{'net_ftp_firewall'});
 
    ($auth,$resp) = $rc->lpa()
-     if($rc);
+     if ($rc);
   }
   ($ftp,$auth,$resp);
 }
