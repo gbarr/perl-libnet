@@ -16,7 +16,7 @@ use IO::Socket;
 use Net::Cmd;
 use Net::Config;
 
-$VERSION = "2.26"; # $Id: //depot/libnet/Net/SMTP.pm#30 $
+$VERSION = "2.26"; # $Id: //depot/libnet/Net/SMTP.pm#31 $
 
 @ISA = qw(Net::Cmd IO::Socket::INET);
 
@@ -26,11 +26,11 @@ sub new
  my $type = ref($self) || $self;
  my $host = shift if @_ % 2;
  my %arg  = @_; 
- my $hosts = defined $host ? [ $host ] : $NetConfig{smtp_hosts};
+ my $hosts = defined $host ? $host : $NetConfig{smtp_hosts};
  my $obj;
 
  my $h;
- foreach $h (@{$hosts})
+ foreach $h (@{ref($hosts) ? $hosts : [ $hosts ]})
   {
    $obj = $type->SUPER::new(PeerAddr => ($host = $h), 
 			    PeerPort => $arg{Port} || 'smtp(25)',
@@ -570,6 +570,9 @@ known as mailhost:
 This is the constructor for a new Net::SMTP object. C<HOST> is the
 name of the remote host to which an SMTP connection is required.
 
+If C<HOST> is an array reference then each value will be attempted
+in turn until a connection is made.
+
 If C<HOST> is not given, then the C<SMTP_Host> specified in C<Net::Config>
 will be used.
 
@@ -762,6 +765,6 @@ it under the same terms as Perl itself.
 
 =for html <hr>
 
-I<$Id: //depot/libnet/Net/SMTP.pm#30 $>
+I<$Id: //depot/libnet/Net/SMTP.pm#31 $>
 
 =cut
