@@ -21,7 +21,7 @@ use Net::Cmd;
 use Net::Config;
 # use AutoLoader qw(AUTOLOAD);
 
-$VERSION = "2.38"; # $Id: //depot/libnet/Net/FTP.pm#22 $
+$VERSION = "2.39"; # $Id: //depot/libnet/Net/FTP.pm#23 $
 @ISA     = qw(Exporter Net::Cmd IO::Socket::INET);
 
 # Someday I will "use constant", when I am not bothered to much about
@@ -356,12 +356,13 @@ sub get
   }
 
  $buf = '';
-
+ my $swlen;
+ 
  do
   {
    $len = $data->read($buf,1024);
   }
- while($len > 0 && syswrite($loc,$buf,$len) == $len);
+ while($len && defined($swlen = syswrite($loc,$buf,$len)) && $swlen == $len);
 
  close($loc)
 	unless defined $localfd;
@@ -526,7 +527,8 @@ sub _store_cmd
   {
    last unless $len = sysread($loc,$buf="",1024);
 
-   unless($sock->write($buf,$len) == $len)
+   my $wlen;
+   unless(defined($wlen = $sock->write($buf,$len)) && $wlen == $len)
     {
      $sock->abort;
      close($loc)

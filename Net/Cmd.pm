@@ -13,7 +13,7 @@ use strict;
 use vars qw(@ISA @EXPORT $VERSION);
 use Carp;
 
-$VERSION = "2.11";
+$VERSION = "2.12";
 @ISA     = qw(Exporter);
 @EXPORT  = qw(CMD_INFO CMD_OK CMD_MORE CMD_REJECT CMD_ERROR CMD_PENDING);
 
@@ -168,9 +168,10 @@ sub command
 
    my $str =  join(" ",@_) . "\015\012";
    my $len = length $str;
-
+   my $swlen;
+   
    $cmd->close
-	unless syswrite($cmd,$str,$len) == $len;
+	unless (defined($swlen = syswrite($cmd,$str,$len)) && $swlen == $len);
 
    $cmd->debug_print(1,$str)
 	if($cmd->debug);

@@ -10,7 +10,7 @@ use Carp;
 require Net::FTP::dataconn;
 
 @ISA = qw(Net::FTP::dataconn);
-$VERSION = sprintf("1.%02d",(q$Id: //depot/libnet/Net/FTP/I.pm#5 $ =~ /#(\d+)/)[0]);
+$VERSION = "1.06"; # $Id: //depot/libnet/Net/FTP/I.pm#6 $
 
 sub read
 {
@@ -24,7 +24,7 @@ sub read
 
  my $n = sysread($data, $buf, $size);
 
- ${*$data}{'net_ftp_bytesread'} += $n if $n > 0;
+ ${*$data}{'net_ftp_bytesread'} += $n if $n;
  ${*$data}{'net_ftp_eof'} = 1 unless $n;
 
  $n;
@@ -48,7 +48,7 @@ sub write
  my $off = 0;
  while($sent > 0) {
    my $n = syswrite($data, $buf, $sent,$off);
-   return $n if $n < 0;
+   return undef unless defined($n);
    $sent -= $n;
    $off += $n;
  }
