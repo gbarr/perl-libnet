@@ -22,7 +22,7 @@ use Net::Config;
 use Fcntl qw(O_WRONLY O_RDONLY O_APPEND O_CREAT O_TRUNC);
 # use AutoLoader qw(AUTOLOAD);
 
-$VERSION = "2.74"; # $Id: //depot/libnet/Net/FTP.pm#83 $
+$VERSION = "2.74"; # $Id: //depot/libnet/Net/FTP.pm#84 $
 @ISA     = qw(Exporter Net::Cmd IO::Socket::INET);
 
 # Someday I will "use constant", when I am not bothered to much about
@@ -1415,8 +1415,6 @@ C<mkdir> will attempt to create all the directories in the given path.
 
 Returns the full pathname to the new directory.
 
-=item ls ( [ DIR ] )
-
 =item alloc ( SIZE [, RECORD_SIZE] )
 
 The alloc command allows you to give the ftp server a hint about the size
@@ -1430,6 +1428,8 @@ The size of the file will be determined, and sent to the server
 automatically for normal files so that this method need only be called if
 you are transfering data from a socket, named pipe, or other stream not
 associated with a normal file.
+
+=item ls ( [ DIR ] )
 
 Get a directory listing of C<DIR>, or the current directory.
 
