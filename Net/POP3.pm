@@ -13,7 +13,7 @@ use Net::Cmd;
 use Carp;
 use Net::Config;
 
-$VERSION = "2.16"; # $Id: //depot/libnet/Net/POP3.pm#10 $
+$VERSION = "2.17"; # $Id: //depot/libnet/Net/POP3.pm#11 $
 
 @ISA = qw(Net::Cmd IO::Socket::INET);
 
@@ -272,7 +272,7 @@ sub _NOOP { shift->command('NOOP')->response() == CMD_OK }
 sub _RSET { shift->command('RSET')->response() == CMD_OK }
 sub _QUIT { shift->command('QUIT')->response() == CMD_OK }
 sub _TOP  { shift->command('TOP', @_)->response() == CMD_OK }
-sub _UIDL { shift->command('UIDL')->response() == CMD_OK }
+sub _UIDL { shift->command('UIDL',@_)->response() == CMD_OK }
 sub _USER { shift->command('USER',$_[0])->response() == CMD_OK }
 sub _PASS { shift->command('PASS',$_[0])->response() == CMD_OK }
 sub _APOP { shift->command('APOP',@_)->response() == CMD_OK }
