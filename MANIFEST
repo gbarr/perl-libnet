@@ -32,6 +32,7 @@ t/config.t
 t/ftp.t
 t/hostname.t
 t/libnet_t.pl
+t/netrc.t
 t/nntp.t
 t/require.t
 t/smtp.t
