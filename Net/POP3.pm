@@ -13,7 +13,7 @@ use Net::Cmd;
 use Carp;
 use Net::Config;
 
-$VERSION = "1.10";
+$VERSION = "2.10";
 
 @ISA = qw(Net::Cmd IO::Socket::INET);
 
@@ -238,6 +238,7 @@ sub delete
 
 sub uidl
 {
+ @_ == 1 || @_ == 2 or croak 'usage: $pop3->uidl( [ MSGNUM ] )';
  my $me = shift;
  my $uidl;
 
@@ -405,6 +406,17 @@ will be used.
 
 Returns the number of messages in the mailbox.
 
+If the server cannot authenticate C<USER> the I<undef> will be returned.
+
+=item apop ( USER, PASS )
+
+Authenticate with the server identifying as C<USER> with password C<PASS>.
+Similar ti L<login>, but the password is not sent in clear text. 
+
+To use this method you must have the MD5 package installed, if you do not
+this method will return I<undef>
+
+
 =item top ( MSGNUM [, NUMLINES ] )
 
 Get the header and the first C<NUMLINES> of the body for the message
@@ -433,6 +445,12 @@ Returns the highest C<MSGNUM> of all the messages accessed.
 
 Returns an array of two elements. These are the number of undeleted
 elements and the size of the mbox in octets.
+
+=item uidl ( [ MSGNUM ] )
+
+Returns a unique identifier for C<MSGNUM> if given. If C<MSGNUM> is not
+given C<uidl> returns a reference to a hash where the keys are the
+message numbers and the values are the unique identifiers.
 
 =item delete ( MSGNUM )
 

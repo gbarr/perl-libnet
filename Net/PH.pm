@@ -1,7 +1,7 @@
 #
-# Copyright (c) 1995-1997 Graham Barr <gbarr@pobox.com> and
+# Copyright (c) 1995-1997 Graham Barr <gbarr@ti.com> and
 # Alex Hristov <hristov@slb.com>. All rights reserved. This program is free
-# software; you # can redistribute it and/or modify it under the same terms
+# software; you can redistribute it and/or modify it under the same terms
 # as Perl itself.
 
 package Net::PH;
@@ -17,7 +17,7 @@ use IO::Socket;
 use Net::Cmd;
 use Net::Config;
 
-$VERSION = do { my @r=(q$Revision: 2.17 $=~/\d+/g); sprintf "%d."."%02d"x$#r,@r};
+$VERSION = "2.18";
 @ISA     = qw(Exporter Net::Cmd IO::Socket::INET);
 
 sub new
@@ -362,294 +362,101 @@ sub text  { shift->[3] }
 
 package Net::PH::crypt;
 
-##
-#	'cryptit.pl'
-#
-#	Description:	perl port of Steven Dorner's cryptit.c
-#
-#					Allows password encryption for CCSO
-#					qi server.
-#
-#	Author:			Broc Seib
-#	       			Purdue University Computing Center
-#	Date:			Thu Nov  7 21:17:46 EST 1996
-#					Tue Nov 12 16:04:36 EST 1996
-##
+#  The code in this package is based upon 'cryptit.c', Copyright (C) 1988 by
+#  Steven Dorner, and Paul Pomes, and the University of Illinois Board
+#  of Trustees, and by CSNET.
 
-##
-#
-#  This software is based upon 'cryptit.c', Copyright (C) 1988 by
-#  Steven Dorner and the University of Illinois Board of Trustees,
-#  and by CSNET.
-#
-#  The development of this software is independent of any of the
-#  aforementioned parties. No warranties of any kind are expressed
-#  or implied.
-#
-#  Author of this perl library 'cryptit.pl' may be contacted:
-#
-#	Broc Seib bseib@purdue.edu  Network Systems Programmer
-#	1408 Mathematical Sciences  Instructional Computing Division
-#	W Lafayette, IN 47907-1408  Purdue University Computing Center
-#	
-##
+use integer;
+use strict;
+ 
+sub ROTORSZ () { 256 }
+sub MASK () { 255 }
 
-use Math::BigInt;
-use	integer;
+my(@t1,@t2,@t3,$n1,$n2);
 
-##
-#	CONSTANTS
-#
-
-use vars qw($c1 $c2 $c3 $c4 @cr $n1 $n2
-	    $ROTORSZ $MASK $ERR $REPORT $BUGZ
-	    @t1 @t2 @t3 $i $k );
-
-BEGIN {
-	$ROTORSZ = 256;
-	$MASK = 255;
-	$BUGZ = 0;		# to set debug output level
-	$ERR = "";
-	$REPORT = "$ERR\nPlease report this bug to bseib\@purdue.edu.\n";
-}
-#
-##
-
-
-##
-#	Routine:		crypt_start
-#					&crypt_start($passwd);
-#
-#	Description:	Initializes the crypt tables based on a passwd.
-#
-#	Author:			Broc Seib
-#	       			Purdue University Computing Center
-#	Date:			Thu Nov  7 21:33:37 EST 1996
-##
-sub crypt_start # (char *pass)
-{
-	my	$pw = $_[0] if $_[0];
-	my	($ic, $i, $k, $temp, $random, $buf, $lbuf);
-	my	$seed;
-	my	($signed_seed, $sign);
-	my	$b32 = new Math::BigInt '4294967296';
-	my	$b31 = new Math::BigInt '2147483648';
-
-	$n1 = 0;
-	$n2 = 0;
-
-	##
-	#	init tables to zero
-	#
-	for ($i = 0; $i < $ROTORSZ; $i++) {
-		$t1[$i] = $t2[$i] = $t3[$i] = 0;
-	}
-	#
-	##
-
-	##
-	#	create a "random" set of chars, DES-based on your passwd,
-	#	using the same passwd as salt.
-	#
-	$buf = crypt($pw, $pw);	# should return a 13 char str to $buf
-	$lbuf = length($buf);
-	return(-1) if ($lbuf <= 0); # caller didn't supply a passwd
-	#
-	#	using a seeded pseudo random num gen, fill in the tables
-	#	with "random" guk.
-	#
-	$seed = new Math::BigInt '123';		# where did 123 come from, Steve? :-)
-	for ($i = 0; $i < $lbuf; $i++) {
-		$seed = ($seed * ord(substr($buf,$i,1)) + $i) % $b32;
-	}
-	for ($i = 0; $i < $ROTORSZ; $i++) {
-		$t1[$i] = $i;
-	}
-
-	for ($i = 0; $i < $ROTORSZ; $i++) {
-		print STDERR "\n" if ($BUGZ > 1);
-		$seed = (5 * $seed + ord(substr($buf,($i % $lbuf),1))) % $b32;
-		printf(STDERR "seed: %08lx\n",$seed) if ($BUGZ > 1);
-		if ($seed >= $b31) {
-			$sign = -1;
-			$signed_seed = ($seed - $b32);
-		} else {
-			$sign = 1;
-			$signed_seed = ($seed);
-		}
-		printf(STDERR "sgsd: %08lx\n",$signed_seed) if ($BUGZ > 1);
-		$random = $sign * int($signed_seed % '65521');
-		printf(STDERR "ran1: %08lx\n",$random) if ($BUGZ > 1);
-		$k = $ROTORSZ - 1 - $i;
-		$ic = ($random & $MASK) % ($k + 1);
-		printf(STDERR " ic1: %08lx\n",$ic) if ($BUGZ > 1);
-		$random = ($random >> 8) & $MASK;
-		printf(STDERR "ran2: %08lx\n",$random) if ($BUGZ > 1);
-		$temp = $t1[$k];
-		$t1[$k] = $t1[$ic];
-		$t1[$ic] = $temp;
-		next if ($t3[$k] != 0);
-		unless ($k) {
-			$ERR = "[0] Can't % by zero. \$k=$k";
-			die $REPORT;
-		}
-		$ic = ($random & $MASK) % $k;
-		printf(STDERR " ic2: %08lx\n",$ic) if ($BUGZ > 1);
-		while ($t3[$ic] != 0) {
-			unless ($k) {
-				$ERR = "[1] Can't % by zero. \$k=$k";
-				die $REPORT;
-			}
-			$ic = ($ic + 1) % $k;
-			printf(STDERR " ic3: %08lx\n",$ic) if ($BUGZ > 1);
-		}
-		$t3[$k] = $ic;
-		$t3[$ic] = $k;
-	}
-	for ($i = 0; $i < $ROTORSZ; $i++) {
-		$t2[$t1[$i] & $MASK] = $i;
-	}
-	#
-	##
-
-	##
-	#	if in debug mode, print the crypt tables
-	#
-	&print_t(@t1) if $BUGZ;
-	&print_t(@t2) if $BUGZ;
-	&print_t(@t3) if $BUGZ;
-	#
-	##
-
-	##
-	#	return value undefined
-	#
-	undef;
-	#
-	##
+sub crypt_start {
+    my $pass = shift;
+    $n1 = 0;
+    $n2 = 0;
+    crypt_init($pass);
 }
 
+sub crypt_init {
+    my $pw = shift;
+    my $i;
 
-##
-#	Routine:		encryptit
-#					($len,$crypt_str) = &encryptit($plain_str);
-#
-#	Description:	Encrypts a string given the current state of
-#					the encryption tables, as setup by &crypt_start().
-#					The plain string is passed in, A length scalar is
-#					returned, representing the length of the encrypted
-#					string. The encrypted string also contains a length
-#					byte as the first byte. The crypt string is returned
-#					as the second return array element.
-#
-#	Author:			Broc Seib
-#	       			Purdue University Computing Center
-#	Date:			Thu Nov  7 23:00:44 EST 1996
-##
-sub encryptit
-{
-	my	$plain_str = $_[0] if $_[0];
-	my	$crypt_str;
-	my	($x, @cr);
+    @t2 = @t3 = (0) x ROTORSZ;
 
-	print STDERR $plain_str,"\n" if $BUGZ;
-
-	##
-	#	for each letter in the plain str, create a
-	#	byte for part of the crypt str. They will actually
-	#	be remapped into a 6bit character set, thus growing
-	#	in length by a factor of a third. It is advised to pass
-	#	in a string that is a length multiple of three.
-	#
-	for ($i=0;$i<length($plain_str);$i++) {
-		$x = ord(substr($plain_str,$i,1)) + $n1;
-		$x = $t1[$x & $MASK] + $n2;
-		$x = $t3[$x & $MASK] - $n2;
-		$x = $t2[$x & $MASK] - $n1;
-		$x = ($x & $MASK);
-		push (@cr, $x);
-		$n1 = ($n1 + 1) % $ROTORSZ;
-		$n2 = ($n2 + 1) % $ROTORSZ unless ($n1);
-	}
-	#
-	##
-
-	##
-	#	convert this list of bytes into printable string
-	#	and return it along with str length
-	#
-	$crypt_str =  &encode(@cr);
-	return (length($crypt_str),$crypt_str);
-	#
-	##
-}
+    my $buf = crypt($pw,$pw);
+    return -1 unless length($buf) > 0;
+    $buf = substr($buf . "\0" x 13,0,13);
+    my @buf = map { ord $_ } split(//, $buf);
 
 
-##
-#	Routine:		encode
-#
-#	Description:	Encodes a list of bytes into a printable string.
-#					The printable characters are in a set of 64
-#					beginning with ASCII '#'. Only 6 bits are needed
-#					per character, so a set of 3 chars incoming are
-#					converted into 4 chars outgoing. The beginning
-#					length byte represents the number of eight bit
-#					chars coming in, not the number of six bit chars
-#					going out.
-#
-#	Author:			Broc Seib
-#	       			Purdue University Computing Center
-#	Date:			Thu Nov  7 23:41:36 EST 1996
-##
-sub encode
-{
-	my	@cr = @_ if @_;		# the crypt char list;
-	my	$str;
-	my	($c1, $c2, $c3, $c4);
-	my	@ts;				# stands for "threesome"
-
-	$str = &ENC($#cr + 1);		# length byte
-
-	@ts = splice(@cr,0,3);		# grab first three from list
-	while ($#ts == 2) {			# right size
-		$c1 = int(  $ts[0] / 4);
-		$c2 = int( ($ts[0] % 4) * 16 + (int($ts[1] / 16) % 16) );
-		$c3 = int( ($ts[1] % 16) * 4 + (int($ts[2] / 64) % 4 ) );
-		$c4 = int( ($ts[2] % 64) );
-		$str = $str . &ENC($c1) . &ENC($c2) . &ENC($c3) . &ENC($c4);
-		@ts = splice(@cr,0,3);	# grab next three from list
-	}
-
-	$str;	# return encoded string
-}
-
-
-sub ENC {
-	my	$c = $_[0] if $_[0];
-	return sprintf("%c",(($c % 64) + ord('#')) );
-}
-
-sub SetDebugMode {
-	$BUGZ = $_[0];
-}
-
-sub print_t {
-    my $i = 0;
-    my @t = @_;
-    foreach (@t) {
-        printf(STDERR "%02x",$_);
-        unless (++$i % 32) {
-            print STDERR "\n";
-        } else {
-            print STDERR ":" unless ($i % 4);
-        }
+    my $seed = 123;
+    for($i = 0 ; $i < 13 ; $i++) {
+	$seed = $seed * $buf[$i] + $i;
     }
-    print STDERR "\n";
+    @t1 = (0 .. ROTORSZ-1);
+    
+    for($i = 0 ; $i < ROTORSZ ; $i++) {
+	$seed = 5 * $seed + $buf[$i % 13];
+	my $random = $seed % 65521;
+	my $k = ROTORSZ - 1 - $i;
+	my $ic = ($random & MASK) % ($k + 1);
+	$random >>= 8;
+	@t1[$k,$ic] = @t1[$ic,$k];
+	next if $t3[$k] != 0;
+	$ic = ($random & MASK) % $k;
+	while($t3[$ic] != 0) {
+	    $ic = ($ic + 1) % $k;
+	}
+	$t3[$k] = $ic;
+	$t3[$ic] = $k;
+    }
+    for($i = 0 ; $i < ROTORSZ ; $i++) {
+	$t2[$t1[$i] & MASK] = $i
+    }
 }
 
-##
-#	EOF
-##
+sub encode {
+    my $sp = shift;
+    my $ch;
+    my $n = scalar(@$sp);
+    my @out = ($n);
+    my $i;
+
+    for($i = 0 ; $i < $n ; ) {
+	my($f0,$f1,$f2) = splice(@$sp,0,3);
+	push(@out,
+	    $f0 >> 2,
+	    ($f0 << 4) & 060 | ($f1 >> 4) & 017,
+	    ($f1 << 2) & 074 | ($f2 >> 6) & 03,
+	    $f2 & 077);
+	$i += 3;
+   }
+   join("", map { chr((($_ & 077) + 35) & 0xff) } @out);  # ord('#') == 35
+}
+
+sub encryptit {
+    my $from = shift;
+    my @from = map { ord $_ } split(//, $from);
+    my @sp = ();
+    my $ch;
+    while(defined($ch = shift @from)) {
+	push(@sp,
+	    $t2[($t3[($t1[($ch + $n1) & MASK] + $n2) & MASK] - $n2) & MASK] - $n1);
+
+	$n1++;
+	if($n1 == ROTORSZ) {
+	    $n1 = 0;
+	    $n2++;
+	    $n2 = 0 if $n2 == ROTORSZ;
+	}
+    }
+    encode(\@sp);
+}
+
 1;
 
 __END__
@@ -810,7 +617,7 @@ the field values, given in the Make argument, changed.
 Enter login mode using C<USER> and C<PASS>. If C<ENCRYPT> is given and
 is I<true> then the password will be used to encrypt a challenge text 
 string provided by the server, and the encrypted string will be sent back
-to the server. If C<ENCRYPT> is not given, or I<false> the the password 
+to the server. If C<ENCRYPT> is not given, or I<false> then the password 
 will be sent in clear text (I<this is not recommended>)
 
 =item logout()
@@ -935,7 +742,7 @@ L<Net::Cmd>
 
 =head1 AUTHORS
 
-Graham Barr <gbarr@pobox.com>
+Graham Barr <gbarr@ti.com>
 Alex Hristov <hristov@slb.com>
 
 =head1 ACKNOWLEDGMENTS
@@ -952,10 +759,10 @@ executed when passing parameters as string references.
 =head1 COPYRIGHT
 
 The encryption code is based upon cryptit.c, Copyright (C) 1988 by
-Steven Dorner and the University of Illinois Board of Trustees,
-and by CSNET.
+Steven Dorner, and Paul Pomes, and the University of Illinois Board
+of Trustees, and by CSNET.
 
-All other code is Copyright (c) 1996-1997 Graham Barr <gbarr@pobox.com>
+All other code is Copyright (c) 1996-1997 Graham Barr <gbarr@ti.com>
 and Alex Hristov <hristov@slb.com>. All rights reserved. This program is
 free software; you can redistribute it and/or modify it under the same
 terms as Perl itself.

@@ -1,3 +1,16 @@
+Wed Oct  1 1997
+	Net::PH
+	- re-wrote crypt code. now should be 2-3x faster.
+
+	Net::SNPP
+	- added _SITE method
+	- added parse_response, so that SNPP style multi-line responses
+	  can be caught.
+
+	Net::SNPP::HylaFax
+	- new module added, defines methods that HylaFax uses. Implemented
+	  using _SITE -- *** NOTE there is no docs for this module yet!!!!
+
 Thu Sep 11 1997
 
 	- Removed Net::Telnet, users should now use Net::Telnet by Jay Rogers.
@@ -18,7 +31,7 @@ Thu Sep 11 1997
         - Fixed _arg_hash to pass "" when the value is empty
 
 	Net::POP3
-	- Added apop method
+	- Added apop and uidl methods
 
 Thu Apr 03 1997
         Net::Domain
