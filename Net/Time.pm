@@ -1,6 +1,6 @@
 # Net::Time.pm
 #
-# Copyright (c) 1995-1997 Graham Barr <gbarr@ti.com>. All rights reserved.
+# Copyright (c) 1995-1997 Graham Barr <gbarr@pobox.com>. All rights reserved.
 # This program is free software; you can redistribute it and/or
 # modify it under the same terms as Perl itself.
 
@@ -119,7 +119,7 @@ C<udp>. The result will be an ASCII string or I<undef> upon failure.
 
 =head1 AUTHOR
 
-Graham Barr <gbarr@ti.com>
+Graham Barr <gbarr@pobox.com>
 
 =head1 COPYRIGHT
 

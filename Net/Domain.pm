@@ -1,6 +1,6 @@
 # Net::Domain.pm
 #
-# Copyright (c) 1995-1997 Graham Barr <gbarr@ti.com>. All rights reserved.
+# Copyright (c) 1995-1997 Graham Barr <gbarr@pobox.com>. All rights reserved.
 # This program is free software; you can redistribute it and/or
 # modify it under the same terms as Perl itself.
 
@@ -281,7 +281,7 @@ Returns the remainder of the FQDN after the I<hostname> has been removed.
 
 =head1 AUTHOR
 
-Graham Barr <gbarr@ti.com>.
+Graham Barr <gbarr@pobox.com>.
 Adapted from Sys::Hostname by David Sundstrom <sunds@asictest.sc.ti.com>
 
 =head1 COPYRIGHT

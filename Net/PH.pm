@@ -1,5 +1,5 @@
 #
-# Copyright (c) 1995-1997 Graham Barr <gbarr@ti.com> and
+# Copyright (c) 1995-1997 Graham Barr <gbarr@pobox.com> and
 # Alex Hristov <hristov@slb.com>. All rights reserved. This program is free
 # software; you # can redistribute it and/or modify it under the same terms
 # as Perl itself.
@@ -935,7 +935,7 @@ L<Net::Cmd>
 
 =head1 AUTHORS
 
-Graham Barr <gbarr@ti.com>
+Graham Barr <gbarr@pobox.com>
 Alex Hristov <hristov@slb.com>
 
 =head1 ACKNOWLEDGMENTS
@@ -955,7 +955,7 @@ The encryption code is based upon cryptit.c, Copyright (C) 1988 by
 Steven Dorner and the University of Illinois Board of Trustees,
 and by CSNET.
 
-All other code is Copyright (c) 1996-1997 Graham Barr <gbarr@ti.com>
+All other code is Copyright (c) 1996-1997 Graham Barr <gbarr@pobox.com>
 and Alex Hristov <hristov@slb.com>. All rights reserved. This program is
 free software; you can redistribute it and/or modify it under the same
 terms as Perl itself.

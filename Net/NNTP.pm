@@ -1,6 +1,6 @@
 # Net::NNTP.pm
 #
-# Copyright (c) 1995-1997 Graham Barr <gbarr@ti.com>. All rights reserved.
+# Copyright (c) 1995-1997 Graham Barr <gbarr@pobox.com>. All rights reserved.
 # This program is free software; you can redistribute it and/or
 # modify it under the same terms as Perl itself.
 
@@ -917,9 +917,23 @@ specified.
 Returns a reference to a HASH where the keys are the message numbers and the
 values are the References: lines from the articles
 
-=item listgroup
+=item listgroup ( [ GROUP ] )
+
+Returns a reference to a list of all the active messages in C<GROUP>, or
+the current group if C<GROUP> is not specified.
 
 =item reader
+
+Tell the server that you are a reader and not another server.
+
+This is required by some servers. For example if you are connecting to
+an INN server and you have transfer permission your connection will
+be connected to the transfer daemon, not the NNTP daemon. Issuing
+this command will cause the transfer daemon to hand over control
+to the NNTP daemon.
+
+Some servers do not understand this command, but issuing it and ignoring
+the response is harmless.
 
 =back
 
@@ -1025,7 +1039,7 @@ L<Net::Cmd>
 
 =head1 AUTHOR
 
-Graham Barr <gbarr@ti.com>
+Graham Barr <gbarr@pobox.com>
 
 =head1 COPYRIGHT
 

@@ -1060,6 +1060,10 @@ directory with the same leafname as C<LOCAL_FILE>.
 Returns C<REMOTE_FILE>, or the generated remote filename if C<REMOTE_FILE>
 is not given.
 
+B<NOTE>: If for some reason the transfer does not complete and an error is
+returned then the contents that had been transfered will not be remove
+automatically.
+
 =item put_unique ( LOCAL_FILE [, REMOTE_FILE ] )
 
 Same as put but uses the C<STOU> command.
