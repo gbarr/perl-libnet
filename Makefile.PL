@@ -4,7 +4,7 @@
 
 $NAME     = 'Net';
 $DISTNAME = "libnet";
-$VERSION  = "1.18";
+$VERSION  = "1.19";
 
 BEGIN { require 5.002 }
 
