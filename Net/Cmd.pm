@@ -1,4 +1,4 @@
-# Net::Cmd.pm $Id: //depot/libnet/Net/Cmd.pm#23 $
+# Net::Cmd.pm $Id: //depot/libnet/Net/Cmd.pm#24 $
 #
 # Copyright (c) 1995-1997 Graham Barr <gbarr@pobox.com>. All rights reserved.
 # This program is free software; you can redistribute it and/or
@@ -192,7 +192,12 @@ sub command
 {
  my $cmd = shift;
 
- return $cmd unless defined fileno($cmd);
+ unless (defined fileno($cmd))
+  {
+    $cmd->set_status("599", "Connection closed");
+    return $cmd;
+  }
+
 
  $cmd->dataend()
     if(exists ${*$cmd}{'net_cmd_lastch'});
@@ -634,6 +639,6 @@ it under the same terms as Perl itself.
 
 =for html <hr>
 
-I<$Id: //depot/libnet/Net/Cmd.pm#23 $>
+I<$Id: //depot/libnet/Net/Cmd.pm#24 $>
 
 =cut
