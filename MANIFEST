@@ -3,6 +3,7 @@ Config.eg
 Configure
 Hostname.pm.eg			Example replacement for Hostname.pm
 MANIFEST
+META.yml			Module meta-data
 Makefile.PL
 Net/Cmd.pm
 Net/Config.pm
@@ -30,6 +31,7 @@ demos/smtp.self
 demos/time
 install-nomake
 t/config.t
+t/datasend.t
 t/ftp.t
 t/hostname.t
 t/libnet_t.pl
@@ -37,4 +39,3 @@ t/netrc.t
 t/nntp.t
 t/require.t
 t/smtp.t
-t/datasend.t
