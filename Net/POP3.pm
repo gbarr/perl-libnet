@@ -13,7 +13,7 @@ use Net::Cmd;
 use Carp;
 use Net::Config;
 
-$VERSION = "2.18"; # $Id: //depot/libnet/Net/POP3.pm#12 $
+$VERSION = "2.19"; # $Id: //depot/libnet/Net/POP3.pm#13 $
 
 @ISA = qw(Net::Cmd IO::Socket::INET);
 
@@ -144,8 +144,10 @@ sub pass
  return undef
    unless($me->_PASS($pass));
 
- ${*$me}{'net_pop3_count'} = ($me->message =~ /(\d+)\s+message/io)
+ my $ret = ${*$me}{'net_pop3_count'} = ($me->message =~ /(\d+)\s+message/io)
 	? $1 : ($me->popstat)[0];
+
+ $ret ? $ret : "0E0";
 }
 
 sub reset
@@ -407,9 +409,11 @@ C<Net::POP3> uses C<Net::Netrc> to lookup the password using the host
 and username. If the username is not specified then the current user name
 will be used.
 
-Returns the number of messages in the mailbox.
+Returns the number of messages in the mailbox. However if there are no
+messages on the server the string C<"0E0"> will be returned. This is
+will give a true value in a boolean context, but zero in a numeric context.
 
-If the server cannot authenticate C<USER> the I<undef> will be returned.
+If there was an error authenticating the user then I<undef> will be returned.
 
 =item apop ( USER, PASS )
 
