@@ -12,7 +12,7 @@ use IO::Socket;
 use IO::Select;
 use IO::File;
 
-$VERSION = "0.01";
+$VERSION = "0.02";
 
 sub RRQ	  () { 01 } # read request
 sub WRQ	  () { 02 } # write request
@@ -27,10 +27,10 @@ sub new {
 
     bless {
 	net_tftp_host    => $host,
-	net_tftp_timeout => $arg{'-timeout'} || 5,
-	net_tftp_rexmit  => $arg{'-rexmit'} || 5,
-	net_tftp_mode    => exists $arg{'-mode'} ? $arg{'-mode'} : 'netascii',
-	net_tftp_port    => exists $arg{'-port'} ? $arg{'-port'} : 'tftp(69)',
+	net_tftp_timeout => $arg{'Timeout'} || 5,
+	net_tftp_rexmit  => $arg{'Rexmit'} || 5,
+	net_tftp_mode    => exists $arg{'Mode'} ? $arg{'Mode'} : 'netascii',
+	net_tftp_port    => exists $arg{'Port'} ? $arg{'Port'} : 'tftp(69)',
     }, $pkg;
 }
 
@@ -57,31 +57,35 @@ sub binary {
 sub get {
     my $self = shift;
     my $file = shift;
-    my %arg = @_;
-    my $mode = exists $arg{'-mode'} ? $arg{'-mode'} : $self->{'net_tftp_mode'};    
-    my $port = exists $arg{'-port'} ? $arg{'-port'} : $self->{'net_tftp_port'};    
-    my $host = exists $arg{'-host'} ? $arg{'-host'} : $self->{'net_tftp_host'};    
-    my $rexmit = exists $arg{'-rexmit'} ? $arg{'-rexmit'} : $self->{'net_tftp_rexmit'};    
-    my $timeout = exists $arg{'-timeout'} ? $arg{'-timeout'} : $self->{'net_tftp_timeout'};    
-    my $proto;
+    my %arg = (
+	Mode    => $self->{'net_tftp_mode'},
+	Port    => $self->{'net_tftp_port'},
+	Host    => $self->{'net_tftp_host'},
+	Rexmit  => $self->{'net_tftp_rexmit'},
+	Timeout => $self->{'net_tftp_timeout'},
+	@_
+    );
+    my($host,$port,$proto) = @arg{'Host','Port'};
 
-    $mode = "netascii" unless $mode =~ /^(netascii|octet)$/i;
+    $arg{'Mode'} = lc($arg{'Mode'});
+    $arg{'Mode'} = "netascii" unless $arg{'Mode'} eq "octet";
     
     # This is naughty as _sock_info is private, but I maintain IO::Socket
     ($host,$port,$proto) = IO::Socket::INET::_sock_info($host,$port,'udp');
 
     my $sock = IO::Socket::INET->new(Proto => 'udp');
+    my $mode = $arg{'Mode'};
     my $pkt = pack("n a* c a* c", RRQ, $file, 0, $mode, 0);
 
     $sock->send($pkt,0,pack_sockaddr_in($port,inet_aton($host)));
 
     my $sel = IO::Select->new($sock);
-    my $io = Net::TFTP::IO->new($sock,$sel, $mode eq "netascii",$rexmit,$timeout);
+    my $io = Net::TFTP::IO->new($sock,$sel, $mode eq "netascii",@arg{'Rexmit','Timeout'});
 
     return $io
-	unless exists $arg{'-local'};
+	unless exists $arg{'Local'};
 
-    my $local = IO::File->new($arg{'-local'},O_WRONLY|O_CREAT);
+    my $local = IO::File->new($arg{'Local'},O_WRONLY|O_CREAT);
 
     while(sysread($io,$pkt,512)) {
 	syswrite($local,$pkt,length($pkt));
@@ -214,6 +218,7 @@ sub _read {
 
 sub READ {
     # $self, $buf, $len, $offset
+
     my $self = shift;
     my $ret;
 
