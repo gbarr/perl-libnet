@@ -1,6 +1,6 @@
 
 package Net::Config;
-# $Id: //depot/libnet/Net/Config.pm#6 $
+# $Id: //depot/libnet/Net/Config.pm#7 $
 
 require Exporter;
 use vars qw(@ISA @EXPORT %NetConfig $VERSION $CONFIGURE $LIBNET_CFG);
@@ -9,7 +9,7 @@ use strict;
 
 @EXPORT  = qw(%NetConfig);
 @ISA     = qw(Net::LocalCfg Exporter);
-$VERSION = "1.04";
+$VERSION = "1.05";
 
 eval { local $SIG{__DIE__}; require Net::LocalCfg };
 
@@ -41,10 +41,12 @@ if ( -f $file ) {
 }
 if ($< == $> and !$CONFIGURE)  {
     my $home = eval { (getpwuid($>))[7] } || $ENV{HOME};
-    $file = $home . "/.libnetrc";
-    $ref = eval { do $file } if -f $file;
-    %NetConfig = (%NetConfig, %{ $ref })
-	if ref($ref) eq 'HASH';	
+    if (defined $home) {
+	$file = $home . "/.libnetrc";
+	$ref = eval { do $file } if -f $file;
+	%NetConfig = (%NetConfig, %{ $ref })
+	    if ref($ref) eq 'HASH';	
+    }
 }
 my ($k,$v);
 while(($k,$v) = each %NetConfig) {
@@ -208,5 +210,7 @@ configuration.
 If true the C<Configure> will check each hostname given that it exists
 
 =back
+
+$Id: //depot/libnet/Net/Config.pm#7 $
 
 =cut
