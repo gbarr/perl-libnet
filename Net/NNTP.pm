@@ -14,7 +14,7 @@ use Carp;
 use Time::Local;
 use Net::Config;
 
-$VERSION = "2.21"; # $Id: //depot/libnet/Net/NNTP.pm#15 $
+$VERSION = "2.22"; # $Id: //depot/libnet/Net/NNTP.pm#16 $
 @ISA     = qw(Net::Cmd IO::Socket::INET);
 
 sub new
@@ -87,7 +87,7 @@ sub debug_text
  my $inout = shift;
  my $text = shift;
 
- if(($nntp->code == 350 && $text =~ /^(\S+)/)
+ if((ref($nntp) and $nntp->code == 350 and $text =~ /^(\S+)/)
     || ($text =~ /^(authinfo\s+pass)/io)) 
   {
    $text = "$1 ....\n"
@@ -1113,6 +1113,6 @@ it under the same terms as Perl itself.
 
 =for html <hr>
 
-I<$Id: //depot/libnet/Net/NNTP.pm#15 $>
+I<$Id: //depot/libnet/Net/NNTP.pm#16 $>
 
 =cut
