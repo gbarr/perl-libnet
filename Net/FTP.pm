@@ -21,7 +21,7 @@ use Net::Cmd;
 use Net::Config;
 # use AutoLoader qw(AUTOLOAD);
 
-$VERSION = "2.43"; # $Id: //depot/libnet/Net/FTP.pm#28 $
+$VERSION = "2.44"; # $Id: //depot/libnet/Net/FTP.pm#29 $
 @ISA     = qw(Exporter Net::Cmd IO::Socket::INET);
 
 # Someday I will "use constant", when I am not bothered to much about
@@ -240,8 +240,8 @@ sub login
    $ok = $ftp->_PASS($pass || "");
   }
 
- $ok = $ftp->_ACCT($acct || "")
-	if ($ok == CMD_MORE);
+ $ok = $ftp->_ACCT($acct)
+	if (defined($acct) && ($ok == CMD_MORE || $ok == CMD_OK));
 
  $ftp->authorize()
     if($ok == CMD_OK && defined ${*$ftp}{'net_ftp_firewall'});
@@ -557,10 +557,11 @@ sub _store_cmd
     }
   }
 
- $sock->close();
-
  close($loc)
 	unless defined $localfd;
+
+ $sock->close() or
+	return undef;
 
  ($remote) = $ftp->message =~ /unique file name:\s*(\S*)\s*\)/
 	if ('STOU' eq uc $cmd);
@@ -842,7 +843,7 @@ sub _data_cmd
 ## Over-ride methods (Net::Cmd)
 ##
 
-sub debug_text { $_[2] =~ /^(pass|resp)/i ? "$1 ....\n" : $_[2]; }
+sub debug_text { $_[2] =~ /^(pass|resp|acct)/i ? "$1 ....\n" : $_[2]; }
 
 sub command
 {
@@ -988,8 +989,8 @@ Net::FTP - FTP Client class
 
     use Net::FTP;
     
-    $ftp = Net::FTP->new("some.host.name");
-    $ftp->login("anonymous","me@here.there");
+    $ftp = Net::FTP->new("some.host.name", Debug => 0);
+    $ftp->login("anonymous",'me@here.there');
     $ftp->cwd("/pub");
     $ftp->get("that.file");
     $ftp->quit;
