@@ -19,16 +19,9 @@ gbarr@pobox.com.
 
 =head1 Author and Copyright Information
 
-Copyright (c) 1997 Graham Barr.
-All rights reserved.
-
-=head2 Non-commercial Reproduction
-
-Permission is granted to distribute this document, in part or in full,
-via electronic means or printed copy providing that (1) that all credits
-and copyright notices be retained, (2) that no charges beyond reproduction
-be involved, and (3) that a reasonable attempt be made to use the most
-current version available.
+Copyright (c) 1997-1998 Graham Barr. All rights reserved.
+This document is free; you can redistribute it and/or modify it
+under the terms of the Artistic Licence.
 
 =head2 Disclaimer
 
@@ -88,9 +81,9 @@ at
 
 =over
 
-=head2 How do I download files from a FTP server
+=head2 How do I download files from a FTP server ?
 
-An example taken from an articlt posted to comp.lang.perl.misc
+An example taken from an article posted to comp.lang.perl.misc
 
     #!/your/path/to/perl
 
@@ -133,13 +126,96 @@ the C<binary> method
 
     $ftp->binary;
 
-=head2 How can I can the size of a file on a remote FTP server ?
+=head2 How can I get the size of a file on a remote FTP server ?
 
-=head2 How can I can the modification time of a file on a remote FTP server ?
+=head2 How can I get the modification time of a file on a remote FTP server ?
+
+=head2 How can I change the permissions of a file on a remote server ?
+
+The FTP protocol does not have a command for changing the permissions
+of a file on the remote server. But some ftp servers may allow a chmod
+command to be issued via a SITE command, eg
+
+    $ftp->quot('site chmod 0777',$filename);
+
+But this is not guaranteed to work.
 
 =head2 Can I do a reget operation like the ftp command ?
 
 =head2 How do I get a directory listing from a FTP server ?
+
+=head2 Changeing directory to "" does not fail ?
+
+Passing an argument of "" to ->cwd() has the same affect of calling ->cwd()
+without any arguments. Turn on Debug (I<See below>) and you will see what is
+happening
+
+    $ftp = Net::FTP->new($host, Debug => 1);
+    $ftp->login;
+    $ftp->cwd("");
+
+gives
+
+    Net::FTP=GLOB(0x82196d8)>>> CWD /
+    Net::FTP=GLOB(0x82196d8)<<< 250 CWD command successful.
+
+=head2 I am behind a SOCKS firewall, but the Firewall option does not work ?
+
+The Firewall option is only for support of one type of firewall. The type
+supported is a ftp proxy.
+
+To use Net::FTP, or any other module in the libnet distribution,
+through a SOCKS firewall you must create a socks-ified perl executable
+by compiling perl with the socks library.
+
+=head2 I am behind a FTP proxy firewall, but cannot access machines outside ?
+
+Net::FTP implements the most popular ftp proxy firewall approach. The sceme
+implemented is that where you loginin to the firewall with C<user@hostname>
+
+I have heard of one other type of firewall which requires a login to the
+firewall with an accont, then a second login with C<user@hostname>. You can
+still use Net::FTP to traverse these firewalls, but a more manual approach
+must be taken, eg
+
+    $ftp = Net::FTP->new($firewall) or die $@;
+    $ftp->login($firewall_user, $firewall_passwd) or die $ftp->message;
+    $ftp->login($ext_user . '@' . $ext_host, $ext_passwd) or die $ftp->message.
+
+=head2 I have seen scripts call a method message, but cannot find it documented ?
+
+Net::FTP, like several other packages in libnet, inherits from Net::Cmd, so
+all the methods described in Net::Cmd are also avaliable on Net::FTP
+objects.
+
+=back
+
+=head1 Using Net::SMTP
+
+=over
+
+=head2 Why can't the part of an Email address after the @ be used as the hostname ?
+
+The part of an Email address which follows the @ is not necessarily a hostname,
+it is a mail domain. To find the name of a host to connect for a mail domain
+you need to do a DNS MX lookup
+
+=head2 Why does Net::SMTP not do DNS MX lookups ?
+
+Net::SMTP implements the SMTP protocol. The DNS MX lookup is not part
+of this protocol.
+
+=head2 The verify method always returns true ?
+
+Well it may seem thay way, but it does not. The verify method returns true
+if the command suceeded. If you pass verify an address which the
+server would normally have to forward to another machine the the command
+will suceed with something like
+
+    252 Couldn't verify <someone@there> but will attempt delivery anyway
+
+This command will only fail if you pass it an address in a domain the
+the server directly delivers for, and that address does not exist.
 
 =back
 
@@ -192,7 +268,7 @@ being sent or responce being received.
 
 =back
 
-=head1
+=head1 AUTHOR AND COPYRIGHT
 
 Copyright (c) 1997 Graham Barr.
 All rights reserved.
