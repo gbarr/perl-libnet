@@ -21,7 +21,7 @@ use Net::Cmd;
 use Net::Config;
 # use AutoLoader qw(AUTOLOAD);
 
-$VERSION = "2.36"; # $Id: //depot/libnet/Net/FTP.pm#20 $
+$VERSION = "2.37"; # $Id: //depot/libnet/Net/FTP.pm#21 $
 @ISA     = qw(Exporter Net::Cmd IO::Socket::INET);
 
 # Someday I will "use constant", when I am not bothered to much about
@@ -420,15 +420,32 @@ sub mkdir
      $path .= shift @path;
 
      $ftp->_MKD($path);
-     $path = $ftp->_extract_path($path);
 
-     # 521 means directory already exists
-     last
-        unless $ftp->ok || $ftp->code == 521 || $ftp->code == 550;
+     $path = $ftp->_extract_path($path);
+    }
+
+   # If the creation of the last element was not sucessful, see if we
+   # can cd to it, if so then return path
+
+   unless($ftp->ok)
+    {
+     my($status,$message) = ($ftp->status,$ftp->message);
+     my $pwd = $ftp->pwd;
+     
+     if($pwd && $ftp->cd($dir))
+      {
+       $path = $dir;
+       $ftp->cd($pwd);
+      }
+     else
+      {
+       undef $path;
+      }
+     $ftp->set_status($status,$message);
     }
   }
 
- $ftp->_extract_path($path);
+ $path;
 }
 
 sub delete
