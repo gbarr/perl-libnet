@@ -13,7 +13,7 @@ use strict;
 use vars qw(@ISA @EXPORT $VERSION);
 use Carp;
 
-$VERSION = "2.12";
+$VERSION = "2.13";
 @ISA     = qw(Exporter);
 @EXPORT  = qw(CMD_INFO CMD_OK CMD_MORE CMD_REJECT CMD_ERROR CMD_PENDING);
 
@@ -159,6 +159,8 @@ sub command
 {
  my $cmd = shift;
 
+ return $cmd unless defined fileno($cmd);
+ 
  $cmd->dataend()
     if(exists ${*$cmd}{'net_cmd_lastch'});
 
@@ -337,6 +339,8 @@ sub datasend
  my $arr = @_ == 1 && ref($_[0]) ? $_[0] : \@_;
  my $line = join("" ,@$arr);
 
+ return 0 unless defined(fileno($cmd));
+
  return 1
     unless length($line);
 
@@ -388,6 +392,8 @@ sub datasend
 sub dataend
 {
  my $cmd = shift;
+
+ return 0 unless defined(fileno($cmd));
 
  return 1
     unless(exists ${*$cmd}{'net_cmd_lastch'});
