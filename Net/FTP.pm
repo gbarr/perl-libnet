@@ -21,7 +21,7 @@ use Net::Cmd;
 use Net::Config;
 # use AutoLoader qw(AUTOLOAD);
 
-$VERSION = "2.56"; # $Id: //depot/libnet/Net/FTP.pm#53 $
+$VERSION = "2.57"; # $Id: //depot/libnet/Net/FTP.pm#54 $
 @ISA     = qw(Exporter Net::Cmd IO::Socket::INET);
 
 # Someday I will "use constant", when I am not bothered to much about
@@ -565,7 +565,7 @@ sub rmdir
     my $ok;
 
     return $ok
-	if $ftp->_RMD( $dir ) || !$recurse;
+	if $ok = $ftp->_RMD( $dir ) or !$recurse;
 
     # Try to delete the contents
     # Get a list of all the files in the directory
@@ -595,6 +595,18 @@ sub rmdir
     # rmdir() will fail because directory is not empty
     return $ftp->_RMD($dir) ;
 }
+
+sub restart
+{
+  @_ == 2 || croak 'usage: $ftp->restart( BYTE_OFFSET )';
+
+  my($ftp,$where) = @_;
+
+  ${*$ftp}{'net_ftp_rest'} = $where;
+
+  return undef;
+}
+
 
 sub mkdir
 {
@@ -1344,6 +1356,13 @@ Change directory to the parent of the current directory.
 
 Returns the full pathname of the current directory.
 
+=item restart ( WHERE )
+
+Set the byte offset at which to begin the next data transfer. Net::FTP simply
+records this value and uses it when during the next data transfer. For this
+reason this method will not return an error, but setting it may cause
+a subsequent data transfer to fail.
+
 =item rmdir ( DIR )
 
 Remove the directory with the name C<DIR>.
@@ -1583,6 +1602,10 @@ given the the timeout value from the command connection will be used.
 
 Returns the number of bytes written before any <CRLF> translation.
 
+=item bytes_read ()
+
+Returns the number of bytes read so far.
+
 =item abort ()
 
 Abort the current data transfer.
@@ -1692,6 +1715,6 @@ under the same terms as Perl itself.
 
 =for html <hr>
 
-I<$Id: //depot/libnet/Net/FTP.pm#53 $>
+I<$Id: //depot/libnet/Net/FTP.pm#54 $>
 
 =cut
