@@ -55,7 +55,8 @@ SKIP: {
 	$stat[2] = 077;
 	ok( !defined(Net::Netrc::_readrc()),
 		'_readrc() should not read world-writable file' );
-	ok( $warn =~ /^Bad permissions:/, '... and should warn about it' );
+	ok( scalar($warn =~ /^Bad permissions:/),
+		'... and should warn about it' );
 
 	# the owner field should still not match
 	$stat[2] = 0;
@@ -63,7 +64,8 @@ SKIP: {
         if ($<) { 
           ok( !defined(Net::Netrc::_readrc()), 
               '_readrc() should not read file owned by someone else' ); 
-          ok( $warn =~ /^Not owner:/, '... and should warn about it' ); 
+          ok( scalar($warn =~ /^Not owner:/),
+		'... and should warn about it' ); 
         } else { 
           skip("testing as root",2);
         } 
