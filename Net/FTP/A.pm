@@ -1,4 +1,4 @@
-## $Id: //depot/libnet/Net/FTP/A.pm#14 $
+## $Id: //depot/libnet/Net/FTP/A.pm#15 $
 ## Package to read/write on ASCII data connections
 ##
 
@@ -10,7 +10,7 @@ use Carp;
 require Net::FTP::dataconn;
 
 @ISA = qw(Net::FTP::dataconn);
-$VERSION = "1.13";
+$VERSION = "1.14";
 
 sub read {
   my    $data 	 = shift;
@@ -71,9 +71,6 @@ sub write {
   my    $size 	= shift || croak 'write($buf,$size,[$timeout])';
   my    $timeout = @_ ? shift : $data->timeout;
 
-  $data->can_write($timeout) or
-	 croak "Timeout";
-
   (my $tmp = substr($buf,0,$size)) =~ s/\n/\015\012/sg;
 
   # If the remote server has closed the connection we will be signal'd
@@ -86,6 +83,9 @@ sub write {
   my $wrote = 0;
 
   while($len) {
+    $data->can_write($timeout) or
+	 croak "Timeout";
+
     $off += $wrote;
     $wrote = syswrite($data, substr($tmp,$off), $len);
     return undef
