@@ -210,7 +210,7 @@ sub getline
     if scalar(@{${*$cmd}{'net_cmd_lines'}});
 
  my $partial = defined(${*$cmd}{'net_cmd_partial'})
-		? ${*$cmd}{'net_cmd_partial'} : || "";
+		? ${*$cmd}{'net_cmd_partial'} : "";
  my $fd = fileno($cmd);
  
  return undef
@@ -358,7 +358,7 @@ sub datasend
  my $len = length($line) - 1;
  my $offset = 1;
  my $win = "";
- vec($win,$fd,1) = 1;
+ vec($win,fileno($cmd),1) = 1;
  my $timeout = $cmd->timeout || undef;
 
  while($len)
