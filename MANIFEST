@@ -16,7 +16,6 @@ Net/FTP/L.pm
 Net/FTP/dataconn.pm
 Net/NNTP.pm			Network News Transfer Protocol
 Net/Netrc.pm			.netrc lookup routines
-Net/PH.pm			CCSO Nameserver Client class
 Net/POP3.pm			Post Office Protocol
 Net/SMTP.pm			Simple Mail Transfer Protocol Client
 Net/SNPP.pm			Simple Network Pager Protocol Client
@@ -39,11 +38,9 @@ htdocs/Net/DummyInetd.html
 htdocs/Net/FTP.html
 htdocs/Net/NNTP.html
 htdocs/Net/Netrc.html
-htdocs/Net/PH.html
 htdocs/Net/POP3.html
 htdocs/Net/SMTP.html
 htdocs/Net/SNPP.html
-htdocs/Net/TFTP.html
 htdocs/Net/Time.html
 htdocs/Net/libnetFAQ.html
 htdocs/index.html
@@ -51,6 +48,5 @@ libnet.ppd
 t/ftp.t
 t/hostname.t
 t/nntp.t
-t/ph.t
 t/require.t
 t/smtp.t

@@ -18,10 +18,6 @@ Net::NNTP	RFC977		Network News Transfer Protocol
 Net::POP3	RFC1939		Post Office Protocol 3
 Net::SNPP	RFC1861		Simple Network Pager Protocol
 
-The distribution also contains a module (Net::PH) which facilitates
-comunicate with with servers using the CCSO Nameserver Server-Client
-Protocol
-
 FUTURE WORK
 
 AVAILABILITY
