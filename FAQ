@@ -7,7 +7,7 @@ libnetFAQ - libnet Frequently Asked Questions
 This document is distributed with the libnet disribution, and is also
 avaliable on the libnet web page at
 
-    http://www.connect.net/gbarr/libnet/
+    http://www.pobox.com/~gbarr/libnet/
 
 
 
@@ -73,7 +73,7 @@ in
 The latest release and information is also avaliable on the libnet web page
 at
 
- http://www.connect.net/gbarr/libnet/
+ http://www.pobox.com/~gbarr/libnet/
 
 =back
 
@@ -182,7 +182,7 @@ must be taken, eg
     $ftp->login($firewall_user, $firewall_passwd) or die $ftp->message;
     $ftp->login($ext_user . '@' . $ext_host, $ext_passwd) or die $ftp->message.
 
-=head2 My fto proxy firewall does not listen on port 21
+=head2 My ftp proxy firewall does not listen on port 21
 
 FTP servers usually listen on the same port number, port 21, as any other
 FTP server. But there is no reason why thi has to be the case.
@@ -197,13 +197,41 @@ can be resolved by either passing a Firewall option like C<"hostname:1234">
 or by setting the C<ftp_firewall> option in Net::Config to be a string
 in in the same form.
 
+=head2 Is it possible to change the file permissions of a file on an FTP server ?
 
+The answer to this is "maybe". The FTP protocol does not specify a command to change
+file permissions on a remote host. However many servers do allow you to run the
+chmod command via the C<SITE> command. This can be done with
+
+  $ftp->site('chmod','0775',$file);
 
 =head2 I have seen scripts call a method message, but cannot find it documented ?
 
 Net::FTP, like several other packages in libnet, inherits from Net::Cmd, so
 all the methods described in Net::Cmd are also avaliable on Net::FTP
 objects.
+
+=head2 Why does Net::FTP not implement mput and mget methods
+
+The quick answer is because they are easy to implement yourself. The long
+answer is that to write these in such a way that multiple platforms are
+supported correctly would just require too much code. Below are
+some examples how you can implement these yourself.
+
+sub mput {
+  my($ftp,$pattern) = @_;
+  foreach my $file (<$pattern>) {
+    $ftp->put($file) or warn $ftp->message;
+  }
+}
+
+sub mget {
+  my($ftp,$pattern) = @_;
+  foreach my $file ($ftp->ls($pattern)) {
+    $ftp->get($file) or warn $ftp->message;
+  }
+}
+
 
 =back
 
