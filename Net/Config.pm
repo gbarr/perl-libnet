@@ -1,4 +1,6 @@
+
 package Net::Config;
+# $Id: //depot/libnet/Net/Config.pm#6 $
 
 require Exporter;
 use vars qw(@ISA @EXPORT %NetConfig $VERSION $CONFIGURE $LIBNET_CFG);
@@ -7,7 +9,7 @@ use strict;
 
 @EXPORT  = qw(%NetConfig);
 @ISA     = qw(Net::LocalCfg Exporter);
-$VERSION = "1.03";
+$VERSION = "1.04";
 
 eval { local $SIG{__DIE__}; require Net::LocalCfg };
 
@@ -62,13 +64,13 @@ sub requires_firewall {
     $host = inet_ntoa($host);
 
     if(exists $NetConfig{'local_netmask'}) {
-	my $quad = unpack("N",pack("C*",split(".",$host)));
+	my $quad = unpack("N",pack("C*",split(/\./,$host)));
 	my $list = $NetConfig{'local_netmask'};
 	$list = [$list] unless ref($list);
 	foreach (@$list) {
 	    my($net,$bits) = (m#^(\d+\.\d+\.\d+\.\d+)/(\d+)$#) or next;
 	    my $mask = ~0 << (32 - $bits);
-	    my $addr = unpack("N",pack("C*",split(/\./,$host)));
+	    my $addr = unpack("N",pack("C*",split(/\./,$net)));
 
 	    return 0 if (($addr & $mask) == ($quad & $mask));
 	}
