@@ -21,7 +21,7 @@ use Net::Cmd;
 use Net::Config;
 # use AutoLoader qw(AUTOLOAD);
 
-$VERSION = "2.42"; # $Id: //depot/libnet/Net/FTP.pm#27 $
+$VERSION = "2.43"; # $Id: //depot/libnet/Net/FTP.pm#28 $
 @ISA     = qw(Exporter Net::Cmd IO::Socket::INET);
 
 # Someday I will "use constant", when I am not bothered to much about
@@ -638,11 +638,14 @@ sub supported {
 
     my $text = $ftp->message;
     if($text =~ /following\s+commands/i) {
-	$text =~ s/.*\n//;
+	$text =~ s/^.*\n//;
 	$text =~ s/\n/ /sog;
 	while($text =~ /(\w+)([* ])/g) {
 	    $hash->{"\U$1"} = $2 eq " " ? 1 : 0;
 	}
+    }
+    else {
+	$hash->{$cmd} = $text !~ /unimplemented/i;
     }
 
     $hash->{$cmd} ||= 0;
