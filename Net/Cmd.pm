@@ -1,4 +1,4 @@
-# Net::Cmd.pm $Id: //depot/libnet/Net/Cmd.pm#29 $
+# Net::Cmd.pm $Id: //depot/libnet/Net/Cmd.pm#30 $
 #
 # Copyright (c) 1995-1997 Graham Barr <gbarr@pobox.com>. All rights reserved.
 # This program is free software; you can redistribute it and/or
@@ -21,7 +21,7 @@ BEGIN {
   }
 }
 
-$VERSION = "2.22";
+$VERSION = "2.23";
 @ISA     = qw(Exporter);
 @EXPORT  = qw(CMD_INFO CMD_OK CMD_MORE CMD_REJECT CMD_ERROR CMD_PENDING);
 
@@ -490,7 +490,7 @@ sub TIEHANDLE {
 # end-of-file when the dot is encountered.
 sub READ {
   my $cmd = shift;
-  my (undef,$len,$offset) = @_;
+  my ($len,$offset) = @_[1,2];
   return unless exists ${*$cmd}{'net_cmd_readbuf'};
   my $done = 0;
   while (!$done and length(${*$cmd}{'net_cmd_readbuf'}) < $len) {
@@ -707,6 +707,6 @@ it under the same terms as Perl itself.
 
 =for html <hr>
 
-I<$Id: //depot/libnet/Net/Cmd.pm#29 $>
+I<$Id: //depot/libnet/Net/Cmd.pm#30 $>
 
 =cut
