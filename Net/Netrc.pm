@@ -11,7 +11,7 @@ use strict;
 use FileHandle;
 use vars qw($VERSION);
 
-$VERSION = "2.09"; # $Id: //depot/libnet/Net/Netrc.pm#4$
+$VERSION = "2.10"; # $Id: //depot/libnet/Net/Netrc.pm#4$
 
 my %netrc = ();
 
@@ -70,7 +70,10 @@ sub _readrc
        next;
       }
 
-     push(@tok, split(/[\s\n]+/, $_));
+     s/^\s*//;
+     chomp;
+     push(@tok, $+)
+       while(length && s/^("([^"]*)"|(\S+))\s*//);
 
 TOKEN:
      while(@tok)
@@ -92,7 +95,7 @@ TOKEN:
        if($tok eq "machine")
         {
          my $host = shift @tok;
-         $mach = bless {machine => $mach};
+         $mach = bless {machine => $host};
 
          $netrc{$host} = []
             unless exists($netrc{$host});
