@@ -1,0 +1,5 @@
+MANIFEST			This file
+Makefile.PL			Makemaker makefile
+README				Copyright
+SMTP.pm
+t/dummy.t
