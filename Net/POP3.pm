@@ -13,7 +13,7 @@ use Net::Cmd;
 use Carp;
 use Net::Config;
 
-$VERSION = "2.19"; # $Id: //depot/libnet/Net/POP3.pm#14 $
+$VERSION = "2.20"; # $Id: //depot/libnet/Net/POP3.pm#15 $
 
 @ISA = qw(Net::Cmd IO::Socket::INET);
 
@@ -267,6 +267,17 @@ sub uidl
  return $uidl;
 }
 
+sub ping
+{
+ @_ == 2 or croak 'usage: $pop3->ping( USER )';
+ my $me = shift;
+
+ return () unless $me->_PING(@_) && $me->message =~ /(\d+)\D+(\d+)/;
+
+ ($1 || 0, $2 || 0);
+}
+
+ 
 sub _STAT { shift->command('STAT')->response() == CMD_OK }
 sub _LIST { shift->command('LIST',@_)->response() == CMD_OK }
 sub _RETR { shift->command('RETR',$_[0])->response() == CMD_OK }
@@ -279,6 +290,7 @@ sub _UIDL { shift->command('UIDL',@_)->response() == CMD_OK }
 sub _USER { shift->command('USER',$_[0])->response() == CMD_OK }
 sub _PASS { shift->command('PASS',$_[0])->response() == CMD_OK }
 sub _APOP { shift->command('APOP',@_)->response() == CMD_OK }
+sub _PING { shift->command('PING',$_[0])->response() == CMD_OK }
 
 sub _RPOP { shift->command('RPOP',$_[0])->response() == CMD_OK }
 sub _LAST { shift->command('LAST')->response() == CMD_OK }
@@ -451,8 +463,13 @@ Returns the highest C<MSGNUM> of all the messages accessed.
 
 =item popstat ()
 
-Returns an array of two elements. These are the number of undeleted
+Returns a list of two elements. These are the number of undeleted
 elements and the size of the mbox in octets.
+
+=item ping ( USER )
+
+Returns a list of two elements. These are the number of new messages
+and the total number of messages for C<USER>.
 
 =item uidl ( [ MSGNUM ] )
 
