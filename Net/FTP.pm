@@ -21,7 +21,7 @@ use Net::Cmd;
 use Net::Config;
 use AutoLoader qw(AUTOLOAD);
 
-$VERSION = "2.25"; # $Id$
+$VERSION = "2.26"; # $Id:$
 @ISA     = qw(Exporter Net::Cmd IO::Socket::INET);
 
 1;
@@ -176,7 +176,7 @@ sub login
 
  $ok = $ftp->_USER($user);
 
- # Some dumb firewall's don't prefix the connection messages
+ # Some dumb firewalls don't prefix the connection messages
  $ok = $ftp->response()
 	if($ok == CMD_OK && $ftp->code == 220 && $user =~ /\@/);
 
@@ -192,7 +192,7 @@ sub login
 	if ($rc);
 
      $pass = "-" . (getpwuid($>))[0] . "@" 
-        if (!defined $pass && $ruser =~ /^anonymous/o);
+        if (!defined $pass && (!defined($ruser) || $ruser =~ /^anonymous/o));
     }
 
    $ok = $ftp->_PASS($pass || "");
