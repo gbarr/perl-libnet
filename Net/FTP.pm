@@ -22,7 +22,7 @@ use Net::Config;
 use Fcntl qw(O_WRONLY O_RDONLY O_APPEND O_CREAT O_TRUNC);
 # use AutoLoader qw(AUTOLOAD);
 
-$VERSION = "2.68"; # $Id: //depot/libnet/Net/FTP.pm#71 $
+$VERSION = "2.68"; # $Id: //depot/libnet/Net/FTP.pm#72 $
 @ISA     = qw(Exporter Net::Cmd IO::Socket::INET);
 
 # Someday I will "use constant", when I am not bothered to much about
@@ -1199,10 +1199,18 @@ Net::FTP - FTP Client class
 
     use Net::FTP;
 
-    $ftp = Net::FTP->new("some.host.name", Debug => 0);
-    $ftp->login("anonymous",'-anonymous@');
-    $ftp->cwd("/pub");
-    $ftp->get("that.file");
+    $ftp = Net::FTP->new("some.host.name", Debug => 0)
+      or die "Cannot connect to some.host.name: $@";
+
+    $ftp->login("anonymous",'-anonymous@')
+      or die "Cannot login ", $ftp->message;
+
+    $ftp->cwd("/pub")
+      or die "Cannot change working directory ", $ftp->message;
+
+    $ftp->get("that.file")
+      or die "get failed ", $ftp->message;
+
     $ftp->quit;
 
 =head1 DESCRIPTION
@@ -1721,6 +1729,6 @@ under the same terms as Perl itself.
 
 =for html <hr>
 
-I<$Id: //depot/libnet/Net/FTP.pm#71 $>
+I<$Id: //depot/libnet/Net/FTP.pm#72 $>
 
 =cut
