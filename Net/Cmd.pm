@@ -1,4 +1,4 @@
-# Net::Cmd.pm $Id: //depot/libnet/Net/Cmd.pm#24 $
+# Net::Cmd.pm $Id: //depot/libnet/Net/Cmd.pm#25 $
 #
 # Copyright (c) 1995-1997 Graham Barr <gbarr@pobox.com>. All rights reserved.
 # This program is free software; you can redistribute it and/or
@@ -20,7 +20,7 @@ BEGIN {
   }
 }
 
-$VERSION = "2.18";
+$VERSION = "2.19";
 @ISA     = qw(Exporter);
 @EXPORT  = qw(CMD_INFO CMD_OK CMD_MORE CMD_REJECT CMD_ERROR CMD_PENDING);
 
@@ -639,6 +639,6 @@ it under the same terms as Perl itself.
 
 =for html <hr>
 
-I<$Id: //depot/libnet/Net/Cmd.pm#24 $>
+I<$Id: //depot/libnet/Net/Cmd.pm#25 $>
 
 =cut
