@@ -20,7 +20,7 @@ BEGIN {
   }
 }
 
-$VERSION = "2.18"; # $Id: //depot/libnet/Net/Cmd.pm#21 $
+$VERSION = "2.18"; # $Id: //depot/libnet/Net/Cmd.pm#22 $
 @ISA     = qw(Exporter);
 @EXPORT  = qw(CMD_INFO CMD_OK CMD_MORE CMD_REJECT CMD_ERROR CMD_PENDING);
 
@@ -39,11 +39,11 @@ sub toebcdic
 {
  my $cmd = shift;
 
- unless (exists $cmd->{'net_cmd_asciipeer'})
+ unless (exists {*$cmd}{'net_cmd_asciipeer'})
   {
-   my $string = shift;
+   my $string = $_[0];
    my $ebcdicstr = $tr->toebcdic($string);
-   $cmd->{'net_cmd_asciipeer'} = $string !~ /^\d+/ && $ebcdicstr =~ /^\d+/;
+   ${*$cmd}{'net_cmd_asciipeer'} = $string !~ /^\d+/ && $ebcdicstr =~ /^\d+/;
   }
 
   $cmd->{'net_cmd_asciipeer'}
@@ -54,7 +54,7 @@ sub toebcdic
 sub toascii
 {
   my $cmd = shift;
-  $cmd->{'net_cmd_asciipeer'}
+  ${*$cmd}{'net_cmd_asciipeer'}
     ? $tr->toascii($_[0])
     : $_[0];
 }
@@ -634,6 +634,6 @@ it under the same terms as Perl itself.
 
 =for html <hr>
 
-I<$Id: //depot/libnet/Net/Cmd.pm#21 $>
+I<$Id: //depot/libnet/Net/Cmd.pm#22 $>
 
 =cut
