@@ -21,7 +21,7 @@ use Net::Cmd;
 use Net::Config;
 # use AutoLoader qw(AUTOLOAD);
 
-$VERSION = "2.52"; # $Id: //depot/libnet/Net/FTP.pm#38 $
+$VERSION = "2.52"; # $Id: //depot/libnet/Net/FTP.pm#39 $
 @ISA     = qw(Exporter Net::Cmd IO::Socket::INET);
 
 # Someday I will "use constant", when I am not bothered to much about
@@ -406,26 +406,34 @@ sub get
   {
    carp "Cannot binmode Local file $local: $!\n";
    $data->abort;
+   close($loc) unless $localfd;
    return undef;
   }
 
  $buf = '';
- my $swlen;
  my($count,$hashh,$hashb,$ref) = (0);
 
  ($hashh,$hashb) = @$ref
    if($ref = ${*$ftp}{'net_ftp_hash'});
 
- do
+ while(1)
   {
-   $len = $data->read($buf,1024);
+   last unless $len = $data->read($buf,1024);
    if($hashh) {
     $count += $len;
     print $hashh "#" x (int($count / $hashb));
     $count %= $hashb;
    }
+   my $written = syswrite($loc,$buf,$len);
+   unless(defined($written) && $written == $len)
+    {
+     carp "Cannot write to Local file $local: $!\n";
+     $data->abort;
+     close($loc)
+        unless defined $localfd;
+     return undef;
+    }
   }
- while($len && defined($swlen = syswrite($loc,$buf,$len)) && $swlen == $len);
 
  print $hashh "\n" if $hashh;
 
