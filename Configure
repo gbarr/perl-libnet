@@ -155,39 +155,56 @@ sub get_bool ($$)
 sub get_netmask ($$)
 {
  my($prompt,$def) = @_;
- my @mask;
- my $pat = join('\.',('([01]\d{0,2}|2[0-4]\d?|25[0-5]|[2-9]\d?)')x4)
-	   . '/([012]\d?|3[01]|[0-9])';
+
  chomp($prompt);
 
  my %list;
  @list{@$def} = ();
- while(1)
-  {
+
+MASK:
+ while(1) {
    my $bad = 0;
    my $ans = Prompt($prompt) or last;
 
-   $ans =~ s/(\A\s+|\s+\Z)//g;
-
-   if($ans eq '*')
-    {
+   if($ans eq '*') {
      %list = ();
      next;
-    }
-   my $del = $ans =~ s/^-\s*//;
-##FIXME
-   @mask = split(/\s+/, $ans);
-   return undef unless @mask;
-   foreach (@mask)
-    {
-     next if /^($pat)$/o;
-     warn "Bad netmask '$_'\n";
-     $bad++;
-    }
-   last unless $bad;
+   }
+
+   if($ans eq '=') {
+     print "\n",( %list ? join("\n", sort keys %list) : 'none'),"\n\n";
+     next;
+   }
+
+   unless ($ans =~ m{^\s*(?:(-?\s*)(\d+(?:\.\d+){0,3})/(\d+))}) {
+     warn "Bad netmask '$ans'\n";
+     next;
+   }
+
+   my($remove,$bits,@ip) = ($1,$3,split(/\./, $2),0,0,0);
+   if ( $ip[0] < 1 || $bits < 1 || $bits > 32) {
+     warn "Bad netmask '$ans'\n";
+     next MASK;
+   }
+   foreach my $byte (@ip) {
+     if ( $byte > 255 ) {
+       warn "Bad netmask '$ans'\n";
+       next MASK;
+     }
+   } 
+
+   my $mask = sprintf("%d.%d.%d.%d/%d",@ip[0..3],$bits); 
+
+   if ($remove) {
+     delete $list{$mask};
+   }
+   else {
+     $list{$mask} = 1;
+   }
+
   }
 
- \@mask;
+ [ keys %list ];
 }
 
 ##
@@ -353,6 +370,7 @@ $cfg{'daytime_hosts'} = get_host_list($msg,$def);
 #---------------------------------------------------------------------------
 
 $msg = <<EDQ;
+
 Do you have a firewall/ftp proxy  between your machine and the internet 
 
 If you use a SOCKS firewall answer no
@@ -403,6 +421,8 @@ fwuser/fwpass => firewall user & password
      PASS pass
      AUTH fwuser
      RESP fwpass
+
+Choice:
 EDQ
  $def = exists $oldcfg{'ftp_firewall_type'}  ? $oldcfg{'ftp_firewall_type'} : 1;
  $ans = Prompt($msg,$def);
@@ -422,9 +442,13 @@ if (defined $cfg{'ftp_firewall'})
  {
   print <<EDQ;
 
-Sometime a hostname lookup is sufficient to determine if a host is inside
-a firewall, but this is not foolproof. To make this funtion more acurate
-I need to know netmasks for your local network.
+By default Net::FTP assumes that it only needs to use a firewall if it
+cannot resolve the name of the host given. This only works if your DNS
+system is setup to only resolve internal hostnames. If this is not the
+case and your DNS will resolve external hostnames, then another method
+is needed. Net::Config can do this if you provide the netmasks that
+describe your internal network. Each netmask should be entered in the
+form x.x.x.x/y, for example 127.0.0.0/8 or 214.8.16.32/24
 
 EDQ
 $def = [];
@@ -435,9 +459,12 @@ if(ref($oldcfg{'local_netmask'}))
 	join("\n\t",@{$def}),"\n\n";
  }
 
-print "Enter one netmask at each prompt, prefix with a - to remove
-a netmask from the list` enter a '*' to clear the whole list
-and an emty line to continue with Configure.";
+print "
+Enter one netmask at each prompt, prefix with a - to remove a netmask
+from the list, enter a '*' to clear the whole list, an '=' to show the
+current list and an empty line to continue with Configure.
+
+";
 
   my $mask = get_netmask("netmask :",$def);
   $cfg{'local_netmask'} = $mask if ref($mask) && @$mask;
