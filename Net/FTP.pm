@@ -21,7 +21,7 @@ use Net::Cmd;
 use Net::Config;
 # use AutoLoader qw(AUTOLOAD);
 
-$VERSION = "2.44"; # $Id: //depot/libnet/Net/FTP.pm#29 $
+$VERSION = "2.45"; # $Id: //depot/libnet/Net/FTP.pm#30 $
 @ISA     = qw(Exporter Net::Cmd IO::Socket::INET);
 
 # Someday I will "use constant", when I am not bothered to much about
@@ -213,7 +213,7 @@ sub login
 
  if(defined ${*$ftp}{'net_ftp_firewall'})
   {
-   $user .= "@" . ${*$ftp}{'net_ftp_host'};
+   $user .= '@' . ${*$ftp}{'net_ftp_host'};
   }
 
  $ok = $ftp->_USER($user);
@@ -420,11 +420,54 @@ sub pwd
  $ftp->_extract_path;
 }
 
+# rmdir( $ftp, $dir, [ $recurse ] )
+#
+# Removes $dir on remote host via FTP.
+# $ftp is handle for remote host
+#
+# If $recurse is TRUE, the directory and deleted recursively.
+# This means all of its contents and subdirectories.
+#
+# Initial version contributed by Dinkum Software
+#
 sub rmdir
 {
- @_ == 2 || croak 'usage: $ftp->rmdir( DIR )';
+    @_ == 2 || @_ == 3 or croak('usage: $ftp->rmdir( DIR [, RECURSE ] )');
 
- $_[0]->_RMD($_[1]);
+    # Pick off the args
+    my ($ftp, $dir, $recurse) = @_ ;
+    my $ok;
+
+    return $ok
+	if $ftp->_RMD( $dir ) || !$recurse;
+
+    # Try to delete the contents
+    # Get a list of all the files in the directory
+    my $filelist = $ftp->ls($dir) 
+
+    return undef
+	unless $filelist && @$filelist; # failed, it is probably not a directory
+
+    # Go thru and delete each file or the directory
+    my $file;
+    foreach $file (@$filelist)
+    {
+	next  # successfully deleted the file
+	    if $ftp->delete( $dir . '/' . $file);
+
+	# Failed to delete it, assume its a directory
+	# Recurse and ignore errors, the final rmdir() will
+	# fail on any errors here
+	return $ok
+	    unless $ok = $ftp->rmdir($dir . '/' . $file, 1) ;
+    }
+
+    # Directory should be empty
+    # Try to remove the directory again
+    # Pass results directly to caller
+    # If any of the prior deletes failed, this
+    # rmdir() will fail because directory is not empty
+    return $ftp->_RMD($dir) ;
 }
 
 sub mkdir
@@ -543,9 +586,10 @@ sub _store_cmd
  $sock = $ftp->_data_cmd($cmd, $remote) or 
 	return undef;
 
+ my $blk_size = ${*$ftp}{'net_ftp_blk_size'} || 10240;
  while(1)
   {
-   last unless $len = sysread($loc,$buf="",1024);
+   last unless $len = sysread($loc,$buf="",$blk_size);
 
    my $wlen;
    unless(defined($wlen = $sock->write($buf,$len)) && $wlen == $len)
@@ -584,12 +628,11 @@ sub port
 
    ${*$ftp}{'net_ftp_listen'} ||= IO::Socket::INET->new(Listen    => 5,
 				    	    	        Proto     => 'tcp',
-				    	    	        LocalAddr => $ftp->sockhost, 
 				    	    	       );
   
    my $listen = ${*$ftp}{'net_ftp_listen'};
 
-   my($myport, @myaddr) = ($listen->sockport, split(/\./,$listen->sockhost));
+   my($myport, @myaddr) = ($listen->sockport, split(/\./,$ftp->sockhost));
 
    $port = join(',', @myaddr, $myport >> 8, $myport & 0xff);
 
