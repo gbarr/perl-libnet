@@ -16,7 +16,7 @@ use IO::Socket;
 use Net::Cmd;
 use Net::Config;
 
-$VERSION = "1.11"; # $Id: //depot/libnet/Net/SNPP.pm#5 $
+$VERSION = "1.11"; # $Id: //depot/libnet/Net/SNPP.pm#6 $
 @ISA     = qw(Net::Cmd IO::Socket::INET);
 @EXPORT  = (qw(CMD_2WAYERROR CMD_2WAYOK CMD_2WAYQUEUED), @Net::Cmd::EXPORT);
 
@@ -305,7 +305,7 @@ Net::SNPP - Simple Network Pager Protocol Client
 =head1 SYNOPSIS
 
     use Net::SNPP;
-    
+
     # Constructors
     $snpp = Net::SNPP->new('snpphost');
     $snpp = Net::SNPP->new('snpphost', Timeout => 60);
@@ -328,17 +328,17 @@ this has been done, all SNPP commands are accessed through this object.
 This example will send a pager message in one hour saying "Your lunch is ready"
 
     #!/usr/local/bin/perl -w
-    
+
     use Net::SNPP;
-    
+
     $snpp = Net::SNPP->new('snpphost');
-    
+
     $snpp->send( Pager   => $some_pager_number,
 	         Message => "Your lunch is ready",
 	         Alert   => 1,
 	         Hold    => time + 3600, # lunch ready in 1 hour :-)
 	       ) || die $snpp->message;
-    
+
     $snpp->quit;
 
 =head1 CONSTRUCTOR

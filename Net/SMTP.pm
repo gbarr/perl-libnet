@@ -16,7 +16,7 @@ use IO::Socket;
 use Net::Cmd;
 use Net::Config;
 
-$VERSION = "2.15"; # $Id: //depot/libnet/Net/SMTP.pm#11 $
+$VERSION = "2.15"; # $Id: //depot/libnet/Net/SMTP.pm#12 $
 
 @ISA = qw(Net::Cmd IO::Socket::INET);
 
@@ -384,7 +384,7 @@ Net::SMTP - Simple Mail Transfer Protocol Client
 =head1 SYNOPSIS
 
     use Net::SMTP;
-    
+
     # Constructors
     $smtp = Net::SMTP->new('mailhost');
     $smtp = Net::SMTP->new('mailhost', Timeout => 60);
@@ -406,9 +406,9 @@ The Net::SMTP class is a subclass of Net::Cmd and IO::Socket::INET.
 This example prints the mail domain name of the SMTP server known as mailhost:
 
     #!/usr/local/bin/perl -w
-    
+
     use Net::SMTP;
-    
+
     $smtp = Net::SMTP->new('mailhost');
     print $smtp->domain,"\n";
     $smtp->quit;
@@ -417,20 +417,20 @@ This example sends a small message to the postmaster at the SMTP server
 known as mailhost:
 
     #!/usr/local/bin/perl -w
-    
+
     use Net::SMTP;
-    
+
     $smtp = Net::SMTP->new('mailhost');
-    
+
     $smtp->mail($ENV{USER});
     $smtp->to('postmaster');
-    
+
     $smtp->data();
     $smtp->datasend("To: postmaster\n");
     $smtp->datasend("\n");
     $smtp->datasend("A simple test message\n");
     $smtp->dataend();
-    
+
     $smtp->quit;
 
 =head1 CONSTRUCTOR

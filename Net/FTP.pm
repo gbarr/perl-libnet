@@ -21,7 +21,7 @@ use Net::Cmd;
 use Net::Config;
 # use AutoLoader qw(AUTOLOAD);
 
-$VERSION = "2.56"; # $Id: //depot/libnet/Net/FTP.pm#46 $
+$VERSION = "2.56"; # $Id: //depot/libnet/Net/FTP.pm#47 $
 @ISA     = qw(Exporter Net::Cmd IO::Socket::INET);
 
 # Someday I will "use constant", when I am not bothered to much about
@@ -399,7 +399,7 @@ sub abort
  send($ftp,pack("CCC", $TELNET_IAC, $TELNET_IP, $TELNET_IAC),MSG_OOB);
 
  $ftp->command(pack("C",$TELNET_DM) . "ABOR");
- 
+
  ${*$ftp}{'net_ftp_dataconn'}->close()
     if defined ${*$ftp}{'net_ftp_dataconn'};
 
@@ -489,7 +489,7 @@ sub get
 
  close($loc)
 	unless defined $localfd;
- 
+
  $data->close(); # implied $ftp->response
 
  return $local;
@@ -606,7 +606,7 @@ sub mkdir
     {
      my($status,$message) = ($ftp->status,$ftp->message);
      my $pwd = $ftp->pwd;
-     
+
      if($pwd && $ftp->cwd($dir))
       {
        $path = $dir;
@@ -748,7 +748,7 @@ sub port
    ${*$ftp}{'net_ftp_listen'} ||= IO::Socket::INET->new(Listen    => 5,
 				    	    	        Proto     => 'tcp',
 				    	    	       );
-  
+
    my $listen = ${*$ftp}{'net_ftp_listen'};
 
    my($myport, @myaddr) = ($listen->sockport, split(/\./,$ftp->sockhost));
@@ -996,9 +996,9 @@ sub _data_cmd
    return $data;
  }
 
- 
+
  close(delete ${*$ftp}{'net_ftp_listen'});
- 
+
  return undef;
 }
 
@@ -1151,7 +1151,7 @@ Net::FTP - FTP Client class
 =head1 SYNOPSIS
 
     use Net::FTP;
-    
+
     $ftp = Net::FTP->new("some.host.name", Debug => 0);
     $ftp->login("anonymous",'me@here.there');
     $ftp->cwd("/pub");

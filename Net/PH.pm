@@ -17,7 +17,7 @@ use IO::Socket;
 use Net::Cmd;
 use Net::Config;
 
-$VERSION = "2.20"; # $Id: //depot/libnet/Net/PH.pm#7 $
+$VERSION = "2.20"; # $Id: //depot/libnet/Net/PH.pm#8 $
 @ISA     = qw(Exporter Net::Cmd IO::Socket::INET);
 
 sub new
@@ -298,7 +298,7 @@ sub fields
  my %resp;
  my $cur_num = 0;
  my @tags = ();
- 
+
  while(defined($ln = $ph->getline))
   {
    $ph->debug_print(0,$ln)
@@ -372,7 +372,7 @@ package Net::PH::crypt;
 
 use integer;
 use strict;
- 
+
 sub ROTORSZ () { 256 }
 sub MASK () { 255 }
 
@@ -402,7 +402,7 @@ sub crypt_init {
 	$seed = $seed * $buf[$i] + $i;
     }
     @t1 = (0 .. ROTORSZ-1);
-    
+
     for($i = 0 ; $i < ROTORSZ ; $i++) {
 	$seed = 5 * $seed + $buf[$i % 13];
 	my $random = $seed % 65521;
@@ -472,7 +472,7 @@ Net::PH - CCSO Nameserver Client class
 =head1 SYNOPSIS
 
     use Net::PH;
-    
+
     $ph = Net::PH->new("some.host.name",
                        Port    => 105,
                        Timeout => 120,
@@ -481,17 +481,17 @@ Net::PH - CCSO Nameserver Client class
     if($ph) {
         $q = $ph->query({ field1 => "value1" },
                         [qw(name address pobox)]);
-    
+
         if($q) {
         }
     }
-    
+
     # Alternative syntax
-    
+
     if($ph) {
         $q = $ph->query('field1=value1',
                         'name address pobox');
-    
+
         if($q) {
         }
     }
@@ -547,7 +547,7 @@ empty list.
 
     $q = $ph->query({ name => $myname },
 		    [qw(name email schedule)]);
-    
+
     foreach $handle (@{$q}) {
 	foreach $field (keys %{$handle}) {
             $c = ${$handle}{$field}->code;
@@ -558,7 +558,7 @@ empty list.
 	}
     }
 
-    
+
 
 Search the database and return fields from all matching entries.
 

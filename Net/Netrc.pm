@@ -11,7 +11,7 @@ use strict;
 use FileHandle;
 use vars qw($VERSION);
 
-$VERSION = "2.10"; # $Id: //depot/libnet/Net/Netrc.pm#4$
+$VERSION = "2.10"; # $Id: //depot/libnet/Net/Netrc.pm#8 $
 
 my %netrc = ();
 
@@ -19,7 +19,7 @@ sub _readrc
 {
  my $host = shift;
  my($home,$file);
- 
+
  if($^O eq "MacOS") {
    $home = $ENV{HOME} || `pwd`;
    chomp($home);
@@ -199,7 +199,7 @@ Net::Netrc - OO interface to users netrc file
 =head1 SYNOPSIS
 
     use Net::Netrc;
-    
+
     $mach = Net::Netrc->lookup('some.machine');
     $login = $mach->login;
     ($login, $password, $account) = $mach->lpa;

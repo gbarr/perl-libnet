@@ -14,7 +14,7 @@ use strict;
 use vars qw($VERSION);
 use Carp;
 
-$VERSION = do { my @r=(q$Revision: 1.6 $=~/\d+/g); sprintf "%d."."%02d"x$#r,@r};
+$VERSION = "1.06"; # $Id: //depot/libnet/Net/DummyInetd.pm#4 $
 
 
 sub _process
@@ -96,9 +96,9 @@ Net::DummyInetd - A dummy Inetd server
 
     use Net::DummyInetd;
     use Net::SMTP;
-    
+
     $inetd = new Net::DummyInetd qw(/usr/lib/sendmail -ba -bs);
-    
+
     $smtp  = Net::SMTP->new('localhost', Port => $inetd->port);
 
 =head1 DESCRIPTION

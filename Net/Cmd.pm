@@ -13,7 +13,7 @@ use strict;
 use vars qw(@ISA @EXPORT $VERSION);
 use Carp;
 
-$VERSION = "2.18";
+$VERSION = "2.18"; # $Id: //depot/libnet/Net/Cmd.pm#18 $
 @ISA     = qw(Exporter);
 @EXPORT  = qw(CMD_INFO CMD_OK CMD_MORE CMD_REJECT CMD_ERROR CMD_PENDING);
 
@@ -160,7 +160,7 @@ sub command
  my $cmd = shift;
 
  return $cmd unless defined fileno($cmd);
- 
+
  $cmd->dataend()
     if(exists ${*$cmd}{'net_cmd_lastch'});
 
@@ -171,7 +171,7 @@ sub command
    my $str =  join(" ", map { /\n/ ? do { my $n = $_; $n =~ tr/\n/ /; $n } : $_; } @_) . "\015\012";
    my $len = length $str;
    my $swlen;
-   
+
    $cmd->close
 	unless (defined($swlen = syswrite($cmd,$str,$len)) && $swlen == $len);
 
@@ -214,7 +214,7 @@ sub getline
  my $partial = defined(${*$cmd}{'net_cmd_partial'})
 		? ${*$cmd}{'net_cmd_partial'} : "";
  my $fd = fileno($cmd);
- 
+
  return undef
 	unless defined $fd;
 
@@ -437,7 +437,7 @@ Net::Cmd - Network Command class (as used by FTP, SMTP etc)
 =head1 SYNOPSIS
 
     use Net::Cmd;
-    
+
     @ISA = qw(Net::Cmd);
 
 =head1 DESCRIPTION

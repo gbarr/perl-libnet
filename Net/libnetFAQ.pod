@@ -11,13 +11,10 @@ avaliable on the libnet web page at
 
     http://www.pobox.com/~gbarr/libnet/
 
-
-
 =head2 How to contribute to this document
 
 You may mail corrections, additions, and suggestions to me
 gbarr@pobox.com.
-
 
 =head1 Author and Copyright Information
 
@@ -71,7 +68,7 @@ The latest libnet release is always on CPAN, you will find it
 in 
 
  http://www.perl.com/CPAN/modules/by-module/Net/
- 
+
 The latest release and information is also avaliable on the libnet web page
 at
 
@@ -280,9 +277,9 @@ are being sent to the remote server and what responces are being
 received back.
 
     #!/your/path/to/perl
-    
+
     use Net::FTP;
-    
+
     my $ftp = new Net::FTP($host, Debug => 1);
     $ftp->login('gbarr','password');
     $ftp->quit;
@@ -319,3 +316,8 @@ being sent or responce being received.
 
 Copyright (c) 1997 Graham Barr.
 All rights reserved.
+
+=head1 DOCUMENT VERSION
+
+$Id: //depot/libnet/Net/libnetFAQ.pod#2 $
+
