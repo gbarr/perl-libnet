@@ -13,7 +13,7 @@ use strict;
 
 @EXPORT  = qw(%NetConfig);
 @ISA     = qw(Net::LocalCfg Exporter);
-$VERSION = "1.05"; # $Id: //depot/libnet/Net/Config.pm#9 $
+$VERSION = "1.06"; # $Id: //depot/libnet/Net/Config.pm#10 $
 
 eval { local $SIG{__DIE__}; require Net::LocalCfg };
 
@@ -45,6 +45,7 @@ if ( -f $file ) {
 }
 if ($< == $> and !$CONFIGURE)  {
     my $home = eval { (getpwuid($>))[7] } || $ENV{HOME};
+    $home ||= $ENV{HOMEDRIVE} . ($ENV{HOMEPATH}||'') if defined $ENV{HOMEDRIVE};
     if (defined $home) {
 	$file = $home . "/.libnetrc";
 	$ref = eval { do $file } if -f $file;
@@ -284,6 +285,6 @@ If true the C<Configure> will check each hostname given that it exists
 
 =for html <hr>
 
-I<$Id: //depot/libnet/Net/Config.pm#9 $>
+I<$Id: //depot/libnet/Net/Config.pm#10 $>
 
 =cut

@@ -11,7 +11,7 @@ use strict;
 use FileHandle;
 use vars qw($VERSION);
 
-$VERSION = "2.11"; # $Id: //depot/libnet/Net/Netrc.pm#10 $
+$VERSION = "2.12"; # $Id: //depot/libnet/Net/Netrc.pm#11 $
 
 my %netrc = ();
 
@@ -27,6 +27,7 @@ sub _readrc
  } else {
    # Some OS's don't have `getpwuid', so we default to $ENV{HOME}
    $home = eval { (getpwuid($>))[7] } || $ENV{HOME};
+   $home ||= $ENV{HOMEDRIVE} . ($ENV{HOMEPATH}||'') if defined $ENV{HOMEDRIVE};
    $file = $home . "/.netrc";
  }
 
@@ -328,6 +329,6 @@ it under the same terms as Perl itself.
 
 =for html <hr>
 
-$Id: //depot/libnet/Net/Netrc.pm#10 $
+$Id: //depot/libnet/Net/Netrc.pm#11 $
 
 =cut
