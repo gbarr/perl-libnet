@@ -2,6 +2,18 @@ Copyright (c) 1995 Graham Barr <Graham.Barr@tiuk.ti.com>. All rights
 reserved. This program is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself.
 
-Please report any bugs/suggestions to <Graham.Barr@tiuk.ti.com>.
+This release has got a significant number of changes sine the last release
+so is probably prone to a few bugs.
 
+*** NOTE *** NOTE *** NOTE *** NOTE *** NOTE *** NOTE *** NOTE *** NOTE ***
+
+My intention is to attempt to make this package so that it can be used in
+a non-blocking manner. This may, in future, cause the interface to change.
+
+Although I will try to limit the impact of this I cannot gaurantee that
+future releases will be 100% compatable.
+
+*** NOTE *** NOTE *** NOTE *** NOTE *** NOTE *** NOTE *** NOTE *** NOTE ***
+
+Please report any bugs/suggestions to <Graham.Barr@tiuk.ti.com>.
 

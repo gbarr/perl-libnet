@@ -1,0 +1,19 @@
+Mon Dec 11 1995  Graham Barr <bodg@tiuk.ti.com>
+
+	o Introduced IO::Socket which eventually will be released
+	  separetely.
+	o Comands that create a data connection noe return the data
+	  connection socket
+	o Data connection now blessed into a package Net::FTP::type
+	  where type is the connection type (eg A for ASCII)
+
+Mon Nov 20 1995  Graham Barr <bodg@tiuk.ti.com>
+
+	o Some perl -w clean ups
+
+
+Thu Nov  9 1995  Graham Barr <bodg@tiuk.ti.com>
+
+	o Modified FTP::new() to call croak when IP address cannot be
+	  determined from name given.
+
