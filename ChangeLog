@@ -1,3 +1,37 @@
+Change 378 on 2000/03/10 by <gbarr@pobox.com> (Graham Barr)
+
+	Net::FTP::A
+	- Fix to stop possible forever loop
+
+Change 377 on 2000/03/10 by <gbarr@pobox.com> (Graham Barr)
+
+	Net::FTP::A
+	- use " not '
+
+Change 376 on 2000/03/10 by <gbarr@pobox.com> (Graham Barr)
+
+	Net::Config
+	- need to import inet_aton and inet_ntoa
+
+Change 375 on 2000/03/10 by <gbarr@pobox.com> (Graham Barr)
+
+	Net::Config
+	- change arg to split to /\./ from "."
+
+Change 374 on 2000/03/07 by <gbarr@pobox.com> (Graham Barr)
+
+	Net::FTP::A
+	- Fix return value of read()
+
+Change 373 on 2000/03/07 by <gbarr@pobox.com> (Graham Barr)
+
+	Net::FTP::I
+	- Fix typo
+
+Change 372 on 2000/03/07 by <gbarr@pobox.com> (Graham Barr)
+
+	Release 1.07
+
 Change 371 on 2000/03/06 by <gbarr@pobox.com> (Graham Barr)
 
 	- Moved FAQ to Net/libnetFAQ.pod
