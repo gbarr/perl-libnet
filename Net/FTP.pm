@@ -21,7 +21,7 @@ use Net::Cmd;
 use Net::Config;
 # use AutoLoader qw(AUTOLOAD);
 
-$VERSION = "2.53"; # $Id: //depot/libnet/Net/FTP.pm#41 $
+$VERSION = "2.53"; # $Id: //depot/libnet/Net/FTP.pm#42 $
 @ISA     = qw(Exporter Net::Cmd IO::Socket::INET);
 
 # Someday I will "use constant", when I am not bothered to much about
@@ -74,6 +74,7 @@ sub new
 
  ${*$ftp}{'net_ftp_host'}     = $host;		# Remote hostname
  ${*$ftp}{'net_ftp_type'}     = 'A';		# ASCII/binary/etc mode
+ ${*$ftp}{'net_ftp_blksize'}  = abs($arg{'BlockSize'} || 10240);
 
  ${*$ftp}{'net_ftp_firewall'} = $fire
 	if(defined $fire);
@@ -456,9 +457,11 @@ sub get
  ($hashh,$hashb) = @$ref
    if($ref = ${*$ftp}{'net_ftp_hash'});
 
+ my $blksize = ${*$ftp}{'net_ftp_blksize'};
+
  while(1)
   {
-   last unless $len = $data->read($buf,1024);
+   last unless $len = $data->read($buf,$blksize);
    if($hashh) {
     $count += $len;
     print $hashh "#" x (int($count / $hashb));
@@ -680,7 +683,8 @@ sub _store_cmd
  $sock = $ftp->_data_cmd($cmd, $remote) or 
 	return undef;
 
- my $blk_size = ${*$ftp}{'net_ftp_blk_size'} || 10240;
+ my $blksize = ${*$ftp}{'net_ftp_blksize'};
+
  my($count,$hashh,$hashb,$ref) = (0);
 
  ($hashh,$hashb) = @$ref
@@ -688,7 +692,7 @@ sub _store_cmd
 
  while(1)
   {
-   last unless $len = sysread($loc,$buf="",$blk_size);
+   last unless $len = sysread($loc,$buf="",$blksize);
 
    if($hashh) {
     $count += $len;
@@ -878,6 +882,7 @@ sub _dataconn
    $data->timeout($ftp->timeout);
    ${*$ftp}{'net_ftp_dataconn'} = $data;
    ${*$data}{'net_ftp_cmd'} = $ftp;
+   ${*$data}{'net_ftp_blksize'} = ${*$ftp}{'net_ftp_blksize'};
   }
 
  $data;
@@ -901,11 +906,11 @@ sub _list_cmd
 
  my $databuf = '';
  my $buf = '';
+ my $blksize = ${*$ftp}{'net_ftp_blksize'};
 
- while($data->read($databuf,1024))
-  {
+ while($data->read($databuf,$blksize)) {
    $buf .= $databuf;
-  }
+ }
 
  my $list = [ split(/\n/,$buf) ];
 
@@ -1199,6 +1204,9 @@ given host cannot be directly connected to, then the
 connection is made to the firewall machine and the string C<@hostname> is
 appended to the login identifier. This kind of setup is also refered to
 as a ftp proxy.
+
+B<BlockSize> - This is the block size that Net::FTP will use when doing
+transfers. (defaults to 10240)
 
 B<Port> - The port number to connect to on the remote machine for the
 FTP connection

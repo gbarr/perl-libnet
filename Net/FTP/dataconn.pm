@@ -58,8 +58,11 @@ sub close
  my $data = shift;
  my $ftp  = ${*$data}{'net_ftp_cmd'};
 
- return $data->abort
-   if(exists ${*$data}{'net_ftp_bytesread'} && !${*$data}{'net_ftp_eof'});
+ if(exists ${*$data}{'net_ftp_bytesread'} && !${*$data}{'net_ftp_eof'}) {
+   my $junk;
+   $data->read($junk,1,0);
+   return $data->abort unless ${*$data}{'net_ftp_eof'};
+ }
 
  $data->_close;
 

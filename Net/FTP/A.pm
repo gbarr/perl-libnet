@@ -3,99 +3,97 @@
 ##
 
 package Net::FTP::A;
-
+use strict;
 use vars qw(@ISA $buf $VERSION);
 use Carp;
 
 require Net::FTP::dataconn;
 
 @ISA = qw(Net::FTP::dataconn);
-$VERSION = "1.09"; # $Id: //depot/libnet/Net/FTP/A.pm#9 $
+$VERSION = "1.10"; # $Id: //depot/libnet/Net/FTP/A.pm#10 $
 
-sub new
-{
- my $class = shift;
- my $data = $class->SUPER::new(@_) || return undef;
+sub read {
+  my    $data 	 = shift;
+  local *buf 	 = \$_[0]; shift;
+  my    $size 	 = shift || croak 'read($buf,$size,[$offset])';
+  my    $timeout = @_ ? shift : $data->timeout;
 
- ${*$data}{'net_ftp_last'} = " ";
+  if (length(${*$data}) < $size) {
+    my $blksize = ${*$data}{'net_ftp_blksize'};
+    $blksize = $size if $size > $blksize;
 
- $data;
-}
+    my $l = 0;
+    my $n;
 
-sub read
-{
- my    $data 	= shift;
- local *buf 	= \$_[0]; shift;
- my    $size 	= shift || croak 'read($buf,$size,[$offset])';
- my    $timeout = @_ ? shift : $data->timeout;
-
- ${*$data} ||= "";
- my $l = 0;
-
- READ:
-  {
-   $data->can_read($timeout) or
-	croak "Timeout";
-
-   $buf = ${*$data};
-
-   my $n = sysread($data, $buf, $size, length $buf);
-
-   return undef
-     unless defined $n;
-
-   ${*$data}{'net_ftp_bytesread'} += $n;
-   ${*$data}{'net_ftp_eof'} = 1 unless $n;
-
-   ${*$data} = substr($buf,-1) eq "\015" ? chop($buf) : "";
-
-   $buf =~ s/\015\012/\n/sgo;
-   $l = length($buf);
-   
-   redo READ
-     if($l == 0 && $n > 0);
-
-   if($n == 0 && $l == 0)
+    READ:
     {
-     $buf = ${*$data};
-     ${*$data} = "";
-     $l = length($buf);
+      my $readbuf = defined(${*$data}{'net_ftp_cr'}) ? '\015' : '';
+
+      $data->can_read($timeout) or
+	   croak "Timeout";
+
+      if ($n = sysread($data, $readbuf, $blksize, length $readbuf)) {
+        ${*$data}{'net_ftp_bytesread'} += $n;
+	${*$data}{'net_ftp_cr'} = substr($readbuf,-1) eq "\015"
+					? chop($readbuf)
+					: undef;
+      }
+      else {
+        return undef
+	  unless defined $n;
+
+        ${*$data}{'net_ftp_eof'} = 1;
+      }
+
+      $readbuf =~ s/\015\012/\n/sgo;
+      ${*$data} .= $readbuf;
+
+      unless (length(${*$data})) {
+
+        redo READ
+	  if($n > 0);
+
+        $size = length(${*$data})
+          if($n == 0);
+      }
     }
   }
 
- return $l;
+  $buf = substr(${*$data},0,$size);
+  substr(${*$data},0,$size) = '';
+
+  $size;
 }
 
-sub write
-{
- my    $data 	= shift;
- local *buf 	= \$_[0]; shift;
- my    $size 	= shift || croak 'write($buf,$size,[$timeout])';
- my    $timeout = @_ ? shift : $data->timeout;
+sub write {
+  my    $data 	= shift;
+  local *buf 	= \$_[0]; shift;
+  my    $size 	= shift || croak 'write($buf,$size,[$timeout])';
+  my    $timeout = @_ ? shift : $data->timeout;
 
- $data->can_write($timeout) or
-	croak "Timeout";
+  $data->can_write($timeout) or
+	 croak "Timeout";
 
- (my $tmp = substr($buf,0,$size)) =~ s/\n/\015\012/sg;
+  (my $tmp = substr($buf,0,$size)) =~ s/\n/\015\012/sg;
 
- # If the remote server has closed the connection we will be signal'd
- # when we write. This can happen if the disk on the remote server fills up
+  # If the remote server has closed the connection we will be signal'd
+  # when we write. This can happen if the disk on the remote server fills up
 
- local $SIG{PIPE} = 'IGNORE';
+  local $SIG{PIPE} = 'IGNORE';
 
- my $len = length($tmp);
- my $off = 0;
- my $wrote = 0;
+  my $len = length($tmp);
+  my $off = 0;
+  my $wrote = 0;
 
- while($len) {
-   $off += $wrote;
-   $wrote = syswrite($data, substr($tmp,$off), $len);
-   return undef
-     unless defined($wrote);
-   $len -= $wrote;
- }
+  while($len) {
+    $off += $wrote;
+    $wrote = syswrite($data, substr($tmp,$off), $len);
+    return undef
+      unless defined($wrote);
+    $len -= $wrote;
+  }
 
- return $size;
+  $size;
 }
 
 1;
