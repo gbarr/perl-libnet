@@ -1,3 +1,33 @@
+*** Release 1.06
+
+Fri Oct 31 1997 <gbarr@pobox.com> (Graham Barr)
+
+	Net::FTP
+	- Fixed undef warning in login() when $ruser does not exist in .netrc
+	- Added new supported() method
+	- DESTORY now sends quit command
+	- corrected OOB commands sent prior to an abort command
+	- close will call abort unless eof seen
+	- documentation updates
+	
+	Net::FTP::datacon
+	- abort() will read a byte if non have been read
+	
+	Net::FTP::A
+	- read was using arg#3 as an offset ?? change to use as timeout, this
+	  now matches Net::FTP::I::read and the docs
+	- speedup to read()
+
+Fri Sep 26 1997 <gbarr@pobox.com> (Graham Barr)
+
+	Net::Cmd
+	- modified ->response() to return CMD_ERROR if ->getline() returns
+	  undef
+
+Sun Sep 14 1997 <gbarr@pobox.com> (Graham Barr)
+
+	Small tweak to Makefile,PL to remove requirement for Data::Dumper
+
 Wed Oct  1 1997
 	Net::PH
 	- re-wrote crypt code. now should be 2-3x faster.
@@ -32,6 +62,8 @@ Thu Sep 11 1997
 
 	Net::POP3
 	- Added apop and uidl methods
+
+*** Release 1.05
 
 Thu Apr 03 1997
         Net::Domain
@@ -246,6 +278,3 @@ Thu Nov  9 1995  Graham Barr <gbarr@ti.com>
 
 	o Modified SMTP::new() to call croak if IP address of the given host
 	  cannot be found
-
-
-
