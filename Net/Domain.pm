@@ -16,7 +16,7 @@ use Net::Config;
 @ISA = qw(Exporter);
 @EXPORT_OK = qw(hostname hostdomain hostfqdn domainname);
 
-$VERSION = "2.08"; # $Id: //depot/libnet/Net/Domain.pm#6 $
+$VERSION = "2.09"; # $Id: //depot/libnet/Net/Domain.pm#7 $
 
 my($host,$domain,$fqdn) = (undef,undef,undef);
 
@@ -47,7 +47,7 @@ sub _hostname {
 	chomp ($host = `hostname`);
     }
     else {
-	local $SIG{__DIE__};
+	local $SIG{'__DIE__'};
 
 	# syscall is preferred since it avoids tainting problems
 	eval {
@@ -105,7 +105,7 @@ sub _hostdomain {
     return $domain
     	if(defined $domain);
 
-    local $SIG{__DIE__};
+    local $SIG{'__DIE__'};
 
     return $domain = $NetConfig{'inet_domain'}
 	if defined $NetConfig{'inet_domain'};
