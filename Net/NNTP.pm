@@ -14,7 +14,7 @@ use Carp;
 use Time::Local;
 use Net::Config;
 
-$VERSION = "2.16"; # $Id: //depot/libnet/Net/NNTP.pm#4 $
+$VERSION = "2.17"; # $Id: //depot/libnet/Net/NNTP.pm#5 $
 @ISA     = qw(Net::Cmd IO::Socket::INET);
 
 sub new
@@ -73,7 +73,8 @@ sub new
    # I want to ignore this failure, so restore the previous status.
    $obj->set_status($c,\@m);
   }
- ${*$obj}{'net_nntp_post'} = $c >= 200 && $c <= 209 ? 1 : 0;
+
+ ${*$obj}{'net_nntp_post'} = $c == 200 ? 1 : 0;
 
  $obj;
 }

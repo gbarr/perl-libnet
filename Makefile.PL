@@ -53,16 +53,14 @@ sub MY::post_initialize
 
 #--- Create Net::Config
 
-use IO::File;
-
 my $config_pm = "Net/Config.pm";
 my $libnet_cfg = "libnet.cfg";
 
-# Use %INC and IO::File to determine how this machine
+# Use %INC and ExtUtils::MakeMaker to determine how this machine
 # maps package names to path names
 
 foreach (keys %INC) {
- last if ($config_pm = $_) =~ s/^IO(.)File/Net${1}Config/;
+ last if ($config_pm = $_) =~ s/^ExtUtils(.)MakeMaker/Net${1}Config/;
 }
 
 system($^X, 'Configure')

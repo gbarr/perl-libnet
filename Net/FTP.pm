@@ -21,7 +21,7 @@ use Net::Cmd;
 use Net::Config;
 use AutoLoader qw(AUTOLOAD);
 
-$VERSION = "2.27"; # $Id: //depot/libnet/Net/FTP.pm#10 $
+$VERSION = "2.27"; # $Id: //depot/libnet/Net/FTP.pm#11 $
 @ISA     = qw(Exporter Net::Cmd IO::Socket::INET);
 
 1;
@@ -1050,13 +1050,15 @@ Returns the full pathname to the new directory.
 
 Get a directory listing of C<DIR>, or the current directory.
 
-Returns a reference to a list of lines returned from the server.
+In an array context, returns a list of lines returned from the server. In
+a scalar context, returns a reference to a list.
 
 =item dir ( [ DIR ] )
 
 Get a directory listing of C<DIR>, or the current directory in long format.
 
-Returns a reference to a list of lines returned from the server.
+In an array context, returns a list of lines returned from the server. In
+a scalar context, returns a reference to a list.
 
 =item get ( REMOTE_FILE [, LOCAL_FILE [, WHERE]] )
 

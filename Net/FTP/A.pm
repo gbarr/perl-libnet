@@ -69,23 +69,26 @@ sub write
  # What is previous pkt ended in \015 or not ??
 
  my $tmp;
- ($tmp = $buf) =~ s/(?!\015)\012/\015\012/sg;
+ ($tmp = substr($buf,0,$size)) =~ s/(?!\015)\012/\015\012/sg;
 
  # If the remote server has closed the connection we will be signal'd
  # when we write. This can happen if the disk on the remote server fills up
 
  local $SIG{PIPE} = 'IGNORE';
 
- my $len = $size + length($tmp) - length($buf);
- my $wrote = syswrite($data, $tmp, $len);
+ my $len = length($tmp);
+ my $off = 0;
+ my $wrote = 0;
 
- if($wrote > 0)
-  {
-   $wrote = $wrote == $len ? $size
-			   : $len - $wrote
-  }
+ while($len) {
+   $off += $wrote;
+   $wrote = syswrite($data, substr($tmp,$off), $len);
+   return $wrote
+     if $wrote <= 0;
+   $len -= $wrote;
+ }
 
- return $wrote;
+ return $size;
 }
 
 1;

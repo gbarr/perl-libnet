@@ -13,7 +13,7 @@ use strict;
 use vars qw(@ISA @EXPORT $VERSION);
 use Carp;
 
-$VERSION = "2.09";
+$VERSION = "2.10";
 @ISA     = qw(Exporter);
 @EXPORT  = qw(CMD_INFO CMD_OK CMD_MORE CMD_REJECT CMD_ERROR CMD_PENDING);
 
@@ -164,9 +164,13 @@ sub command
 
  if (scalar(@_))
   {
-   my $str =  join(" ",@_) . "\015\012";
+   local $SIG{PIPE} = 'IGNORE';
 
-   syswrite($cmd,$str,length $str);
+   my $str =  join(" ",@_) . "\015\012";
+   my $len = length $str;
+
+   $cmd->close
+	unless syswrite($cmd,$str,$len) == $len;
 
    $cmd->debug_print(1,$str)
 	if($cmd->debug);

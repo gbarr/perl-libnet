@@ -17,7 +17,7 @@ use IO::Socket;
 use Net::Cmd;
 use Net::Config;
 
-$VERSION = "2.19"; # $Id: //depot/libnet/Net/PH.pm#4 $
+$VERSION = "2.20"; # $Id: //depot/libnet/Net/PH.pm#5 $
 @ISA     = qw(Exporter Net::Cmd IO::Socket::INET);
 
 sub new
@@ -297,12 +297,14 @@ sub fields
  my $ln;
  my %resp;
  my $cur_num = 0;
-
+ my @tags = ();
+ 
  while(defined($ln = $ph->getline))
   {
    $ph->debug_print(0,$ln)
      if ($ph->debug & 2);
    chomp($ln);
+
    my($code,$num,$tag,$data,$last_tag);
 
    if($ln =~ /^-(\d+):(\d+):\s*([^:]*):\s*(.*)/o)
@@ -321,15 +323,17 @@ sub fields
      else
       {
        $resp{$tag} = bless [$code, $num, $tag, $data], "Net::PH::Result";
+       push @tags, $tag;
       }
     }
    else
     {
      $ph->set_status($ph->parse_response($ln));
-     return \%resp;
+     return wantarray ? (\%resp, \@tags) : \%resp;
     }
   }
- return undef;
+
+ return;
 }
 
 sub quit
@@ -637,9 +641,14 @@ Exit login mode and return to anonymous mode.
         print "field:[$field] [$c][$v][$f][$t]\n";
     }
 
-Returns a reference to a HASH. The keys of the HASH are the field names
-and the values are C<Net::PH:Result> objects (I<code>, I<value>, I<field>,
-I<text>).
+In a scalar context, returns a reference to a HASH. The keys of the HASH are
+the field names and the values are C<Net::PH:Result> objects (I<code>,
+I<value>, I<field>, I<text>).
+
+In an array context, returns a two element array. The first element is a
+reference to a HASH as above, the second element is a reference to an array
+which contains the tag names in the order that they were returned from the
+server.
 
 C<FIELD_LIST> is a string that lists the fields for which info will be
 returned.

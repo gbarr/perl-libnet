@@ -59,7 +59,7 @@ sub close
  my $ftp  = ${*$data}{'net_ftp_cmd'};
 
  return $data->abort
-   unless(${*$data}{'net_ftp_eof'});
+   if(exists ${*$data}{'net_ftp_bytesread'} && !${*$data}{'net_ftp_eof'});
 
  $data->_close;
 
