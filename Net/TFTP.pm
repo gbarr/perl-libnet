@@ -10,7 +10,7 @@ use strict;
 use vars qw($VERSION);
 use IO::File;
 
-$VERSION = "0.10";
+$VERSION = "0.11";
 
 sub RRQ	  () { 01 } # read request
 sub WRQ	  () { 02 } # write request
@@ -406,7 +406,7 @@ sub CLOSE {
 	else {
 	    # Clear the buffer
 	    unless(exists $self->{'error'}) {
-        	while(length($self->{'obuf'} >= $self->{'blksize'})) {
+        	while(length($self->{'obuf'}) >= $self->{'blksize'}) {
 		    last if _write($self) < 0;
         	}
 
