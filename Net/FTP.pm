@@ -1,4 +1,4 @@
-# Net::FTP.pm $Id: //depot/libnet/Net/FTP.pm#48 $
+# Net::FTP.pm $Id: //depot/libnet/Net/FTP.pm#49 $
 #
 # Copyright (c) 1995-8 Graham Barr <gbarr@pobox.com>. All rights reserved.
 # This program is free software; you can redistribute it and/or
@@ -747,6 +747,7 @@ sub port
 
    ${*$ftp}{'net_ftp_listen'} ||= IO::Socket::INET->new(Listen    => 5,
 				    	    	        Proto     => 'tcp',
+							Timeout   => $ftp->timeout,
 				    	    	       );
 
    my $listen = ${*$ftp}{'net_ftp_listen'};
@@ -1652,6 +1653,6 @@ Copyright (c) 1995-1998 Graham Barr. All rights reserved.
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.
 
-$Id: //depot/libnet/Net/FTP.pm#48 $
+$Id: //depot/libnet/Net/FTP.pm#49 $
 
 =cut

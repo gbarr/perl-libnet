@@ -1,3 +1,17 @@
+Change 402 on 2000/03/23 by <gbarr@pobox.com> (Graham Barr)
+
+	Net::Config
+	- Fix typos in requires_firewall(), Thanks to Johan Vromans <jvromans@squirrel.nl>
+
+Change 401 on 2000/03/23 by <gbarr@pobox.com> (Graham Barr)
+
+	Net::FTP
+	- fix rmdir for when ls() returns full paths
+
+Change 379 on 2000/03/13 by <gbarr@pobox.com> (Graham Barr)
+
+	Release 1.0702
+
 Change 378 on 2000/03/10 by <gbarr@pobox.com> (Graham Barr)
 
 	Net::FTP::A
