@@ -21,7 +21,7 @@ use Net::Cmd;
 use Net::Config;
 # use AutoLoader qw(AUTOLOAD);
 
-$VERSION = "2.50"; # $Id: //depot/libnet/Net/FTP.pm#35 $
+$VERSION = "2.51"; # $Id: //depot/libnet/Net/FTP.pm#36 $
 @ISA     = qw(Exporter Net::Cmd IO::Socket::INET);
 
 # Someday I will "use constant", when I am not bothered to much about
@@ -243,8 +243,10 @@ sub login
  $ok = $ftp->_ACCT($acct)
 	if (defined($acct) && ($ok == CMD_MORE || $ok == CMD_OK));
 
- $ftp->authorize()
-    if($ok == CMD_OK && defined ${*$ftp}{'net_ftp_firewall'});
+ if($ok == CMD_OK && defined ${*$ftp}{'net_ftp_firewall'}) {
+   my($f,$auth,$resp) = _auth_id($ftp);
+   $ftp->authorize($auth,$resp) if defined($resp);
+ }
 
  $ok == CMD_OK;
 }
@@ -257,10 +259,7 @@ sub account
  $ftp->_ACCT($acct) == CMD_OK;
 }
 
-sub authorize
-{
- @_ >= 1 || @_ <= 3 or croak 'usage: $ftp->authorize( [AUTH [, RESP]])';
-
+sub _auth_id {
  my($ftp,$auth,$resp) = @_;
 
  unless(defined $resp)
@@ -275,6 +274,14 @@ sub authorize
    ($auth,$resp) = $rc->lpa()
      if($rc);
   }
+  ($ftp,$auth,$resp);
+}
+
+sub authorize
+{
+ @_ >= 1 || @_ <= 3 or croak 'usage: $ftp->authorize( [AUTH [, RESP]])';
+
+ my($ftp,$auth,$resp) = &_auth_id;
 
  my $ok = $ftp->_AUTH($auth || "");
 

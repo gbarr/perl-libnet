@@ -16,7 +16,7 @@ use IO::Socket;
 use Net::Cmd;
 use Net::Config;
 
-$VERSION = "2.14"; # $Id: //depot/libnet/Net/SMTP.pm#10 $
+$VERSION = "2.15"; # $Id: //depot/libnet/Net/SMTP.pm#11 $
 
 @ISA = qw(Net::Cmd IO::Socket::INET);
 
@@ -256,13 +256,15 @@ sub reset
 sub recipient
 {
  my $smtp = shift;
- my $ok = 1;
  my $opts = "";
+ my $skip_bad = 0;
 
  if(@_ && ref($_[-1]))
   {
    my %opt = %{pop(@_)};
    my $v;
+
+   $skip_bad = delete $opt{'SkipBad'};
 
    if(exists ${*$smtp}{'net_smtp_esmtp'})
     {
@@ -285,18 +287,25 @@ sub recipient
 		. ' - ignored'
 	if scalar keys %opt;
     }
-   else
+   elsif(%opt)
     {
      carp 'Net::SMTP::recipient: ESMTP not supported by host - options discarded :-(';
     }
   }
 
- while($ok && scalar(@_))
+ my @ok;
+ my $addr;
+ foreach $addr (@_) 
   {
-   $ok = $smtp->_RCPT("TO:" . _addr(shift) . $opts);
+    if($smtp->_RCPT("TO:" . _addr($addr) . $opts)) {
+      push(@ok,$addr) if $skip_bad;
+    }
+    elsif(!$skip_bad) {
+      return 0;
+    }
   }
 
- return $ok;
+ return $skip_bad ? @ok : 1;
 }
 
 sub to { shift->recipient(@_) }
@@ -517,13 +526,23 @@ Reset the status of the server. This may be called after a message has been
 initiated, but before any data has been sent, to cancel the sending of the
 message.
 
-=item recipient ( ADDRESS [, ADDRESS [ ...]] )
+=item recipient ( ADDRESS [, ADDRESS [ ...]] [, OPTIONS ] )
 
 Notify the server that the current message should be sent to all of the
 addresses given. Each address is sent as a separate command to the server.
 Should the sending of any address result in a failure then the
 process is aborted and a I<false> value is returned. It is up to the
 user to call C<reset> if they so desire.
+
+The C<recipient> method can some additional OPTIONS which is passed
+in hash like fashion, using key and value pairs.  Possible options are:
+
+ Notify    =>
+ SkipBad   => ignore bad addresses
+
+If C<SkipBad> is true the C<recipient> will not return an error when a
+bad address is encountered and it will return an array of addresses
+that did succeed.
 
 =item to ( ADDRESS [, ADDRESS [...]] )
 

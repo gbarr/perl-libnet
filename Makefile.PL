@@ -85,21 +85,10 @@ chk_version(IO::Socket => '1.05') or
 
 #--- Write the Makefile
 
-my @clean = qw(*% *.html *.b[ac]k *.old *.orig *.rej);
-
-push @clean, map { "*/$_" } @clean;
-
 WriteMakefile(
 	VERSION   => $VERSION,
 	DISTNAME  => $DISTNAME,
 	NAME      => $NAME,
-
-	'dist'    => {COMPRESS => 'gzip -9f',
-		      SUFFIX   => '.gz', 
-		      DIST_DEFAULT => 'all tardist',
-		     },
- 
-	'clean'   => {FILES => join(" ", @clean,  )},
 	'realclean'   => {FILES => $config_pm},
 	PREREQ_PM => {
 			Socket => 1.3,
