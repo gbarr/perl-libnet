@@ -30,7 +30,8 @@ Net::FTP - FTP Client class
 
 =head1 DESCRIPTION
 
-C<Net::FTP> is a class implementing a simple FTP client in Perl.
+C<Net::FTP> is a class implementing a simple FTP client in Perl as described
+in RFC959
 
 =head2 TO BE CONTINUED ...
 
@@ -39,11 +40,11 @@ C<Net::FTP> is a class implementing a simple FTP client in Perl.
 require 5.001;
 use Socket 1.3;
 use Carp;
-use IO::Socket;
+use Net::Socket;
 
-@ISA = qw(IO::Socket);
+@ISA = qw(Net::Socket);
 
-$VERSION = sprintf("%d.%02d", q$Revision: 1.8 $ =~ /(\d+)\.(\d+)/);
+$VERSION = sprintf("%d.%02d", q$Revision: 1.18 $ =~ /(\d+)\.(\d+)/);
 sub Version { $VERSION }
 
 use strict;
@@ -63,19 +64,20 @@ remote host. Possible options are:
 
 =cut
 
-sub FTP_READY    { 0 }
-sub FTP_RESPONSE { 1 }
-sub FTP_XFER     { 2 }
+sub FTP_READY    { 0 } # Ready 
+sub FTP_RESPONSE { 1 } # Waiting for a response
+sub FTP_XFER     { 2 } # Doing data xfer
 
 sub new {
  my $pkg  = shift;
  my $host = shift;
  my %arg  = @_; 
- my $me = bless IO::Socket->new(Peer	=> $host, 
+ my $me = bless Net::Socket->new(Peer	=> $host, 
 				Service	=> 'ftp', 
 				Port	=> $arg{Port} || 'ftp'
 				), $pkg;
 
+ ${*$me} = "";					# partial response text
  @{*$me} = ();					# Last response text
 
  %{*$me} = (%{*$me},				# Copy current values
@@ -94,6 +96,9 @@ sub new {
 	   );
 
  $me->autoflush(1);
+
+ $me->debug($arg{Debug})
+   if(exists $arg{Debug});
 
  unless(2 == $me->response())
   {
@@ -120,8 +125,13 @@ sub debug {
  my $me = shift;
  my $debug = ${*$me}{Debug};
  
- ${*$me}{Debug} = 0 + shift
-	if @_;
+ if(@_)
+  {
+   ${*$me}{Debug} = 0 + shift;
+
+   printf STDERR "\n$me VERSION %s\n", $Net::FTP::VERSION
+     if(${*$me}{Debug});
+  }
 
  $debug;
 }
@@ -183,8 +193,14 @@ sub login {
  my $acct = shift if(defined $pass);
  my $ok;
 
- ($user,$pass,$acct) = netrc(${*$me}{FtpHost})
-	unless defined $user;
+ unless(defined $user)
+  {
+   require Net::Netrc;
+   my $rc = Net::Netrc->lookup(${*$me}{FtpHost});
+
+   ($user,$pass,$acct) = $rc->lpa()
+	if $rc;
+  }
 
  $user = "anonymous"
 	unless defined $user;
@@ -265,6 +281,7 @@ sub get {
  my $me = shift;
  my $remote = shift;
  my $local  = shift;
+ my $where  = shift || 0;
  my($loc,$len,$buf,$resp,$localfd,$data);
  local *FD;
 
@@ -281,15 +298,21 @@ sub get {
   {
    $loc = \*FD;
 
-   unless(open($loc,">$local"))
+   unless(($where) ? open($loc,">>$local") : open($loc,">$local"))
     {
      carp "Cannot open Local file $local: $!\n";
      return undef;
     }
   }
 
- $data = $me->retr($remote) or
-	return undef;
+ if ($where) {   
+   $data = $me->rest_cmd($where,$remote) or
+	return undef; 
+ }
+ else {
+   $data = $me->retr($remote) or
+     return undef;
+ }
 
  $buf = '';
 
@@ -302,9 +325,7 @@ sub get {
  close($loc)
 	unless $localfd;
  
- $resp = $data->close();
-
- 200 <= $resp && $resp < 300;
+ $data->close() == 2; # implied $me->response
 }
 
 sub cwd {
@@ -313,6 +334,13 @@ sub cwd {
 
  return $dir eq ".." ? $me->CDUP()
 		     : $me->CWD($dir);
+}
+
+sub pwd {
+ my $me = shift;
+
+ $me->PWD() ? ($me->message =~ /\"([^\"]+)/)[0]
+            : undef;
 }
 
 sub put	       { shift->send("stor",@_) }
@@ -399,7 +427,7 @@ sub port {
 
    # create a Listen socket at same address as the command socket
 
-   $listen = IO::Socket->new(Listen  => 5,
+   $listen = Net::Socket->new(Listen  => 5,
 			     Service => 'ftp',
 			     Addr    => $me->sockhost, 
 			    );
@@ -448,7 +476,7 @@ sub timeout {
 
 sub accept {
  my $me = shift;
- 
+
  return undef unless defined ${*$me}{LISTEN};
 
  my $data = ${*$me}{LISTEN}->accept;
@@ -487,30 +515,56 @@ sub list_cmd {
  my $cmd = lc shift;
  my $data = $me->$cmd(@_);
 
- die "undef" unless(defined $data);
+ return undef
+	unless(defined $data);
 
  bless $data, "Net::FTP::A"; # Force ASCII mode
 
  my $databuf = '';
- my $list = [];
+ my $buf = '';
 
  while($data->read($databuf,1024)) {
-   push(@{$list}, split(/\n/,$databuf)); ## break into lines
+   $buf .= $databuf;
  }
+
+ my $list = [ split(/\n/,$buf) ];
+
+ $data->close();
 
  wantarray ? @{$list} : $list;
 }
 
 sub data_cmd {
  my $me = shift;
+ my $cmd = uc shift;
  my $ok = 1;
  my $pasv = defined ${*$me}{Pasv} ? 1 : 0;
- my $cmd = uc shift;
 
  $ok = $me->port
 	unless $pasv || defined ${*$me}{Port};
 
  $ok = $me->$cmd(@_)
+	if $ok;
+
+ return $pasv ? $ok
+	      : $ok ? $me->accept()
+		    : undef;
+}
+
+sub rest_cmd {
+ my $me = shift;
+ my $ok = 1;
+ my $pasv = defined ${*$me}{Pasv} ? 1 : 0;
+ my $where = shift;
+ my $file = shift;
+
+ $ok = $me->port
+	unless $pasv || defined ${*$me}{Port};
+
+ $ok = $me->REST($where)
+	if $ok;
+
+ $ok = $me->RETR($file)
 	if $ok;
 
  return $pasv ? $ok
@@ -538,7 +592,7 @@ sub send_cmd {
 
   ${*$me}{State} = FTP_RESPONSE;
 
-  printf STDERR "$me>> %s\n", $cmd=~/^(pass|resp)/i ? "$1 ...." : $cmd
+  printf STDERR "\n$me>> %s", $cmd=~/^(pass|resp)/i ? "$1 ....\n" : $cmd
 	if $me->debug;
  }
 
@@ -575,14 +629,16 @@ sub response {
  my($code,$more,$rin,$rout,$partial,$buf) = (undef,0,'','','','');
 
  @{*$me} = (); # the responce
+ $buf = ${*$me};
+ my @buf = ();
 
  vec($rin,fileno($me),1) = 1;
 
  do
   {
-   if(($timeout==0) || select($rout=$rin, undef, undef, $timeout))
+   if(length($buf) || ($timeout==0) || select($rout=$rin, undef, undef, $timeout))
     {
-     unless(sysread($me, $buf, 1024))
+     unless(length($buf) || sysread($me, $buf, 1024))
       {
        carp "Unexpected EOF on command channel";
        return undef;
@@ -590,21 +646,25 @@ sub response {
 
      substr($buf,0,0) = $partial;    ## prepend from last sysread
 
-     my @buf = split(/\r?\n/, $buf);  ## break into lines
+     @buf = split(/\r?\n/, $buf);  ## break into lines
 
      $partial = (substr($buf, -1, 1) eq "\n") ? ''
 					      : pop(@buf); 
 
-     my $cmd;
-     foreach $cmd (@buf)
+     $buf = "";
+
+     while (@buf)
       {
+       my $cmd = shift @buf;
        print STDERR "$me<< $cmd\n"
 	 if $me->debug;
  
        ($code,$more) = ($1,$2)
 	if $cmd =~ /^(\d\d\d)(.)/;
- 
+
        push(@{*$me},$');
+
+       last unless(defined $more && $more eq "-");
       } 
     }
    else
@@ -613,145 +673,16 @@ sub response {
      return undef;
     }
   }
- while(length($partial) || (defined $more && $more eq "-"));
+ while((scalar(@{*$me}) == 0) || (defined $more && $more eq "-"));
+
+ ${*$me} = @buf ? join("\n",@buf,"") : "";
+ ${*$me} .= $partial;
 
  ${*$me}{Code} = $code;
  ${*$me}{State} = FTP_READY;
 
  substr($code,0,1);
 }
-
-sub netrc {
- my $host = shift;
- my $file = (getpwuid($>))[7] . "/.netrc";
- my($login,$pass,$acct) = (undef,undef,undef);
- local *NETRC;
- local $_;
-
- my @stat = stat($file);
-
- if(@stat)
-  {
-   if($stat[2] & 077)
-    {
-     carp "Bad permissions: $file";
-     return ();
-    }
-   if($stat[4] != $<)
-    {
-     carp "Not owner: $file";
-     return ();
-    }
-  }
-
- if(open(NETRC,$file))
-  {
-   my($mach,$macdef,$tok,@tok) = (0,0);
-
-LINE_LOOP:
-   while(<NETRC>) 
-    {
-     $macdef = 0 if /\A\n\Z/;
-
-     next if $macdef;
-
-     push(@tok, split(/[\s\n]+/, $_));
-
-TOKEN_LOOP:
-     while(@tok)
-      {
-       if($tok[0] eq "default")
-	{
-	 last LINE_LOOP if $mach;
-
-	 shift(@tok);
-	 $mach = 1;
-	 ($login,$pass,$acct) = (undef,undef,undef);
-
-	 next TOKEN_LOOP;
-	}
-
-       last TOKEN_LOOP unless @tok > 1;
-       $tok = shift(@tok);
-
-       if($tok eq "machine")
-	{
-	 last LINE_LOOP if $mach;
-	 $mach = 1 if $host eq shift(@tok);
-	 ($login,$pass,$acct) = (undef,undef,undef);
-	}
-       elsif($tok eq "login")
-	{
-	 $login = shift(@tok);
-	}
-       elsif($tok eq "password")
-	{
-	 $pass = shift(@tok);
-	}
-       elsif($tok eq "account")
-	{
-	 $acct = shift(@tok);
-	}
-       elsif($tok eq "macdef")
-	{
-	 $macdef = 1;
-	}
-      }
-    }
-   close(NETRC);
-
-   return ($login,$pass,$acct)
-	if $mach;
-  }
-
- return ();
-}
-
-sub file_mode {
- local $_ = shift;
- my $mode = 0;
- my($type,$ch);
-
- s/^(.)// and $type = $1;
-
- foreach $ch (split(//,$_))
-  {
-   $mode <<= 1;
-   $mode |= 1 unless $ch eq "-";
-  }
-
- $type eq "d" and $mode |= 0040000 or	# Directory
-   $type eq "l" and $mode |= 0120000 or	# Symbolic Link
-   $mode |= 0100000;			# Regular File
-
- $mode |= 0004000 if /^...s....../i;
- $mode |= 0002000 if /^......s.../i;
- $mode |= 0001000 if /^.........t/i;
-
- $mode;
-}
-
-sub parse_dir
-{
- my $me = shift;
- my $dir = shift;
- my @files = ();
-
- local $_;
-
- foreach (@$dir)
-  {
-   if(/^([\-FlrwxsStTdD]{10}).*(\w+)\s+(\w*\D)\s*(\d+)\s+(\w{3}\s+\d+\s*(\d+:\d+|\d{4}))\s+(\S+)(\s+->\s+(\S+))?/ )
-    {
-     my($mode,$owner,$group,$size,$date,$file,$link) = ($1,$2,$3,$4,$5,$7,$9);
-
-     $mode = file_mode($mode);
-     push(@files, [$mode, $owner, $group, $size, $date, $file, $link]);
-    }
-  }
- wantarray ? @files : \@files;
-}
-
 
 ;########################################
 ;#
@@ -782,6 +713,7 @@ sub RNFR { shift->send_cmd("RNFR",@_)->response() == 3}
 sub RNTO { shift->send_cmd("RNTO",@_)->response() == 2}
 sub ACCT { shift->send_cmd("ACCT",@_)->response() == 2}
 sub RESP { shift->send_cmd("RESP",@_)->response() == 2}
+sub REST { shift->send_cmd("REST",@_)->response() == 3}
 sub USER { my $ok = shift->send_cmd("USER",@_)->response();($ok == 2 || $ok == 3) ? $ok : 0;}
 sub PASS { my $ok = shift->send_cmd("PASS",@_)->response();($ok == 2 || $ok == 3) ? $ok : 0;}
 sub AUTH { my $ok = shift->send_cmd("AUTH",@_)->response();($ok == 2 || $ok == 3) ? $ok : 0;}
@@ -795,10 +727,10 @@ sub SYST { no_imp; }
 sub STAT { no_imp; }
 sub STRU { no_imp; }
 sub REIN { no_imp; }
-sub REST { no_imp; }
 
 package Net::FTP::dataconn;
 use Carp;
+no strict 'vars';
 
 sub abort {
  my $fd = shift;
@@ -812,15 +744,24 @@ sub close {
  my $fd = shift;
  my $ftp = ${*$fd}{Cmd};
 
- $fd->IO::Socket::close();
+ $fd->Net::Socket::close();
  delete ${*$ftp}{DATA};
 
  $ftp->response();
 }
 
+sub timeout {
+ my $me = shift;
+ my $timeout = ${*$me}{Timeout};
+
+ ${*$me}{Timeout} = 0 + shift if(@_);
+
+ $timeout;
+}
+
 sub _select {
  my $fd = shift;
- my $timeout = shift;
+ local *timeout = \$_[0]; shift;
  my $rw = shift;
  my($rin,$win);
 
@@ -842,14 +783,14 @@ sub _select {
 
 sub can_read {
  my $fd = shift;
- my $timeout = shift;
+ local *timeout = \$_[0];
 
  $fd->_select($timeout,1);
 }
 
 sub can_write {
  my $fd = shift;
- my $timeout = shift;
+ local *timeout = \$_[0];
 
  $fd->_select($timeout,0);
 }
@@ -859,8 +800,6 @@ sub cmd {
 
  ${*$me}{Cmd};
 }
-
-# should I have a close sub which calls response ??
 
 
 @Net::FTP::L::ISA = qw(Net::FTP::I);
@@ -875,29 +814,51 @@ no strict 'vars';
 sub read {
  my $fd = shift;
  local *buf = \$_[0]; shift;
- my $size = shift || croak 'read($buf,$size,[$timeout])';
- my $timeout = @_ ? shift : ${*$fd}{Timeout};
+ my $size = shift || croak 'read($buf,$size,[$offset])';
+ my $offset = shift || 0;
+ my $timeout = ${*$fd}{Timeout};
+ my $l;
 
- $fd->can_read($timeout) or
+ croak "Bad offset"
+	if($offset < 0);
+
+ $offset = length $buf
+	if($offset > length $buf);
+
+ $l = 0;
+ READ:
+  {
+   $fd->can_read($timeout) or
 	croak "Timeout";
 
- # this needs a bit more thought so I return the correct number of bytes !!
+   my $n = sysread($fd, ${*$fd}, $size, length ${*$fd});
 
- $buf = '';
+   return $n
+	unless($n >= 0);
 
- my $n = sysread($fd, $buf, $size);
+   my $lf = substr(${*$fd},-1,1) eq "\r" ? chop(${*$fd})
+					 : "";
 
- if($n >= 0)
-  {
-   substr($buf,0,0) = ${*$fd};
-   $buf =~ s/\r\n/\n/g;
-   $buf =~ s/([^\n]*)\Z//so;
-   ${*$fd} = $1;
+   ${*$fd} =~ s/\r\n/\n/go;
 
-   $n = length $buf;
+   substr($buf,$offset) = ${*$fd};
+
+   $l += length(${*$fd});
+   $offset += length(${*$fd});
+
+   ${*$fd} = $lf;
+   
+   redo READ
+     if($l == 0 && $n > 0);
+
+   if($n == 0 && $l == 0)
+    {
+     substr($buf,$offset) = ${*$fd};
+     ${*$fd} = "";
+    }
   }
 
- $n;
+ return $l;
 }
 
 sub write {
@@ -964,7 +925,7 @@ Graham Barr <Graham.Barr@tiuk.ti.com>
 
 =head2 REVISION
 
-$Revision: 1.8 $
+$Revision: 1.17 $
 
 =head2 COPYRIGHT
 

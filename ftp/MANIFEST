@@ -2,6 +2,10 @@ ChangeLog
 MANIFEST			This file
 Makefile.PL			Makemaker makefile
 README				Copyright
-lib/IO/Socket.pm		(v1.01) Generic socket package
-lib/Net/FTP.pm			(v1.08) FTP package
+README.CPAN
+README.DEBUG
+lib/Net/Socket.pm		TEMP replacement for IO::Socket
+lib/Net/FTP.pm			(v1.17) FTP package
+lib/Net/Netrc.pm		(v0) 
 t/dummy.t
+t/require.t

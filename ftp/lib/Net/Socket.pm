@@ -1,42 +1,13 @@
-package IO::Socket;
+package Net::Socket;
 
 =head1 NAME
 
-IO::Socket - Socket filedescriptor class
-
-=head1 SYNOPSIS
-
- use IO::Socket;
-
- $sock = IO::Socket->new(Peer	 => $host, 
- 			 Service => 'ftp', 
- 			);
-
- $sock = IO::Socket->new(Listen  => 5,
- 			 Proto   => 'tcp'
- 			);
-
+Net::Socket - TEMPORARY Socket filedescriptor class, so Net::FTP still
+works while IO::Socket is having a re-fit <GBARR>
 
 =head1 DESCRIPTION
 
-C<IO::Socket> is a class which simplifies the creating of a socket. With
-one function call it will do all the required lookups and system calls
-to create the required socket.
-
-To create a socket connection to a foreign host C<ftp.uu.net> using
-the C<ftp> service
-
- $sock = IO::Socket->new(Peer	 => $host, 
- 			 Service => 'ftp', 
- 			);
-
-If you want to use the same protocal as the C<ftp> service but provide
-your own port number to connect to
-
- $sock = IO::Socket->new(Peer	 => $host, 
- 			 Service => 'ftp', 
- 			 Port    => 2001,
- 			);
+NO TEXT --- THIS MODULE IS TEMPORARY
 
 =cut
 
@@ -48,7 +19,7 @@ require Exporter;
 @ISA = qw(Exporter);
 @EXPORT_OK = @Socket::EXPORT;
 
-$VERSION = sprintf("%d.%02d", q$Revision: 1.1 $ =~ /(\d+)\.(\d+)/);
+$VERSION = sprintf("%d.%02d", q$Revision: 1.2 $ =~ /(\d+)\.(\d+)/);
 sub Version { $VERSION }
 
 ##
@@ -161,7 +132,7 @@ sub new {
 				    : undef;
    
    
-   if($type == SOCK_STREAM)
+   if($type == SOCK_STREAM || $destaddr)
     {
      croak "bad peer address"
 	unless defined $destaddr;
@@ -197,7 +168,7 @@ sub autoflush {
 
 =head2 accept
 
-perform the system call C<accept> on the socket and return a new IO::Soscket
+perform the system call C<accept> on the socket and return a new Net::Socket
 object. This object can be used to communicate with the client that was trying
 to connect.
 
@@ -210,6 +181,12 @@ sub accept {
 
  accept($new,$sock) or
 	croak "accept: $!";
+
+ ${*$new}{Peername} = getpeername($new) or
+	croak "getpeername: $!";
+
+ ${*$new}{Sockname} = getsockname($new) or
+	croak "getsockname: $!";
 
  $new;
 }
@@ -340,7 +317,7 @@ Graham Barr <Graham.Barr@tiuk.ti.com>
 
 =head1 REVISION
 
-$Revision: 1.1 $
+$Revision: 1.2 $
 
 =head1 COPYRIGHT
 

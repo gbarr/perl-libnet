@@ -1,0 +1,76 @@
+
+Welcome to the CPAN, the Comprehensive Perl Archive Network.
+
+This document describes the CPAN itself, the Network.
+
+---
+
+Network
+
+The master CPAN site is at ftp://ftp.funet.fi/
+(Finland, Europe).
+
+The list of the registered CPAN sites follows.
+Please note that the sorting order is alphabetical on fields:
+
+
+	continent - country/state - ftp-url
+
+
+and thus the North American servers happen to be listed last (for the
+moment, anyway, no Oceanian or South American sites volunteered, yet).
+
+
+Registered CPAN sites
+
+
+  Africa
+
+    South Africa    ftp://ftp.is.co.za/programming/perl/CPAN/
+
+  Asia
+
+    Japan           ftp://ftp.lab.kdd.co.jp/lang/perl/CPAN/
+    Taiwan          ftp://dongpo.math.ncu.edu.tw/perl/CPAN/
+
+  Australasia
+
+    Australia       ftp://coombs.anu.edu.au/pub/perl/
+                    ftp://ftp.mame.mu.oz.au/pub/perl/CPAN/
+    New Zealand     ftp://ftp.tekotago.ac.nz/pub/perl/CPAN/
+
+  Europe
+
+    Finland         ftp://ftp.funet.fi/pub/languages/perl/CPAN/
+    France          ftp://ftp.ibp.fr/pub/perl/CPAN/
+                    ftp://ftp.pasteur.fr/pub/computing/unix/perl/CPAN/
+    Germany         ftp://ftp.leo.org/pub/comp/programming/languages/perl/CPAN/
+                    ftp://ftp.rz.ruhr-uni-bochum.de/pub/CPAN/
+    the Netherlands ftp://ftp.cs.ruu.nl/pub/PERL/CPAN/
+    Portugal        ftp://ftp.ci.uminho.pt/pub/lang/perl/
+    Slovenia        ftp://ftp.arnes.si/software/perl/CPAN/
+    Sweden          ftp://ftp.sunet.se/pub/lang/perl/CPAN/
+    Switzerland     ftp://ftp.switch.ch/mirror/CPAN/
+    UK              ftp://ftp.demon.co.uk/pub/mirrors/perl/CPAN/
+                    ftp://unix.hensa.ac.uk/mirrors/perl-CPAN/
+
+  North America
+
+    Florida         ftp://ftp.cis.ufl.edu/pub/perl/CPAN/
+    Illinois        ftp://uiarchive.cso.uiuc.edu/pub/lang/perl/CPAN/
+    Massachusetts   ftp://ftp.delphi.com/pub/mirrors/packages/perl/CPAN/
+    Oklahoma        ftp://ftp.uoknor.edu/mirrors/CPAN/
+    Texas           ftp://ftp.sedl.org/pub/mirrors/CPAN/
+                    ftp://ftp.sterling.com/programming/languages/perl/
+
+
+
+We apologise for the diversity of the CPAN path names but
+having identical and hopefully as short as possible path names
+across several separate ftp sites is well nigh impossible.
+
+Feedback
+
+You can send email
+to the CPAN administrators, cpan-adm@ftp.funet.fi.
+
