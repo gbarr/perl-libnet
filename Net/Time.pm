@@ -17,7 +17,7 @@ use IO::Select;
 @ISA = qw(Exporter);
 @EXPORT_OK = qw(inet_time inet_daytime);
 
-$VERSION = "2.06";
+$VERSION = "2.07";
 
 $TIMEOUT = 120;
 
@@ -74,7 +74,7 @@ sub inet_time
  else {
    # otherwise return seconds since 1972, there were 17 leap years between
    # 1900 and 1972
-   $offset =  (70 * 3153600 + 17 * 86400) | 0;
+   $offset =  (70 * 31536000 + 17 * 86400) | 0;
  }
 
  $time - $offset;
