@@ -21,7 +21,7 @@ use Net::Cmd;
 use Net::Config;
 # use AutoLoader qw(AUTOLOAD);
 
-$VERSION = "2.53"; # $Id: //depot/libnet/Net/FTP.pm#42 $
+$VERSION = "2.54"; # $Id: //depot/libnet/Net/FTP.pm#43 $
 @ISA     = qw(Exporter Net::Cmd IO::Socket::INET);
 
 # Someday I will "use constant", when I am not bothered to much about
@@ -187,8 +187,16 @@ sub mdtm
  my $ftp  = shift;
  my $file = shift;
 
- $ftp->_MDTM($file) && $ftp->message =~ /(\d{4})(\d\d)(\d\d)(\d\d)(\d\d)(\d\d)/
-    ? timegm($6,$5,$4,$3,$2-1,$1 - 1900)
+ # Server Y2K bug workaround
+ #
+ # sigh; some idiotic FTP servers use ("19%d",tm.tm_year) instead of 
+ # ("%d",tm.tm_year+1900).  This results in an extra digit in the
+ # string returned. To account for this we allow an optional extra
+ # digit in the year. Then if the first two digits are 19 we use the
+ # remainder, otherwise we subtract 1900 from the whole year.
+
+ $ftp->_MDTM($file) && $ftp->message =~ /((\d\d)(\d\d\d?))(\d\d)(\d\d)(\d\d)(\d\d)(\d\d)/
+    ? timegm($8,$7,$6,$5,$4-1,$2 eq '19' ? $3 : ($1-1900))
     : undef;
 }
 
