@@ -27,6 +27,7 @@ demos/nntp.mirror
 demos/pop3
 demos/smtp.self
 demos/time
+install-nomake
 t/ftp.t
 t/hostname.t
 t/nntp.t
