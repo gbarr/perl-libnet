@@ -21,7 +21,7 @@ use Net::Cmd;
 use Net::Config;
 # use AutoLoader qw(AUTOLOAD);
 
-$VERSION = "2.40"; # $Id: //depot/libnet/Net/FTP.pm#25 $
+$VERSION = "2.41"; # $Id: //depot/libnet/Net/FTP.pm#26 $
 @ISA     = qw(Exporter Net::Cmd IO::Socket::INET);
 
 # Someday I will "use constant", when I am not bothered to much about
@@ -901,7 +901,7 @@ sub pasv_wait
  my($ftp, $non_pasv) = @_;
  my($file,$rin,$rout);
 
- vec($rin,fileno($ftp),1) = 1;
+ vec($rin='',fileno($ftp),1) = 1;
  select($rout=$rin, undef, undef, undef);
 
  $ftp->response();
