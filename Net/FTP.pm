@@ -21,7 +21,7 @@ use Net::Cmd;
 use Net::Config;
 # use AutoLoader qw(AUTOLOAD);
 
-$VERSION = "2.51"; # $Id: //depot/libnet/Net/FTP.pm#36 $
+$VERSION = "2.52"; # $Id: //depot/libnet/Net/FTP.pm#37 $
 @ISA     = qw(Exporter Net::Cmd IO::Socket::INET);
 
 # Someday I will "use constant", when I am not bothered to much about
@@ -87,6 +87,8 @@ sub new
 		    ? $NetConfig{ftp_ext_passive}
 		    : $NetConfig{ftp_int_passive};	# Whew! :-)
 
+ $ftp->hash(exists $arg{Hash} ? $arg{Hash} : 0, 1024);
+
  $ftp->autoflush(1);
 
  $ftp->debug(exists $arg{Debug} ? $arg{Debug} : undef);
@@ -104,6 +106,32 @@ sub new
 ##
 ## User interface methods
 ##
+
+sub hash {
+    my $ftp = shift;		# self
+    my $prev = ${*$ftp}{'net_ftp_hash'} || [\*STDERR, 0];
+
+    unless(@_) {
+      return $prev;
+    }
+    my($h,$b) = @_;
+    if(@_ == 1) {
+      unless($h) {
+        delete ${*$ftp}{'net_ftp_hash'};
+        return $prev;
+      }
+      elsif(ref($h)) {
+        $b = 1024;
+      }
+      else {
+        ($h,$b) = (\*STDERR,$h);
+      }
+    }
+    select((select($h), $|=1)[0]);
+    $b = 512 if $b < 512;
+    ${*$ftp}{'net_ftp_hash'} = [$h, $b];
+    $prev;
+}        
 
 sub quit
 {
@@ -384,12 +412,23 @@ sub get
 
  $buf = '';
  my $swlen;
- 
+ my($count,$hashh,$hashb,$ref) = (0);
+
+ ($hashh,$hashb) = @$ref
+   if($ref = ${*$ftp}{'net_ftp_hash'});
+
  do
   {
    $len = $data->read($buf,1024);
+   if($hashh) {
+    $count += $len;
+    print $hashh "#" x (int($count / $hashb));
+    $count %= $hashb;
+   }
   }
  while($len && defined($swlen = syswrite($loc,$buf,$len)) && $swlen == $len);
+
+ print $hashh "\n" if $hashh;
 
  close($loc)
 	unless defined $localfd;
@@ -594,9 +633,20 @@ sub _store_cmd
 	return undef;
 
  my $blk_size = ${*$ftp}{'net_ftp_blk_size'} || 10240;
+ my($count,$hashh,$hashb,$ref) = (0);
+
+ ($hashh,$hashb) = @$ref
+   if($ref = ${*$ftp}{'net_ftp_hash'});
+
  while(1)
   {
    last unless $len = sysread($loc,$buf="",$blk_size);
+
+   if($hashh) {
+    $count += $len;
+    print $hashh "#" x (int($count / $hashb));
+    $count %= $hashb;
+   }
 
    my $wlen;
    unless(defined($wlen = $sock->write($buf,$len)) && $wlen == $len)
@@ -604,9 +654,12 @@ sub _store_cmd
      $sock->abort;
      close($loc)
 	unless defined $localfd;
+     print $hashh "\n" if $hashh;
      return undef;
     }
   }
+
+ print $hashh "\n" if $hashh;
 
  close($loc)
 	unless defined $localfd;
@@ -1111,6 +1164,11 @@ using passive mode. This is not usually required except for some I<dumb>
 servers, and some firewall configurations. This can also be set by the
 environment variable C<FTP_PASSIVE>.
 
+B<Hash> - If TRUE, print hash marks (#) on STDERR every 1024 bytes.  This
+simply invokes the C<hash()> method for you, so that hash marks are displayed
+for all transfers.  You can, of course, call C<hash()> explicitly whenever
+you'd like.
+
 If the constructor fails undef will be returned and an error message will
 be in $@
 
@@ -1272,6 +1330,15 @@ may be different.
 =item supported ( CMD )
 
 Returns TRUE if the remote server supports the given command.
+
+=item hash ( [FILEHANDLE_GLOB_REF],[ BYTES_PER_HASH_MARK] )
+
+Called without parameters, or with the first argument false, hash marks
+are suppressed.  If the first argument is true but not a reference to a 
+file handle glob, then \*STDERR is used.  The second argument is the number
+of bytes per hash mark printed, and defaults to 1024.  In all cases the
+return value is a reference to an array of two:  the filehandle glob reference
+and the bytes per hash mark.
 
 =back
 
