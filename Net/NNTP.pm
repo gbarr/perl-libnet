@@ -14,7 +14,7 @@ use Carp;
 use Time::Local;
 use Net::Config;
 
-$VERSION = "2.19"; # $Id: //depot/libnet/Net/NNTP.pm#10 $
+$VERSION = "2.19"; # $Id: //depot/libnet/Net/NNTP.pm#11 $
 @ISA     = qw(Net::Cmd IO::Socket::INET);
 
 sub new
@@ -799,8 +799,8 @@ that it will allow posting.
 
 Obtain information about all the active newsgroups. The results is a reference
 to a hash where the key is a group name and each value is a reference to an
-array. The elements in this array are:- the first article number in the group,
-the last article number in the group and any information flags about the group.
+array. The elements in this array are:- the last article number in the group,
+the first article number in the group and any information flags about the group.
 
 =item newgroups ( SINCE [, DISTRIBUTIONS ])
 
@@ -1059,6 +1059,6 @@ it under the same terms as Perl itself.
 
 =for html <hr>
 
-I<$Id: //depot/libnet/Net/NNTP.pm#10 $>
+I<$Id: //depot/libnet/Net/NNTP.pm#11 $>
 
 =cut
