@@ -16,7 +16,7 @@ use Net::Config;
 @ISA = qw(Exporter);
 @EXPORT_OK = qw(hostname hostdomain hostfqdn domainname);
 
-$VERSION = "2.10"; # $Id: //depot/libnet/Net/Domain.pm#8 $
+$VERSION = "2.11"; # $Id: //depot/libnet/Net/Domain.pm#9 $
 
 my($host,$domain,$fqdn) = (undef,undef,undef);
 
@@ -55,10 +55,12 @@ sub _hostname {
     	    eval {
     		package main;
      		require "syscall.ph";
+		defined(&main::SYS_gethostname);
     	    }
     	    || eval {
     		package main;
      		require "sys/syscall.ph";
+		defined(&main::SYS_gethostname);
     	    }
             and $host = (syscall(&main::SYS_gethostname, $tmp, 256) == 0)
 		    ? $tmp
