@@ -14,7 +14,7 @@ use Carp;
 use Time::Local;
 use Net::Config;
 
-$VERSION = do { my @r=(q$Revision: 2.14.1 $=~/\d+/g); sprintf "%d."."%02d"x$#r,@r};
+$VERSION = "2.15";
 @ISA     = qw(Net::Cmd IO::Socket::INET);
 
 sub new
@@ -59,6 +59,20 @@ sub new
   }
 
  my $c = $obj->code;
+ my @m = $obj->message;
+ 
+ # if server is INN and we have transfer rights the we are currently
+ # talking to innd not nnrpd
+ if($obj->reader)
+  {
+   # If reader suceeds the we need to consider this code to determine postok
+   $c = $obj->code;
+  }
+ else
+  {
+   # I want to ignore this failure, so restore the previous status.
+   $obj->set_status($c,\@m);
+  }
  ${*$obj}{'net_nntp_post'} = $c >= 200 && $c <= 209 ? 1 : 0;
 
  $obj;

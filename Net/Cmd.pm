@@ -205,9 +205,13 @@ sub getline
     if scalar(@{${*$cmd}{'net_cmd_lines'}});
 
  my $partial = ${*$cmd}{'net_cmd_partial'} || "";
+ my $fd = fileno($cmd);
+ 
+ return undef
+	unless defined $fd;
 
  my $rin = "";
- vec($rin,fileno($cmd),1) = 1;
+ vec($rin,$fd,1) = 1;
 
  my $buf;
 

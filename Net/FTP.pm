@@ -213,6 +213,14 @@ sub login
  $ok == CMD_OK;
 }
 
+sub account
+{
+ @_ == 2 or croak 'usage: $ftp->account( ACCT )';
+ my $ftp = shift;
+ my $acct = shift;
+ $ftp->_ACCT($acct) == CMD_OK;
+}
+
 sub authorize
 {
  @_ >= 1 || @_ <= 3 or croak 'usage: $ftp->authorize( [AUTH [, RESP]])';
@@ -763,7 +771,7 @@ sub parse_response
 
  # Darn MS FTP server is a load of CRAP !!!!
  return ()
-	unless ${*$ftp}{'net_cmd_code'};
+	unless ${*$ftp}{'net_cmd_code'} + 0;
 
  (${*$ftp}{'net_cmd_code'},1);
 }
