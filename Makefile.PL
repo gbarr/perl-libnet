@@ -63,7 +63,7 @@ foreach (keys %INC) {
  last if ($config_pm = $_) =~ s/^ExtUtils(.)MakeMaker/Net${1}Config/;
 }
 
-system($^X, 'Configure')
+system(($^O eq 'VMS' ? 'mcr ': ()),$^X, 'Configure')
 	unless -f $libnet_cfg;
 
  $self->{PM}->{$libnet_cfg} = $self->catfile('$(INST_ARCHLIBDIR)',$config_pm);
