@@ -628,7 +628,7 @@ Example:
 
 
     $smtp = Net::SMTP->new('mailhost',
-			   Hello => 'my.mail.domain'
+			   Hello => 'my.mail.domain',
 			   Timeout => 30,
                            Debug   => 1,
 			  );
@@ -636,14 +636,14 @@ Example:
     # the same
     $smtp = Net::SMTP->new(
 			   Host => 'mailhost',
-			   Hello => 'my.mail.domain'
+			   Hello => 'my.mail.domain',
 			   Timeout => 30,
                            Debug   => 1,
 			  );
 
     # Connect to the default server from Net::config
     $smtp = Net::SMTP->new(
-			   Hello => 'my.mail.domain'
+			   Hello => 'my.mail.domain',
 			   Timeout => 30,
 			  );
 
