@@ -53,20 +53,20 @@ sub MY::post_initialize
 
 #--- Create Net::Config
 
-my $config_pm = "Net/Config.pm";
+my $config_pm = "Net/libnet.cfg";
 my $libnet_cfg = "libnet.cfg";
 
 # Use %INC and ExtUtils::MakeMaker to determine how this machine
 # maps package names to path names
 
 foreach (keys %INC) {
- last if ($config_pm = $_) =~ s/^ExtUtils(.)MakeMaker/Net${1}Config/;
+ last if ($config_pm = $_) =~ s/^ExtUtils(.)MakeMaker.pm/Net${1}libnet.cfg/;
 }
 
 system(($^O eq 'VMS' ? 'mcr ': ()),$^X, 'Configure')
 	unless -f $libnet_cfg;
 
- $self->{PM}->{$libnet_cfg} = $self->catfile('$(INST_ARCHLIBDIR)',$config_pm);
+ $self->{PM}->{$libnet_cfg} = $self->catfile('$(INST_LIBDIR)',$config_pm);
 
  "";
 }

@@ -37,3 +37,4 @@ t/nntp.t
 t/ph.t
 t/require.t
 t/smtp.t
+Net/Config.pm

@@ -16,7 +16,7 @@ use vars qw($opt_d $opt_o);
 my %cfg = ();
 my @cfg = ();
 
-my($config_pm,$msg,$ans,$def,$have_old);
+my($libnet_cfg,$msg,$ans,$def,$have_old);
 
 ##
 ##
@@ -152,6 +152,48 @@ sub get_bool ($$)
 ##
 ##
 
+sub get_netmask ($$)
+{
+ my($prompt,$def) = @_;
+ my @mask;
+ my $pat = join('\.',('([01]\d{0,2}|2[0-4]\d?|25[0-5]|[2-9]\d?)')x4)
+	   . '/([012]\d?|3[01]|[0-9])';
+ chomp($prompt);
+
+ my %list;
+ @list{@$def} = ();
+ while(1)
+  {
+   my $bad = 0;
+   my $ans = Prompt($prompt) or last;
+
+   $ans =~ s/(\A\s+|\s+\Z)//g;
+
+   if($ans eq '*')
+    {
+     %list = ();
+     next;
+    }
+   my $del = $ans =~ s/^-\s*//;
+##FIXME
+   @mask = split(/\s+/, $ans);
+   return undef unless @mask;
+   foreach (@mask)
+    {
+     next if /^($pat)$/o;
+     warn "Bad netmask '$_'\n";
+     $bad++;
+    }
+   last unless $bad;
+  }
+
+ \@mask;
+}
+
+##
+##
+##
+
 sub default_hostname
 {
  my $host;
@@ -176,17 +218,21 @@ sub default_hostname
 
 getopts('do:');
 
-$config_pm = "libnet.cfg"
-	unless(defined($config_pm = $opt_o));
-
-$have_old = -f $config_pm
-	? require $config_pm
-	: eval { require Net::Config };
+$libnet_cfg = "libnet.cfg"
+	unless(defined($libnet_cfg = $opt_o));
 
 my %oldcfg = ();
 
-%oldcfg = %Net::Config::NetConfig
-	if $have_old;
+$Net::Config::CONFIGURE = 1; # Suppress load of user overrides
+if( -f $libnet_cfg )
+ {
+  %oldcfg = ( %{ do $libnet_cfg } );
+ }
+elsif (eval { require Net::Config }) 
+ {
+  $have_old = 1;
+  %oldcfg = %Net::Config::NetConfig;
+ }
 
 map { $cfg{lc $_} = $cfg{$_}; delete $cfg{$_} if /[A-Z]/ } keys %cfg;
 
@@ -195,7 +241,7 @@ $oldcfg{'test_hosts'} = 1 unless exists $oldcfg{'test_hosts'};
 
 #---------------------------------------------------------------------------
 
-if(!-f $config_pm && $have_old && !$opt_d)
+if($have_old && !$opt_d)
  {
   $msg = <<EDQ;
 
@@ -324,6 +370,33 @@ $cfg{'ftp_firewall'} = get_hostname($msg,$def);
 
 #---------------------------------------------------------------------------
 
+if (defined $cfg{'ftp_firewall'})
+ {
+  print <<EDQ;
+
+Sometime a hostname lookup is sufficient to determine if a host is inside
+a firewall, but this is not foolproof. To make this funtion more acurate
+I need to know netmasks for your local network.
+
+EDQ
+$def = [];
+if(ref($oldcfg{'local_netmask'}))
+ {
+  $def = $oldcfg{'local_netmask'};
+   print "Your current netmasks are :\n\n\t",
+	join("\n\t",@{$def}),"\n\n;
+ }
+
+print "Enter one netmask at each prompt, prefix with a - to remove
+a netmask from the list` enter a '*' to clear the whole list
+and an emty line to continue with Configure.";
+
+  my $mask = get_netmask("netmask :",$def);
+  $cfg{'local_netmask'} = $mask if ref($mask) && @$mask;
+ }
+
+#---------------------------------------------------------------------------
+
 ###$msg =<<EDQ;
 ###
 ###SOCKS is a commonly used firewall protocol. If you use SOCKS firewalls
@@ -407,32 +480,12 @@ print "\n";
 
 #---------------------------------------------------------------------------
 
-my @old = ();
+my $fh = IO::File->new($libnet_cfg, "w") or
+	die "Cannot create `$libnet_cfg': $!";
 
-if($have_old && exists $INC{$config_pm}) {
-    my $fh = IO::File->new($INC{$config_pm}, "r");
-    @old = $fh->getlines;
-    while(@old) {
-	last if(shift(@old) =~ /^%NetConfig/);
-    }
-    while(@old) {
-	last if(pop(@old) =~ /^\s*\);/);
-    }
-    pop @old
-	while(@old && $old[-1] !~ /[^\w\n]/);
-    $old[-1] =~ s/,?\s*\n/,\n/
-	if @old;
-    $fh->close;
-}
+print "Writing $libnet_cfg\n";
 
-my $fh = IO::File->new($config_pm, "w") or
-	die "Cannot create `$config_pm': $!";
-
-print "Writing $config_pm\n";
-
-$fh->print(<DATA>,
-	   "\%NetConfig = (\n",
-	    @old);
+print $fh "{\n";
 
 my $key;
 foreach $key (keys %cfg) {
@@ -453,12 +506,12 @@ foreach $key (keys %cfg) {
     }
     else {
 	$val =~ s/'/\'/sog;
-	$val = "'" . $val . "'";
+	$val = "'" . $val . "'" if $val =~ /\D/;
     }
-    $fh->print("\t",$key," => ",$val,",\n");
+    print $fh "\t'",$key,"' => ",$val,",\n";
 }
 
-$fh->print(");\n1;\n");
+print $fh "}\n";
 
 $fh->close;
 
@@ -466,14 +519,3 @@ $fh->close;
 ############################################################################
 
 exit 0;
-
-__DATA__
-package Net::Config;
-
-require Exporter;
-use vars qw(@ISA @EXPORT %NetConfig);
-use strict;
-
-@EXPORT = qw(%NetConfig);
-@ISA = qw(Exporter);
-
