@@ -17,7 +17,7 @@ use IO::Socket;
 use Net::Cmd;
 use Net::Config;
 
-$VERSION = "2.20"; # $Id: //depot/libnet/Net/PH.pm#6 $
+$VERSION = "2.20"; # $Id: //depot/libnet/Net/PH.pm#7 $
 @ISA     = qw(Exporter Net::Cmd IO::Socket::INET);
 
 sub new

@@ -13,7 +13,7 @@ use Net::Cmd;
 use Carp;
 use Net::Config;
 
-$VERSION = "2.12"; # $Id: //depot/libnet/Net/POP3.pm#5 $
+$VERSION = "2.12"; # $Id: //depot/libnet/Net/POP3.pm#6 $
 
 @ISA = qw(Net::Cmd IO::Socket::INET);
 

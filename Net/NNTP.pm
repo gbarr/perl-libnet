@@ -14,7 +14,7 @@ use Carp;
 use Time::Local;
 use Net::Config;
 
-$VERSION = "2.17"; # $Id: //depot/libnet/Net/NNTP.pm#5 $
+$VERSION = "2.17"; # $Id: //depot/libnet/Net/NNTP.pm#6 $
 @ISA     = qw(Net::Cmd IO::Socket::INET);
 
 sub new
