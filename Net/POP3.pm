@@ -13,7 +13,7 @@ use Net::Cmd;
 use Carp;
 use Net::Config;
 
-$VERSION = "2.13"; # $Id: //depot/libnet/Net/POP3.pm#7 $
+$VERSION = "2.14"; # $Id: //depot/libnet/Net/POP3.pm#8 $
 
 @ISA = qw(Net::Cmd IO::Socket::INET);
 
@@ -214,8 +214,7 @@ sub list
  my $info = $me->read_until_dot
 	or return undef;
 
- my %hash = ();
- map { /(\d+)\D+(\d+)/; $hash{$1} = $2; } @$info;
+ my %hash = map { (/(\d+)\D+(\d+)/) } @$info;
 
  return \%hash;
 }
