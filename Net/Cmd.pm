@@ -1,4 +1,4 @@
-# Net::Cmd.pm $Id: //depot/libnet/Net/Cmd.pm#30 $
+# Net::Cmd.pm $Id: //depot/libnet/Net/Cmd.pm#31 $
 #
 # Copyright (c) 1995-1997 Graham Barr <gbarr@pobox.com>. All rights reserved.
 # This program is free software; you can redistribute it and/or
@@ -21,7 +21,7 @@ BEGIN {
   }
 }
 
-$VERSION = "2.23";
+$VERSION = "2.24";
 @ISA     = qw(Exporter);
 @EXPORT  = qw(CMD_INFO CMD_OK CMD_MORE CMD_REJECT CMD_ERROR CMD_PENDING);
 
@@ -198,7 +198,7 @@ sub command
 
 
  $cmd->dataend()
-    if(exists ${*$cmd}{'net_cmd_lastch'});
+    if(exists ${*$cmd}{'net_cmd_need_crlf'});
 
  if (scalar(@_))
   {
@@ -392,8 +392,13 @@ sub datasend
 
  return 0 unless defined(fileno($cmd));
 
- return 1
-    unless length($line);
+ unless (length $line) {
+   # Even though we are not sending anything, the fact we were
+   # called means that dataend needs to be called before the next
+   # command, which happens of net_cmd_need_crlf exists
+   ${*$cmd}{'net_cmd_need_crlf'} ||= 0;
+   return 1;
+ }
 
  if($cmd->debug) {
    foreach my $b (split(/\n/,$line)) {
@@ -401,19 +406,16 @@ sub datasend
    }
   }
 
- # Translate LF => CRLF, but not if the LF is
- # already preceeded by a CR
- $line =~ s/\G()\n|([^\r\n])\n/$+\015\012/sgo;
-
- ${*$cmd}{'net_cmd_lastch'} ||= " ";
- $line = ${*$cmd}{'net_cmd_lastch'} . $line;
+ $line =~ s/\r?\n/\r\n/sg;
+ $line =~ tr/\r\n/\015\012/ unless "\r" eq "\015";
 
  $line =~ s/(\012\.)/$1./sog;
+ $line =~ s/^\./../ unless ${*$cmd}{'net_cmd_need_crlf'};
 
- ${*$cmd}{'net_cmd_lastch'} = substr($line,-1,1);
+ ${*$cmd}{'net_cmd_need_crlf'} = substr($line,-1,1) ne "\012";
 
- my $len = length($line) - 1;
- my $offset = 1;
+ my $len = length($line);
+ my $offset = 0;
  my $win = "";
  vec($win,fileno($cmd),1) = 1;
  my $timeout = $cmd->timeout || undef;
@@ -449,16 +451,10 @@ sub dataend
  return 0 unless defined(fileno($cmd));
 
  return 1
-    unless(exists ${*$cmd}{'net_cmd_lastch'});
+    unless(exists ${*$cmd}{'net_cmd_need_crlf'});
 
- if(${*$cmd}{'net_cmd_lastch'} eq "\015")
-  {
-   syswrite($cmd,"\012",1);
-  }
- elsif(${*$cmd}{'net_cmd_lastch'} ne "\012")
-  {
-   syswrite($cmd,"\015\012",2);
-  }
+ syswrite($cmd,"\015\012",2)
+    if ${*$cmd}{'net_cmd_need_crlf'};
 
  $cmd->debug_print(1, ".\n")
     if($cmd->debug);
@@ -707,6 +703,6 @@ it under the same terms as Perl itself.
 
 =for html <hr>
 
-I<$Id: //depot/libnet/Net/Cmd.pm#30 $>
+I<$Id: //depot/libnet/Net/Cmd.pm#31 $>
 
 =cut
