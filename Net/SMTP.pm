@@ -16,7 +16,7 @@ use IO::Socket;
 use Net::Cmd;
 use Net::Config;
 
-$VERSION = do { my @r=(q$Revision: 2.9.1 $=~/\d+/g); sprintf "%d."."%02d"x$#r,@r};
+$VERSION = "2.10"; # $Id: //depot/libnet/Net/SMTP.pm#3 $
 
 @ISA = qw(Net::Cmd IO::Socket::INET);
 
@@ -50,7 +50,7 @@ sub new
 
  unless ($obj->response() == CMD_OK)
   {
-   $obj->SUPER::close();
+   $obj->close();
    return undef;
   }
 
@@ -305,18 +305,19 @@ sub help
 	        : undef;
 }
 
-sub close
+sub quit
 {
  my $me = shift;
 
- return 1
-   unless (ref($me) && defined fileno($me));
-
- $me->_QUIT && $me->SUPER::close;
+ $me->_QUIT;
+ $me->close;
 }
 
-sub DESTROY { shift->close }
-sub quit    { shift->close }
+sub DESTROY
+{
+ my $me = shift;
+ defined(fileno($me)) && $me->quit
+}
 
 ##
 ## RFC821 commands

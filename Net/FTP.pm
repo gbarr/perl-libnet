@@ -21,7 +21,7 @@ use Net::Cmd;
 use Net::Config;
 use AutoLoader qw(AUTOLOAD);
 
-$VERSION = "2.26"; # $Id: //depot/libnet/Net/FTP.pm#9 $
+$VERSION = "2.27"; # $Id: //depot/libnet/Net/FTP.pm#10 $
 @ISA     = qw(Exporter Net::Cmd IO::Socket::INET);
 
 1;
@@ -81,7 +81,7 @@ sub new
 
  unless ($ftp->response() == CMD_OK)
   {
-   $ftp->SUPER::close();
+   $ftp->close();
    undef $ftp;
   }
 
@@ -92,18 +92,19 @@ sub new
 ## User interface methods
 ##
 
-sub close
+sub quit
 {
  my $ftp = shift;
 
- return 1
-   unless (ref($ftp) && defined fileno($ftp));
-
- $ftp->_QUIT && $ftp->SUPER::close;
+ $ftp->_QUIT;
+ $ftp->close;
 }
 
-sub DESTROY { shift->close }
-sub quit    { shift->close }
+sub DESTROY
+{
+ my $ftp = shift;
+ defined(fileno($ftp)) && $ftp->quit
+}
 
 sub ascii  { shift->type('A',@_); }
 sub binary { shift->type('I',@_); }

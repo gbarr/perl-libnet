@@ -1,10 +1,9 @@
 
-print "1..12\n";
+print "1..11\n";
 my $i = 1;
 eval { require Net::Config; } || print "not "; print "ok ",$i++,"\n";
 eval { require Net::Domain; } || print "not "; print "ok ",$i++,"\n";
 eval { require Net::Cmd; }    || print "not "; print "ok ",$i++,"\n";
-eval { require Net::Telnet; } || print "not "; print "ok ",$i++,"\n";
 eval { require Net::Netrc; }  || print "not "; print "ok ",$i++,"\n";
 eval { require Net::FTP; }    || print "not "; print "ok ",$i++,"\n";
 eval { require Net::SMTP; }   || print "not "; print "ok ",$i++,"\n";

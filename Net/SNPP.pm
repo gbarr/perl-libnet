@@ -16,7 +16,7 @@ use IO::Socket;
 use Net::Cmd;
 use Net::Config;
 
-$VERSION = do { my @r=(q$Revision: 1.9.1 $=~/\d+/g); sprintf "%d."."%02d"x$#r,@r};
+$VERSION = "1.10"; # $Id: //depot/libnet/Net/SNPP.pm#3 $
 @ISA     = qw(Net::Cmd IO::Socket::INET);
 @EXPORT  = (qw(CMD_2WAYERROR CMD_2WAYOK CMD_2WAYQUEUED), @Net::Cmd::EXPORT);
 
@@ -56,7 +56,7 @@ sub new
 
  unless ($obj->response() == CMD_OK)
   {
-   $obj->SUPER::close();
+   $obj->close();
    return undef;
   }
 
@@ -213,24 +213,19 @@ sub quit
  @_ == 1 or croak 'usage: $snpp->quit()';
  my $snpp = shift;
 
- $snpp->_QUIT
-    && $snpp->close;
+ $snpp->_QUIT;
+ $snpp->close;
 }
 
 ##
 ## IO/perl methods
 ##
 
-sub close
+sub DESTROY
 {
  my $snpp = shift;
-
- ref($snpp)
-    && defined fileno($snpp)
-    && $snpp->SUPER::close;
+ defined(fileno($snpp)) && $snpp->quit
 }
-
-sub DESTROY { shift->close }
 
 ##
 ## Over-ride methods (Net::Cmd)

@@ -13,7 +13,7 @@ use Net::Cmd;
 use Carp;
 use Net::Config;
 
-$VERSION = "2.10";
+$VERSION = "2.11"; # $Id: //depot/libnet/Net/POP3.pm#4 $
 
 @ISA = qw(Net::Cmd IO::Socket::INET);
 
@@ -277,23 +277,19 @@ sub _APOP { shift->command('APOP',@_)->response() == CMD_OK }
 sub _RPOP { shift->command('RPOP',$_[0])->response() == CMD_OK }
 sub _LAST { shift->command('LAST')->response() == CMD_OK }
 
-sub close
+sub quit
 {
  my $me = shift;
 
- return 1
-   unless (ref($me) && defined fileno($me));
-
- $me->_QUIT && $me->SUPER::close;
+ $me->_QUIT;
+ $me->close;
 }
-
-sub quit    { shift->close }
 
 sub DESTROY
 {
  my $me = shift;
 
- if(fileno($me))
+ if(defined fileno($me))
   {
    $me->reset;
    $me->quit;

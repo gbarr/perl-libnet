@@ -14,7 +14,7 @@ use Carp;
 use Time::Local;
 use Net::Config;
 
-$VERSION = "2.15";
+$VERSION = "2.16"; # $Id: //depot/libnet/Net/NNTP.pm#4 $
 @ISA     = qw(Net::Cmd IO::Socket::INET);
 
 sub new
@@ -289,8 +289,8 @@ sub quit
  @_ == 1 or croak 'usage: $nntp->quit()';
  my $nntp = shift;
 
- $nntp->_QUIT
-    && $nntp->close;
+ $nntp->_QUIT;
+ $nntp->close;
 }
 
 sub slave
@@ -630,16 +630,11 @@ sub _XINDEX    { shift->unsupported }
 ## IO/perl methods
 ##
 
-sub close
+sub DESTROY
 {
  my $nntp = shift;
-
- ref($nntp) 
-    && defined fileno($nntp)
-    && $nntp->SUPER::close;
+ defined(fileno($nntp)) && $nntp->quit
 }
-
-sub DESTROY { shift->close }
 
 
 1;
