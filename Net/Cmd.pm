@@ -1,4 +1,4 @@
-# Net::Cmd.pm $Id: //depot/libnet/Net/Cmd.pm#31 $
+# Net::Cmd.pm $Id: //depot/libnet/Net/Cmd.pm#32 $
 #
 # Copyright (c) 1995-1997 Graham Barr <gbarr@pobox.com>. All rights reserved.
 # This program is free software; you can redistribute it and/or
@@ -444,6 +444,53 @@ sub datasend
  1;
 }
 
+sub rawdatasend
+{
+ my $cmd = shift;
+ my $arr = @_ == 1 && ref($_[0]) ? $_[0] : \@_;
+ my $line = join("" ,@$arr);
+
+ return 0 unless defined(fileno($cmd));
+
+ return 1
+    unless length($line);
+
+ if($cmd->debug)
+  {
+   my $b = "$cmd>>> ";
+   print STDERR $b,join("\n$b",split(/\n/,$line)),"\n";
+  }
+
+ my $len = length($line);
+ my $offset = 0;
+ my $win = "";
+ vec($win,fileno($cmd),1) = 1;
+ my $timeout = $cmd->timeout || undef;
+
+ while($len)
+  {
+   my $wout;
+   if (select(undef,$wout=$win, undef, $timeout) > 0)
+    {
+     my $w = syswrite($cmd, $line, $len, $offset);
+     unless (defined($w))
+      {
+       carp("$cmd: $!") if $cmd->debug;
+       return undef;
+      }
+     $len -= $w;
+     $offset += $w;
+    }
+   else
+    {
+     carp("$cmd: Timeout") if($cmd->debug);
+     return undef;
+    }
+  }
+
+ 1;
+}
+
 sub dataend
 {
  my $cmd = shift;
@@ -666,6 +713,11 @@ some C<debug_print> calls into your method.
 
 Unget a line of text from the server.
 
+=item rawdatasend ( DATA )
+
+Send data to the remote server without performing any conversions. C<DATA>
+is a scalar.
+
 =item read_until_dot ()
 
 Read data from the remote server until a line consisting of a single '.'.
@@ -703,6 +755,6 @@ it under the same terms as Perl itself.
 
 =for html <hr>
 
-I<$Id: //depot/libnet/Net/Cmd.pm#31 $>
+I<$Id: //depot/libnet/Net/Cmd.pm#32 $>
 
 =cut

@@ -16,7 +16,7 @@ use IO::Socket;
 use Net::Cmd;
 use Net::Config;
 
-$VERSION = "2.26"; # $Id: //depot/libnet/Net/SMTP.pm#28 $
+$VERSION = "2.26"; # $Id: //depot/libnet/Net/SMTP.pm#29 $
 
 @ISA = qw(Net::Cmd IO::Socket::INET);
 
@@ -240,13 +240,36 @@ sub mail
 
      if(defined($v = delete $opt{Bits}))
       {
-       if(exists $esmtp->{'8BITMIME'})
+       if($v eq "8")
         {
-	 $opts .= $v == 8 ? " BODY=8BITMIME" : " BODY=7BIT"
+         if(exists $esmtp->{'8BITMIME'})
+          {
+	 $opts .= " BODY=8BITMIME";
+          }
+         else
+          {
+	 carp 'Net::SMTP::mail: 8BITMIME option not supported by host';
+          }
+        }
+       elsif($v eq "binary")
+        {
+         if(exists $esmtp->{'BINARYMIME'} && exists $esmtp->{'CHUNKING'})
+          {
+   $opts .= " BODY=BINARYMIME";
+   ${*$me}{'net_smtp_chunking'} = 1;
+          }
+         else
+          {
+   carp 'Net::SMTP::mail: BINARYMIME option not supported by host';
+          }
+        }
+       elsif(exists $esmtp->{'8BITMIME'} or exists $esmtp->{'BINARYMIME'})
+        {
+   $opts .= " BODY=7BIT";
         }
        else
         {
-	 carp 'Net::SMTP::mail: 8BITMIME option not supported by host';
+   carp 'Net::SMTP::mail: 8BITMIME and BINARYMIME options not supported by host';
         }
       }
 
@@ -369,10 +392,51 @@ sub data
 {
  my $me = shift;
 
- my $ok = $me->_DATA() && $me->datasend(@_);
+ if(exists ${*$me}{'net_smtp_chunking'})
+  {
+   carp 'Net::SMTP::data: CHUNKING extension in use, must call bdat instead';
+  }
+ else
+  {
+   my $ok = $me->_DATA() && $me->datasend(@_);
 
- $ok && @_ ? $me->dataend
-	   : $ok;
+   $ok && @_ ? $me->dataend
+	     : $ok;
+  }
+}
+
+sub bdat
+{
+ my $me = shift;
+
+ if(exists ${*$me}{'net_smtp_chunking'})
+  {
+   my $data = shift;
+
+   $me->_BDAT(length $data) && $me->rawdatasend($data) &&
+     $me->response() == CMD_OK;
+  }
+ else
+  {
+   carp 'Net::SMTP::bdat: CHUNKING extension is not in use, call data instead';
+  }
+}
+
+sub bdatlast
+{
+ my $me = shift;
+
+ if(exists ${*$me}{'net_smtp_chunking'})
+  {
+   my $data = shift;
+
+   $me->_BDAT(length $data, "LAST") && $me->rawdatasend($data) &&
+     $me->response() == CMD_OK;
+  }
+ else
+  {
+   carp 'Net::SMTP::bdat: CHUNKING extension is not in use, call data instead';
+  }
 }
 
 sub datafh {
@@ -431,6 +495,7 @@ sub _RSET { shift->command("RSET")->response()	    == CMD_OK }
 sub _NOOP { shift->command("NOOP")->response()	    == CMD_OK }   
 sub _QUIT { shift->command("QUIT")->response()	    == CMD_OK }   
 sub _DATA { shift->command("DATA")->response()	    == CMD_MORE } 
+sub _BDAT { shift->command("BDAT", @_) }
 sub _TURN { shift->unsupported(@_); } 			   	  
 sub _ETRN { shift->command("ETRN", @_)->response()  == CMD_OK }
 sub _AUTH { shift->command("AUTH", @_)->response()  == CMD_OK }   
@@ -590,7 +655,7 @@ in hash like fashion, using key and value pairs.  Possible options are:
 
  Size        => <bytes>
  Return      => "FULL" | "HDRS"
- Bits        => "7" | "8"
+ Bits        => "7" | "8" | "binary"
  Transaction => <ADDRESS>
  Envelope    => <ENVID>
 
@@ -696,6 +761,6 @@ it under the same terms as Perl itself.
 
 =for html <hr>
 
-I<$Id: //depot/libnet/Net/SMTP.pm#28 $>
+I<$Id: //depot/libnet/Net/SMTP.pm#29 $>
 
 =cut
