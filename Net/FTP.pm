@@ -725,7 +725,7 @@ sub _store_cmd
    # _store_cmd call, figure out if the local file is a regular file(not
    # a pipe, or device) and if so get the file size from stat, and send
    # an ALLO command before sending the STOR, STOU, or APPE command.
-   my $size = -f $local && -s _; # no ALLO if sending data from a pipe
+   my $size = do { local $^W; -f $local && -s _ }; # no ALLO if sending data from a pipe
    $ftp->_ALLO($size) if $size;
   }
  croak("Bad remote filename '$remote'\n")
