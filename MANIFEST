@@ -18,8 +18,6 @@ Net/NNTP.pm			Network News Transfer Protocol
 Net/Netrc.pm			.netrc lookup routines
 Net/POP3.pm			Post Office Protocol
 Net/SMTP.pm			Simple Mail Transfer Protocol Client
-Net/SNPP.pm			Simple Network Pager Protocol Client
-Net/SNPP/HylaFAX.pm
 Net/Time.pm			time & nettime protocols
 Net/libnetFAQ.pod
 README
@@ -29,7 +27,6 @@ demos/nntp
 demos/nntp.mirror
 demos/pop3
 demos/smtp.self
-demos/snpp
 demos/time
 htdocs/Net/Cmd.html
 htdocs/Net/Config.html
@@ -40,7 +37,6 @@ htdocs/Net/NNTP.html
 htdocs/Net/Netrc.html
 htdocs/Net/POP3.html
 htdocs/Net/SMTP.html
-htdocs/Net/SNPP.html
 htdocs/Net/Time.html
 htdocs/Net/libnetFAQ.html
 htdocs/index.html
