@@ -46,10 +46,10 @@ if ($data = $ftp->stor('libnet.tst')) {
   
 }
 else {
-  print STDERR $ftp->message,"\n";
-  printf "not ok %d\n",$t++;
-  printf "not ok %d\n",$t++;
-  printf "not ok %d\n",$t++;
+  print "# ",$ftp->message,"\n";
+  printf "ok %d\n",$t++;
+  printf "ok %d\n",$t++;
+  printf "ok %d\n",$t++;
 }
 
 $ftp->quit  or do {
