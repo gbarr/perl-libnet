@@ -8,7 +8,7 @@ $opt_debug = undef;
 $opt_h = undef;
 $opt_p = undef;
 
-GetOptions(qw(debug h p));
+GetOptions(qw(debug h:s p:s));
 
 die "usage: $0 -h <host> -p <pagerid> <message>"
 	unless defined $opt_h && defined $opt_p && @ARGV;
@@ -16,8 +16,7 @@ die "usage: $0 -h <host> -p <pagerid> <message>"
 Net::SNPP->debug(1)
 	if $opt_debug;
 
-$snpp = Net::SNPP->new($opt_host);
-
+$snpp = Net::SNPP->new($opt_h) or die "$! $@";
 $snpp->pager_id($opt_p) || die $snpp->message;
 $snpp->content(join(" ",@ARGV)) || die $snpp->message;
 $snpp->send() || die $snpp->message;
