@@ -21,7 +21,7 @@ use Net::Cmd;
 use Net::Config;
 # use AutoLoader qw(AUTOLOAD);
 
-$VERSION = "2.46"; # $Id: //depot/libnet/Net/FTP.pm#31 $
+$VERSION = "2.47"; # $Id: //depot/libnet/Net/FTP.pm#32 $
 @ISA     = qw(Exporter Net::Cmd IO::Socket::INET);
 
 # Someday I will "use constant", when I am not bothered to much about
@@ -696,19 +696,19 @@ sub supported {
 }
 
 ##
-## Depreciated methods
+## Deprecated methods
 ##
 
 sub lsl
 {
- carp "Use of Net::FTP::lsl depreciated, use 'dir'"
+ carp "Use of Net::FTP::lsl deprecated, use 'dir'"
     if $^W;
  goto &dir;
 }
 
 sub authorise
 {
- carp "Use of Net::FTP::authorise depreciated, use 'authorize'"
+ carp "Use of Net::FTP::authorise deprecated, use 'authorize'"
     if $^W;
  goto &authorize;
 }
@@ -785,7 +785,7 @@ sub _list_cmd
 
  my $data = $ftp->_data_cmd($cmd,@_);
 
- return undef
+ return
 	unless(defined $data);
 
  require Net::FTP::A;

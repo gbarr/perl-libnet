@@ -14,7 +14,7 @@ use Carp;
 use Time::Local;
 use Net::Config;
 
-$VERSION = "2.18"; # $Id: //depot/libnet/Net/NNTP.pm#7 $
+$VERSION = "2.18"; # $Id: //depot/libnet/Net/NNTP.pm#8 $
 @ISA     = qw(Net::Cmd IO::Socket::INET);
 
 sub new
@@ -965,7 +965,7 @@ second number in a range is less than or equal to the first then the range
 represents all messages in the group after the first message number.
 
 B<NOTE> For compatibility reasons only with earlier versions of Net::NNTP
-a message spec can be passed as a list of two numbers, this is depreciated
+a message spec can be passed as a list of two numbers, this is deprecated
 and a reference to the list should now be passed
 
 =item PATTERN
