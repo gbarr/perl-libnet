@@ -31,7 +31,7 @@ my @stat;
 # for testing _readrc
 $INC{'FileHandle.pm'} = 1;
 
-(my $libnet_t = __FILE__) =~ s/\w+.t/libnet_t.pl/;
+(my $libnet_t = __FILE__) =~ s/\w+.t$/libnet_t.pl/;
 require $libnet_t;
 
 # now that the tricks are out of the way...
