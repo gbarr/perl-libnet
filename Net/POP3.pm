@@ -13,7 +13,7 @@ use Net::Cmd;
 use Carp;
 use Net::Config;
 
-$VERSION = "2.15"; # $Id: //depot/libnet/Net/POP3.pm#9 $
+$VERSION = "2.16"; # $Id: //depot/libnet/Net/POP3.pm#10 $
 
 @ISA = qw(Net::Cmd IO::Socket::INET);
 
@@ -25,6 +25,7 @@ sub new
  my %arg  = @_; 
  my $hosts = defined $host ? [ $host ] : $NetConfig{pop3_hosts};
  my $obj;
+ my @localport = exists $arg{ResvPort} ? ( LocalPort => $arg{ResvPort} ): ();
 
  my $h;
  foreach $h (@{$hosts})
@@ -32,6 +33,7 @@ sub new
    $obj = $type->SUPER::new(PeerAddr => ($host = $h), 
 			    PeerPort => $arg{Port} || 'pop3(110)',
 			    Proto    => 'tcp',
+			    @localport,
 			    Timeout  => defined $arg{Timeout}
 						? $arg{Timeout}
 						: 120
@@ -369,6 +371,10 @@ will be used.
 
 C<OPTIONS> are passed in a hash like fashion, using key and value pairs.
 Possible options are:
+
+B<ResvPort> - If given then the socket for the C<Net::POP3> object
+will be bound to the local port given using C<bind> when the socket is
+created.
 
 B<Timeout> - Maximum time, in seconds, to wait for a response from the
 POP3 server (default: 120)
