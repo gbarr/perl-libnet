@@ -16,7 +16,7 @@ use IO::Socket;
 use Net::Cmd;
 use Net::Config;
 
-$VERSION = "2.11"; # $Id: //depot/libnet/Net/SMTP.pm#6 $
+$VERSION = "2.12"; # $Id: //depot/libnet/Net/SMTP.pm#7 $
 
 @ISA = qw(Net::Cmd IO::Socket::INET);
 
@@ -56,6 +56,7 @@ sub new
 
  ${*$obj}{'net_smtp_host'} = $host;
 
+ (${*$obj}{'net_smtp_banner'}) = $obj->message;
  (${*$obj}{'net_smtp_domain'}) = $obj->message =~ /\A\s*(\S+)/;
 
  unless($obj->hello($arg{Hello} || ""))
@@ -70,6 +71,13 @@ sub new
 ##
 ## User interface methods
 ##
+
+sub banner
+{
+ my $me = shift;
+
+ return ${*$me}{'net_smtp_banner'} || undef;
+}
 
 sub domain
 {
@@ -445,6 +453,11 @@ states that it returns a value, failure will be returned as I<undef> or an
 empty list.
 
 =over 4
+
+=item banner ()
+
+Returns the banner message which the server replied with when the
+initial connection was made.
 
 =item domain ()
 
