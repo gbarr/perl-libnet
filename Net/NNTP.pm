@@ -14,7 +14,7 @@ use Carp;
 use Time::Local;
 use Net::Config;
 
-$VERSION = "2.22"; # $Id: //depot/libnet/Net/NNTP.pm#16 $
+$VERSION = "2.22"; # $Id: //depot/libnet/Net/NNTP.pm#17 $
 @ISA     = qw(Net::Cmd IO::Socket::INET);
 
 sub new
@@ -882,6 +882,10 @@ C<datasend> and C<dataend> methods from L<Net::Cmd>
 
 C<MESSAGE> can be either an array of lines or a reference to an array.
 
+The message, either sent via C<datasend> or as the C<MESSAGE>
+parameter, must be in the format as described by RFC822 and must
+contain From:, Newsgroups: and Subject: headers.
+
 =item postfh ()
 
 Post a new article to the news server using a tied filehandle.  If
@@ -1113,6 +1117,6 @@ it under the same terms as Perl itself.
 
 =for html <hr>
 
-I<$Id: //depot/libnet/Net/NNTP.pm#16 $>
+I<$Id: //depot/libnet/Net/NNTP.pm#17 $>
 
 =cut
