@@ -21,7 +21,7 @@ use Net::Cmd;
 use Net::Config;
 # use AutoLoader qw(AUTOLOAD);
 
-$VERSION = "2.45"; # $Id: //depot/libnet/Net/FTP.pm#30 $
+$VERSION = "2.46"; # $Id: //depot/libnet/Net/FTP.pm#31 $
 @ISA     = qw(Exporter Net::Cmd IO::Socket::INET);
 
 # Someday I will "use constant", when I am not bothered to much about
@@ -341,7 +341,7 @@ sub get
 	unless(defined $local);
 
  croak("Bad remote filename '$remote'\n")
-	if $remote =~ /[\s\r\n]/s;
+	if $remote =~ /[\r\n]/s;
 
  ${*$ftp}{'net_ftp_rest'} = $where
 	if ($where);
@@ -443,7 +443,7 @@ sub rmdir
 
     # Try to delete the contents
     # Get a list of all the files in the directory
-    my $filelist = $ftp->ls($dir) 
+    my $filelist = $ftp->ls($dir);
 
     return undef
 	unless $filelist && @$filelist; # failed, it is probably not a directory
@@ -557,7 +557,7 @@ sub _store_cmd
   }
 
  croak("Bad remote filename '$remote'\n")
-	if $remote =~ /[\s\r\n]/s;
+	if $remote =~ /[\r\n]/s;
 
  if(defined $localfd)
   {
