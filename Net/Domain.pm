@@ -16,7 +16,7 @@ use Net::Config;
 @ISA = qw(Exporter);
 @EXPORT_OK = qw(hostname hostdomain hostfqdn domainname);
 
-$VERSION = "2.06"; # $Id: //depot/libnet/Net/Domain.pm#4 $
+$VERSION = "2.07"; # $Id: //depot/libnet/Net/Domain.pm#5 $
 
 my($host,$domain,$fqdn) = (undef,undef,undef);
 
@@ -28,7 +28,24 @@ sub _hostname {
     return $host
     	if(defined $host);
 
-    local $SIG{__DIE__} = undef;
+    if ($^O eq 'MSWin32') {
+        require Socket;
+        my ($name,$alias,$type,$len,@addr) =  gethostbyname($ENV{'COMPUTERNAME'}||'localhost');
+        while (@addr)
+         {
+          my $a = pop(@addr);
+          $host = gethostbyaddr($a,Socket::AF_INET());
+          last if defined $host;
+         } 
+        if (index($host,'.') > 0) {
+           $fqdn = $host;
+           ($host,$domain) = $fqdn =~ /^([^\.]+)\.(.*)$/;
+         }
+        return $host;
+    }
+
+    local $SIG{__DIE__};
+
 
     # syscall is preferred since it avoids tainting problems
     eval {
@@ -85,7 +102,7 @@ sub _hostdomain {
     return $domain
     	if(defined $domain);
 
-    local $SIG{__DIE__} = undef;
+    local $SIG{__DIE__};
 
     return $domain = $NetConfig{'inet_domain'}
 	if defined $NetConfig{'inet_domain'};

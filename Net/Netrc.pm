@@ -11,7 +11,7 @@ use strict;
 use FileHandle;
 use vars qw($VERSION);
 
-$VERSION = do { my @r=(q$Revision: 2.6 $=~/\d+/g); sprintf "%d."."%02d"x$#r,@r};
+$VERSION = "2.07"; # $Id: //depot/libnet/Net/Netrc.pm#4$
 
 my %netrc = ();
 
@@ -29,8 +29,8 @@ sub _readrc
 
  $netrc{default} = undef;
 
- # OS/2 does not handle stat in a way compatable with this check :-(
- unless($^O eq 'os2')
+ # OS/2 and Win32 do not handle stat in a way compatable with this check :-(
+ unless($^O eq 'os2' || $^O eq 'MSWin32')
   { 
    my @stat = stat($file);
 
