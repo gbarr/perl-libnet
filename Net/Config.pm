@@ -2,6 +2,7 @@ package Net::Config;
 
 require Exporter;
 use vars qw(@ISA @EXPORT %NetConfig $VERSION $CONFIGURE $LIBNET_CFG);
+use Socket qw(inet_aton inet_ntoa);
 use strict;
 
 @EXPORT  = qw(%NetConfig);
