@@ -705,27 +705,63 @@ Reset the status of the server. This may be called after a message has been
 initiated, but before any data has been sent, to cancel the sending of the
 message.
 
-=item recipient ( ADDRESS [, ADDRESS [ ...]] [, OPTIONS ] )
+=item recipient ( ADDRESS [, ADDRESS, [...]] [, OPTIONS ] )
 
 Notify the server that the current message should be sent to all of the
 addresses given. Each address is sent as a separate command to the server.
-Should the sending of any address result in a failure then the
-process is aborted and a I<false> value is returned. It is up to the
-user to call C<reset> if they so desire.
+Should the sending of any address result in a failure then the process is
+aborted and a I<false> value is returned. It is up to the user to call
+C<reset> if they so desire.
 
-The C<recipient> method can some additional OPTIONS which is passed
-in hash like fashion, using key and value pairs.  Possible options are:
+The C<recipient> method can also pass additional case-sensitive OPTIONS as an
+anonymous hash using key and value pairs.  Possible options are:
 
- Notify    =>
- SkipBad   => ignore bad addresses
+  Notify  => ['NEVER'] or ['SUCCESS','FAILURE','DELAY']  (see below)
+  SkipBad => 1        (to ignore bad addresses)
 
-If C<SkipBad> is true the C<recipient> will not return an error when a
-bad address is encountered and it will return an array of addresses
-that did succeed.
+If C<SkipBad> is true the C<recipient> will not return an error when a bad
+address is encountered and it will return an array of addresses that did
+succeed.
 
   $smtp->recipient($recipient1,$recipient2);  # Good
   $smtp->recipient($recipient1,$recipient2, { SkipBad => 1 });  # Good
-  $smtp->recipient("$recipient,$recipient2"); # BAD   
+  $smtp->recipient($recipient1,$recipient2, { Notify => ['FAILURE','DELAY'], SkipBad => 1 });  # Good
+  @goodrecips=$smtp->recipient(@recipients, { Notify => ['FAILURE'], SkipBad => 1 });  # Good
+  $smtp->recipient("$recipient,$recipient2"); # BAD
+
+Notify is used to request Delivery Status Notifications (DSNs), but your
+SMTP/ESMTP service may not respect this request depending upon its version and
+your site's SMTP configuration.
+
+Leaving out the Notify option usually defaults an SMTP service to its default
+behavior equivalent to ['FAILURE'] notifications only, but again this may be
+dependent upon your site's SMTP configuration.
+
+The NEVER keyword must appear by itself if used within the Notify option and "requests
+that a DSN not be returned to the sender under any conditions."
+
+  {Notify => ['NEVER']}
+
+  $smtp->recipient(@recipients, { Notify => ['NEVER'], SkipBad => 1 });  # Good
+
+You may use any combination of these three values 'SUCCESS','FAILURE','DELAY' in
+the anonymous array reference as defined by RFC3461 (see http://rfc.net/rfc3461.html
+for more information.  Note: quotations in this topic from same.).
+
+A Notify parameter of 'SUCCESS' or 'FAILURE' "requests that a DSN be issued on
+successful delivery or delivery failure, respectively."
+
+A Notify parameter of 'DELAY' "indicates the sender's willingness to receive
+delayed DSNs.  Delayed DSNs may be issued if delivery of a message has been
+delayed for an unusual amount of time (as determined by the Message Transfer
+Agent (MTA) at which the message is delayed), but the final delivery status
+(whether successful or failure) cannot be determined.  The absence of the DELAY
+keyword in a NOTIFY parameter requests that a "delayed" DSN NOT be issued under
+any conditions."
+
+  {Notify => ['SUCCESS','FAILURE','DELAY']}
+
+  $smtp->recipient(@recipients, { Notify => ['FAILURE','DELAY'], SkipBad => 1 });  # Good
 
 =item to ( ADDRESS [, ADDRESS [...]] )
 
@@ -755,6 +791,9 @@ which contains the text read from the server.
 =item verify ( ADDRESS )
 
 Verify that C<ADDRESS> is a legitimate mailing address.
+
+Most sites usually disable this feature in their SMTP service configuration.
+Use "Debug => 1" option under new() to see if disabled.
 
 =item help ( [ $subject ] )
 
