@@ -13,7 +13,7 @@ use strict;
 
 @EXPORT  = qw(%NetConfig);
 @ISA     = qw(Net::LocalCfg Exporter);
-$VERSION = "1.09"; # $Id: //depot/libnet/Net/Config.pm#15 $
+$VERSION = "1.09"; # $Id: //depot/libnet/Net/Config.pm#16 $
 
 eval { local $SIG{__DIE__}; require Net::LocalCfg };
 
@@ -193,7 +193,7 @@ Your internet domain name
 
 =item ftp_firewall
 
-If you have an FTP proxy firewall (B<NOT> a HTTP or SOCKS firewall)
+If you have an FTP proxy firewall (B<NOT> an HTTP or SOCKS firewall)
 then this value should be set to the firewall hostname. If your firewall
 does not listen to port 21, then this value should be set to
 C<"hostname:port"> (eg C<"hostname:99">)
@@ -309,6 +309,6 @@ If true then C<Configure> will check each hostname given that it exists
 
 =for html <hr>
 
-I<$Id: //depot/libnet/Net/Config.pm#15 $>
+I<$Id: //depot/libnet/Net/Config.pm#16 $>
 
 =cut

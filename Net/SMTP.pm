@@ -16,7 +16,7 @@ use IO::Socket;
 use Net::Cmd;
 use Net::Config;
 
-$VERSION = "2.18"; # $Id: //depot/libnet/Net/SMTP.pm#18 $
+$VERSION = "2.18"; # $Id: //depot/libnet/Net/SMTP.pm#19 $
 
 @ISA = qw(Net::Cmd IO::Socket::INET);
 
@@ -470,7 +470,7 @@ known as mailhost:
 =item new Net::SMTP [ HOST, ] [ OPTIONS ]
 
 This is the constructor for a new Net::SMTP object. C<HOST> is the
-name of the remote host to which a SMTP connection is required.
+name of the remote host to which an SMTP connection is required.
 
 If C<HOST> is not given, then the C<SMTP_Host> specified in C<Net::Config>
 will be used.
@@ -641,6 +641,6 @@ it under the same terms as Perl itself.
 
 =for html <hr>
 
-I<$Id: //depot/libnet/Net/SMTP.pm#18 $>
+I<$Id: //depot/libnet/Net/SMTP.pm#19 $>
 
 =cut
