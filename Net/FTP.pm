@@ -22,7 +22,7 @@ use Net::Config;
 use Fcntl qw(O_WRONLY O_RDONLY O_APPEND O_CREAT O_TRUNC);
 # use AutoLoader qw(AUTOLOAD);
 
-$VERSION = "2.62"; # $Id: //depot/libnet/Net/FTP.pm#65 $
+$VERSION = "2.63"; # $Id: //depot/libnet/Net/FTP.pm#66 $
 @ISA     = qw(Exporter Net::Cmd IO::Socket::INET);
 
 # Someday I will "use constant", when I am not bothered to much about
@@ -729,7 +729,7 @@ sub _store_cmd
   {
    last unless $len = sysread($loc,$buf="",$blksize);
 
-   if (trEBCDIC)
+   if (trEBCDIC && $ftp->type ne 'I')
     {
      $buf = $ftp->toascii($buf); 
      $len = length($buf);
@@ -1714,6 +1714,6 @@ under the same terms as Perl itself.
 
 =for html <hr>
 
-I<$Id: //depot/libnet/Net/FTP.pm#65 $>
+I<$Id: //depot/libnet/Net/FTP.pm#66 $>
 
 =cut
