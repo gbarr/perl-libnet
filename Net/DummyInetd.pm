@@ -14,7 +14,7 @@ use strict;
 use vars qw($VERSION);
 use Carp;
 
-$VERSION = "1.06"; # $Id: //depot/libnet/Net/DummyInetd.pm#4 $
+$VERSION = "1.06"; # $Id: //depot/libnet/Net/DummyInetd.pm#5 $
 
 
 sub _process
@@ -111,7 +111,7 @@ descriptors duplicated to the new socket.
 
 This package was added as an example of how to use C<Net::SMTP> to connect
 to a C<sendmail> process, which is not the default, via SIDIN and STDOUT.
-A C<Net::Inetd> package will be available in the next release of C<libnet>
+A C<Net::Inetd> package may be available in a future release of C<libnet>
 
 =head1 CONSTRUCTOR
 
@@ -144,5 +144,9 @@ Graham Barr <gbarr@pobox.com>
 Copyright (c) 1995-1997 Graham Barr. All rights reserved.
 This program is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
+
+=for html <hr>
+
+I<$Id: //depot/libnet/Net/DummyInetd.pm#5 $>
 
 =cut

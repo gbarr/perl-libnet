@@ -16,7 +16,7 @@ use IO::Socket;
 use Net::Cmd;
 use Net::Config;
 
-$VERSION = "1.11"; # $Id: //depot/libnet/Net/SNPP.pm#6 $
+$VERSION = "1.11"; # $Id: //depot/libnet/Net/SNPP.pm#7 $
 @ISA     = qw(Net::Cmd IO::Socket::INET);
 @EXPORT  = (qw(CMD_2WAYERROR CMD_2WAYOK CMD_2WAYQUEUED), @Net::Cmd::EXPORT);
 
@@ -369,6 +369,8 @@ Example:
 			   Debug => 1,
 			  );
 
+=back
+
 =head1 METHODS
 
 Unless otherwise stated all methods return either a I<true> or I<false>
@@ -410,5 +412,9 @@ Graham Barr <gbarr@pobox.com>
 Copyright (c) 1995-1997 Graham Barr. All rights reserved.
 This program is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
+
+=for html <hr>
+
+I<$Id: //depot/libnet/Net/SNPP.pm#7 $>
 
 =cut

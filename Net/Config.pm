@@ -1,6 +1,10 @@
+# Net::Config.pm
+#
+# Copyright (c) 2000 Graham Barr <gbarr@pobox.com>. All rights reserved.
+# This program is free software; you can redistribute it and/or
+# modify it under the same terms as Perl itself.
 
 package Net::Config;
-# $Id: //depot/libnet/Net/Config.pm#7 $
 
 require Exporter;
 use vars qw(@ISA @EXPORT %NetConfig $VERSION $CONFIGURE $LIBNET_CFG);
@@ -9,7 +13,7 @@ use strict;
 
 @EXPORT  = qw(%NetConfig);
 @ISA     = qw(Net::LocalCfg Exporter);
-$VERSION = "1.05";
+$VERSION = "1.05"; # $Id: //depot/libnet/Net/Config.pm#8 $
 
 eval { local $SIG{__DIE__}; require Net::LocalCfg };
 
@@ -211,6 +215,8 @@ If true the C<Configure> will check each hostname given that it exists
 
 =back
 
-$Id: //depot/libnet/Net/Config.pm#7 $
+=for html <hr>
+
+I<$Id: //depot/libnet/Net/Config.pm#8 $>
 
 =cut

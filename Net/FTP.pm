@@ -1,4 +1,4 @@
-# Net::FTP.pm $Id: //depot/libnet/Net/FTP.pm#52 $
+# Net::FTP.pm
 #
 # Copyright (c) 1995-8 Graham Barr <gbarr@pobox.com>. All rights reserved.
 # This program is free software; you can redistribute it and/or
@@ -21,7 +21,7 @@ use Net::Cmd;
 use Net::Config;
 # use AutoLoader qw(AUTOLOAD);
 
-$VERSION = "2.56";
+$VERSION = "2.56"; # $Id: //depot/libnet/Net/FTP.pm#53 $
 @ISA     = qw(Exporter Net::Cmd IO::Socket::INET);
 
 # Someday I will "use constant", when I am not bothered to much about
@@ -1690,6 +1690,8 @@ Copyright (c) 1995-1998 Graham Barr. All rights reserved.
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.
 
-$Id: //depot/libnet/Net/FTP.pm#52 $
+=for html <hr>
+
+I<$Id: //depot/libnet/Net/FTP.pm#53 $>
 
 =cut

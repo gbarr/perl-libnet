@@ -14,7 +14,7 @@ use Carp;
 use Time::Local;
 use Net::Config;
 
-$VERSION = "2.19"; # $Id: //depot/libnet/Net/NNTP.pm#9 $
+$VERSION = "2.19"; # $Id: //depot/libnet/Net/NNTP.pm#10 $
 @ISA     = qw(Net::Cmd IO::Socket::INET);
 
 sub new
@@ -1056,5 +1056,9 @@ Graham Barr <gbarr@pobox.com>
 Copyright (c) 1995-1997 Graham Barr. All rights reserved.
 This program is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
+
+=for html <hr>
+
+I<$Id: //depot/libnet/Net/NNTP.pm#10 $>
 
 =cut

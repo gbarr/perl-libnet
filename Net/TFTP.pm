@@ -10,7 +10,7 @@ use strict;
 use vars qw($VERSION);
 use IO::File;
 
-$VERSION = "0.11";
+$VERSION = "0.11"; # $Id: //depot/libnet/Net/TFTP.pm#6 $
 
 sub RRQ	  () { 01 } # read request
 sub WRQ	  () { 02 } # write request
@@ -867,5 +867,9 @@ Graham Barr <gbarr@pobox.com>
 Copyright (c) 1998 Graham Barr. All rights reserved.
 This program is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
+
+=for html <hr>
+
+I<$Id: //depot/libnet/Net/TFTP.pm#6 $>
 
 =cut

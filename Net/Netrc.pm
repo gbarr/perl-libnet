@@ -11,7 +11,7 @@ use strict;
 use FileHandle;
 use vars qw($VERSION);
 
-$VERSION = "2.10"; # $Id: //depot/libnet/Net/Netrc.pm#8 $
+$VERSION = "2.10"; # $Id: //depot/libnet/Net/Netrc.pm#9 $
 
 my %netrc = ();
 
@@ -322,5 +322,9 @@ L<Net::Cmd>
 Copyright (c) 1995-1998 Graham Barr. All rights reserved.
 This program is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
+
+=for html <hr>
+
+$Id: //depot/libnet/Net/Netrc.pm#9 $
 
 =cut

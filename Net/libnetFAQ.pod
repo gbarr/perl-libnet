@@ -32,8 +32,6 @@ in respect of this information or its use.
 
 =head1 Obtaining and installing libnet
 
-=over 4
-
 =head2 What is libnet ?
 
 libnet is a collection of perl5 modules which all related to network
@@ -74,11 +72,7 @@ at
 
  http://www.pobox.com/~gbarr/libnet/
 
-=back
-
 =head1 Using Net::FTP
-
-=over
 
 =head2 How do I download files from a FTP server ?
 
@@ -232,11 +226,7 @@ sub mget {
 }
 
 
-=back
-
 =head1 Using Net::SMTP
-
-=over
 
 =head2 Why can't the part of an Email address after the @ be used as the hostname ?
 
@@ -261,11 +251,7 @@ will suceed with something like
 This command will only fail if you pass it an address in a domain the
 the server directly delivers for, and that address does not exist.
 
-=back
-
 =head1 Debugging scripts
-
-=over
 
 =head2 How can I debug my scripts that use Net::* modules ?
 
@@ -310,14 +296,12 @@ show data coming from the server or C<&gt&gt&gt&gt> to show data
 going to the server. The remainder of the line is the command
 being sent or responce being received.
 
-=back
-
 =head1 AUTHOR AND COPYRIGHT
 
 Copyright (c) 1997 Graham Barr.
 All rights reserved.
 
-=head1 DOCUMENT VERSION
+=for html <hr>
 
-$Id: //depot/libnet/Net/libnetFAQ.pod#3 $
+I<$Id: //depot/libnet/Net/libnetFAQ.pod#4 $>
 

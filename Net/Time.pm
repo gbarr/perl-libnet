@@ -17,7 +17,7 @@ use IO::Select;
 @ISA = qw(Exporter);
 @EXPORT_OK = qw(inet_time inet_daytime);
 
-$VERSION = "2.08"; # $Id: //depot/libnet/Net/Time.pm#7 $
+$VERSION = "2.08"; # $Id: //depot/libnet/Net/Time.pm#8 $
 
 $TIMEOUT = 120;
 
@@ -143,5 +143,9 @@ Graham Barr <gbarr@pobox.com>
 Copyright (c) 1995-1998 Graham Barr. All rights reserved.
 This program is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
+
+=for html <hr>
+
+I<$Id: //depot/libnet/Net/Time.pm#8 $>
 
 =cut

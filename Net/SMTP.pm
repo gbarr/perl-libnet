@@ -16,7 +16,7 @@ use IO::Socket;
 use Net::Cmd;
 use Net::Config;
 
-$VERSION = "2.15"; # $Id: //depot/libnet/Net/SMTP.pm#12 $
+$VERSION = "2.15"; # $Id: //depot/libnet/Net/SMTP.pm#13 $
 
 @ISA = qw(Net::Cmd IO::Socket::INET);
 
@@ -467,6 +467,8 @@ Example:
                            Debug   => 1,
 			  );
 
+=back
+
 =head1 METHODS
 
 Unless otherwise stated all methods return either a I<true> or I<false>
@@ -592,5 +594,9 @@ Graham Barr <gbarr@pobox.com>
 Copyright (c) 1995-1997 Graham Barr. All rights reserved.
 This program is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
+
+=for html <hr>
+
+I<$Id: //depot/libnet/Net/SMTP.pm#13 $>
 
 =cut

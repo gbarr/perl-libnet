@@ -1,3 +1,4 @@
+# Net::PH.pm
 #
 # Copyright (c) 1995-1997 Graham Barr <gbarr@pobox.com> and
 # Alex Hristov <hristov@slb.com>. All rights reserved. This program is free
@@ -17,7 +18,7 @@ use IO::Socket;
 use Net::Cmd;
 use Net::Config;
 
-$VERSION = "2.20"; # $Id: //depot/libnet/Net/PH.pm#8 $
+$VERSION = "2.20"; # $Id: //depot/libnet/Net/PH.pm#9 $
 @ISA     = qw(Exporter Net::Cmd IO::Socket::INET);
 
 sub new
@@ -780,5 +781,9 @@ All other code is Copyright (c) 1996-1997 Graham Barr <gbarr@pobox.com>
 and Alex Hristov <hristov@slb.com>. All rights reserved. This program is
 free software; you can redistribute it and/or modify it under the same
 terms as Perl itself.
+
+=for html <hr>
+
+I<$Id: //depot/libnet/Net/PH.pm#9 $>
 
 =cut

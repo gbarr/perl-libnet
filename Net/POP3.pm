@@ -13,7 +13,7 @@ use Net::Cmd;
 use Carp;
 use Net::Config;
 
-$VERSION = "2.21"; # $Id: //depot/libnet/Net/POP3.pm#17 $
+$VERSION = "2.21"; # $Id: //depot/libnet/Net/POP3.pm#18 $
 
 @ISA = qw(Net::Cmd IO::Socket::INET);
 
@@ -517,5 +517,9 @@ Graham Barr <gbarr@pobox.com>
 Copyright (c) 1995-1997 Graham Barr. All rights reserved.
 This program is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
+
+=for html <hr>
+
+I<$Id: //depot/libnet/Net/POP3.pm#18 $>
 
 =cut
