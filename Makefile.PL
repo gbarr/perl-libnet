@@ -83,13 +83,6 @@ chk_version(IO::Socket => '1.05') or
 	. "*** For Net::Cmd to work you require version 1.05, or later, of\n"
 	. "    IO/Socket.pm from CPAN/modules/by-module/IO/IO-x.x.tar.gz\n\n";
 
-chk_version(Data::Dumper => '0.01') or
-    warn  "\n"
-	. "*** To be able to use the dynamic capabilities of Net::Config\n"
-	. "    you will need to install Data::Dumper\n"
-	. "    You can obtain this from\n"
-	. "    CPAN/modules/by-module/Data/Data-Dumper-x.x.tar.gz\n\n";
-
 #--- Write the Makefile
 
 my @clean = qw(*% *.html *.b[ac]k *.old *.orig *.rej);
@@ -109,7 +102,6 @@ WriteMakefile(
 	'clean'   => {FILES => join(" ", @clean,  )},
 	'realclean'   => {FILES => $config_pm},
 	PREREQ_PM => {
-			Data::Dumper => 0.01,
 			Socket => 1.3,
 			IO::Socket => 1.05
 		    },

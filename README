@@ -59,6 +59,14 @@ installation for a few packages that are recommended to be installed
 together with libnet.  These packages should be available on CPAN
 (described above).
 
+CONFIGURE
+
+Normally when perl Makefile.PL is run it will run Configure which will ask some
+questions about your system. The results of these questions will be stored in
+the Net::Config package. If you are on a system when this script cannot be run
+for some reason then the file Config.eg can be edited manually and installed
+as Net::Config (Net/Comfig.pm)
+
 DOCUMENTATION
 
 See ChangeLog for recent changes.  POD style documentation is included
@@ -88,7 +96,7 @@ include a transcript of a run.
 
 COPYRIGHT
 
-  © 1996, 1997 Graham Barr. All rights reserved.
+  © 1996-98 Graham Barr. All rights reserved.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
