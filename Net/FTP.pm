@@ -21,7 +21,7 @@ use Net::Cmd;
 use Net::Config;
 # use AutoLoader qw(AUTOLOAD);
 
-$VERSION = "2.39"; # $Id: //depot/libnet/Net/FTP.pm#23 $
+$VERSION = "2.39"; # $Id: //depot/libnet/Net/FTP.pm#24 $
 @ISA     = qw(Exporter Net::Cmd IO::Socket::INET);
 
 # Someday I will "use constant", when I am not bothered to much about
@@ -167,10 +167,30 @@ sub size
 {
  my $ftp  = shift;
  my $file = shift;
-
- $ftp->_SIZE($file)
-	? ($ftp->message =~ /(\d+)/)[0]
-	: undef;
+ my $io;
+ if($ftp->supported("SIZE")) {
+	return $ftp->_SIZE($file)
+	    ? ($ftp->message =~ /(\d+)/)[0]
+	    : undef;
+ }
+ elsif($ftp->supported("STAT")) {
+	my @msg;
+	return undef
+	    unless $ftp->_STAT($file) && (@msg = $ftp->message) == 3;
+	my $line;
+	foreach $line (@msg) {
+	    return (split(/\s+/,$line))[4]
+		if $line =~ /^[-rw]{10}/
+	}
+ }
+ elsif($io = $ftp->list($file)) {
+	my $line;
+	$io->read($line,1024);
+	$io->close;
+	return (split(/\s+/,$1))[4]
+	    if $line =~ /^([-rw]{10}.*)\n/s;
+ }
+ undef;
 }
 
 sub login
@@ -924,6 +944,7 @@ sub _RESP { shift->command("RESP",@_)->response() == CMD_OK }
 sub _MDTM { shift->command("MDTM",@_)->response() == CMD_OK }
 sub _SIZE { shift->command("SIZE",@_)->response() == CMD_OK }
 sub _HELP { shift->command("HELP",@_)->response() == CMD_OK }
+sub _STAT { shift->command("STAT",@_)->response() == CMD_OK }
 sub _APPE { shift->command("APPE",@_)->response() == CMD_INFO }
 sub _LIST { shift->command("LIST",@_)->response() == CMD_INFO }
 sub _NLST { shift->command("NLST",@_)->response() == CMD_INFO }
@@ -940,7 +961,6 @@ sub _ALLO { shift->unsupported(@_) }
 sub _SMNT { shift->unsupported(@_) }
 sub _MODE { shift->unsupported(@_) }
 sub _SYST { shift->unsupported(@_) }
-sub _STAT { shift->unsupported(@_) }
 sub _STRU { shift->unsupported(@_) }
 sub _REIN { shift->unsupported(@_) }
 
