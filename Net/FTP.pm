@@ -21,7 +21,7 @@ use Net::Cmd;
 use Net::Config;
 # use AutoLoader qw(AUTOLOAD);
 
-$VERSION = "2.58"; # $Id: //depot/libnet/Net/FTP.pm#56 $
+$VERSION = "2.58"; # $Id: //depot/libnet/Net/FTP.pm#57 $
 @ISA     = qw(Exporter Net::Cmd IO::Socket::INET);
 
 # Someday I will "use constant", when I am not bothered to much about
@@ -1278,10 +1278,11 @@ using passive mode. This is not usually required except for some I<dumb>
 servers, and some firewall configurations. This can also be set by the
 environment variable C<FTP_PASSIVE>.
 
-B<Hash> - If TRUE, print hash marks (#) on STDERR every 1024 bytes.  This
-simply invokes the C<hash()> method for you, so that hash marks are displayed
-for all transfers.  You can, of course, call C<hash()> explicitly whenever
-you'd like.
+B<Hash> - If given a reference to a file handle (e.g., C<\*STDERR>),
+print hash marks (#) on that filehandle every 1024 bytes.  This
+simply invokes the C<hash()> method for you, so that hash marks
+are displayed for all transfers.  You can, of course, call C<hash()>
+explicitly whenever you'd like.
 
 If the constructor fails undef will be returned and an error message will
 be in $@
@@ -1716,6 +1717,6 @@ under the same terms as Perl itself.
 
 =for html <hr>
 
-I<$Id: //depot/libnet/Net/FTP.pm#56 $>
+I<$Id: //depot/libnet/Net/FTP.pm#57 $>
 
 =cut
