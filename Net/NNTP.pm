@@ -14,7 +14,7 @@ use Carp;
 use Time::Local;
 use Net::Config;
 
-$VERSION = "2.18"; # $Id: //depot/libnet/Net/NNTP.pm#8 $
+$VERSION = "2.19"; # $Id: //depot/libnet/Net/NNTP.pm#9 $
 @ISA     = qw(Net::Cmd IO::Socket::INET);
 
 sub new
@@ -60,7 +60,7 @@ sub new
 
  my $c = $obj->code;
  my @m = $obj->message;
- 
+
  unless(exists $arg{Reader} && $arg{Reader} == 0) {
    # if server is INN and we have transfer rights the we are currently
    # talking to innd not nnrpd
@@ -105,11 +105,14 @@ sub postok
 
 sub article
 {
- @_ == 1 || @_ == 2 or croak 'usage: $nntp->article( MSGID )';
+ @_ >= 1 && @_ <= 3 or croak 'usage: $nntp->article( [ MSGID ], [ FH ] )';
  my $nntp = shift;
+ my @fh;
+
+ @fh = (pop) if @_ == 2 || (@_ && ref($_[0]) || ref(\$_[0]) eq 'GLOB');
 
  $nntp->_ARTICLE(@_)
-    ? $nntp->read_until_dot()
+    ? $nntp->read_until_dot(@fh)
     : undef;
 }
 
@@ -133,21 +136,27 @@ sub authinfo_simple
 
 sub body
 {
- @_ == 1 || @_ == 2 or croak 'usage: $nntp->body( [ MSGID ] )';
+ @_ >= 1 && @_ <= 3 or croak 'usage: $nntp->body( [ MSGID ], [ FH ] )';
  my $nntp = shift;
+ my @fh;
+
+ @fh = (pop) if @_ == 2 || (@_ && ref($_[0]) || ref(\$_[0]) eq 'GLOB');
 
  $nntp->_BODY(@_)
-    ? $nntp->read_until_dot()
+    ? $nntp->read_until_dot(@fh)
     : undef;
 }
 
 sub head
 {
- @_ == 1 || @_ == 2 or croak 'usage: $nntp->head( [ MSGID ] )';
+ @_ >= 1 && @_ <= 3 or croak 'usage: $nntp->head( [ MSGID ], [ FH ] )';
  my $nntp = shift;
+ my @fh;
+
+ @fh = (pop) if @_ == 2 || (@_ && ref($_[0]) || ref(\$_[0]) eq 'GLOB');
 
  $nntp->_HEAD(@_)
-    ? $nntp->read_until_dot()
+    ? $nntp->read_until_dot(@fh)
     : undef;
 }
 
@@ -651,7 +660,7 @@ Net::NNTP - NNTP Client class
 =head1 SYNOPSIS
 
     use Net::NNTP;
-    
+
     $nntp = Net::NNTP->new("some.host.name");
     $nntp->quit;
 
@@ -698,39 +707,36 @@ empty list.
 
 =over 4
 
-=item article ( [ MSGID|MSGNUM ] )
+=item article ( [ MSGID|MSGNUM ], [FH] )
 
 Retrieve the header, a blank line, then the body (text) of the
 specified article. 
 
-If no arguments are passed then the current article in the current
-newsgroup is returned.
+If C<FH> is specified then it is expected to be a valid filehandle
+and the result will be printed to it, on sucess a true value will be
+returned. If C<FH> is not specified then the return value, on sucess,
+will be a reference to an array containg the article requested, each
+entry in the array will contain one line of the article.
 
-C<MSGNUM> is a numeric id of an article in the
-current newsgroup, and will change the current article pointer.
-C<MSGID> is the message id of an article as
-shown in that article's header.  It is anticipated that the client
-will obtain the C<MSGID> from a list provided by the C<newnews>
-command, from references contained within another article, or from
-the message-id provided in the response to some other commands.
+If no arguments are passed then the current article in the currently
+selected newsgroup is fetched.
 
-Returns a reference to an array containing the article.
+C<MSGNUM> is a numeric id of an article in the current newsgroup, and
+will change the current article pointer.  C<MSGID> is the message id of
+an article as shown in that article's header.  It is anticipated that the
+client will obtain the C<MSGID> from a list provided by the C<newnews>
+command, from references contained within another article, or from the
+message-id provided in the response to some other commands.
 
-=item body ( [ MSGID|MSGNUM ] )
+If there is an error then C<undef> will be returned.
 
-Retrieve the body (text) of the specified article. 
+=item body ( [ MSGID|MSGNUM ], [FH] )
 
-Takes the same arguments as C<article>
+Like C<article> but only fetches the body of the article.
 
-Returns a reference to an array containing the body of the article.
+=item head ( [ MSGID|MSGNUM ], [FH] )
 
-=item head ( [ MSGID|MSGNUM ] )
-
-Retrieve the header of the specified article. 
-
-Takes the same arguments as C<article>
-
-Returns a reference to an array containing the header of the article.
+Like C<article> but only fetches the headers for the article.
 
 =item nntpstat ( [ MSGID|MSGNUM ] )
 
