@@ -16,7 +16,7 @@ use IO::Socket;
 use Net::Cmd;
 use Net::Config;
 
-$VERSION = "2.26"; # $Id: //depot/libnet/Net/SMTP.pm#29 $
+$VERSION = "2.26"; # $Id: //depot/libnet/Net/SMTP.pm#30 $
 
 @ISA = qw(Net::Cmd IO::Socket::INET);
 
@@ -168,9 +168,10 @@ sub hello
 	if $ok = $me->_HELO($domain);
   }
 
- $ok && $msg[0] =~ /\A\s*(\S+)/
-	? $1
-	: undef;
+ return undef unless $ok;
+
+ $msg[0] =~ /\A\s*(\S+)/;
+ return ($1 || " ");
 }
 
 sub supports {
@@ -761,6 +762,6 @@ it under the same terms as Perl itself.
 
 =for html <hr>
 
-I<$Id: //depot/libnet/Net/SMTP.pm#29 $>
+I<$Id: //depot/libnet/Net/SMTP.pm#30 $>
 
 =cut
