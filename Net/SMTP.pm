@@ -16,7 +16,7 @@ use IO::Socket;
 use Net::Cmd;
 use Net::Config;
 
-$VERSION = "2.10"; # $Id: //depot/libnet/Net/SMTP.pm#3 $
+$VERSION = "2.10"; # $Id: //depot/libnet/Net/SMTP.pm#4 $
 
 @ISA = qw(Net::Cmd IO::Socket::INET);
 
@@ -509,7 +509,7 @@ and C<dataend> methods described in L<Net::Cmd>.
 
 =item expand ( ADDRESS )
 
-Request the server to expand the given address Returns a reference to an array
+Request the server to expand the given address Returns an array
 which contains the text read from the server.
 
 =item verify ( ADDRESS )
