@@ -1,3 +1,22 @@
+*** Patch 1.0601
+
+Tue Nov  4 1997 <gbarr@pobox.com> (Graham Barr)
+
+	Configure
+	- Fix croak problem
+
+
+	Net::FTP, Net::NNTP, Net::PH, Net::POP3, Net::SMTP, Net::SNPP
+	- Fix error cause by calling close method when "unexpected EOF:
+	  has been encountered.
+	
+	t/require.t
+	- Remove Net::Telnet test
+
+Fri Oct 31 1997 <gbarr@pobox.com> (Graham Barr)
+
+	Release 1.06
+
 *** Release 1.06
 
 Fri Oct 31 1997 <gbarr@pobox.com> (Graham Barr)

@@ -6,18 +6,18 @@ Makefile.PL
 Net/Cmd.pm			(v2.09) 
 Net/Domain.pm			(v2.0502) DNS Domain name lookup
 Net/DummyInetd.pm		(v1.06) 
-Net/FTP.pm			(v2.26) File Transfer Protocol Client
+Net/FTP.pm			(v2.27) File Transfer Protocol Client
 Net/FTP/A.pm
 Net/FTP/E.pm
 Net/FTP/I.pm
 Net/FTP/L.pm
 Net/FTP/dataconn.pm
-Net/NNTP.pm			(v2.15) Network News Transfer Protocol
+Net/NNTP.pm			(v2.16) Network News Transfer Protocol
 Net/Netrc.pm			(v2.06) .netrc lookup routines
-Net/PH.pm			(v2.18) CCSO Nameserver Client class
-Net/POP3.pm			(v2.10) Post Office Protocol
-Net/SMTP.pm			(v2.0901) Simple Mail Transfer Protocol Client
-Net/SNPP.pm			(v1.0901) Simple Network Pager Protocol Client
+Net/PH.pm			(v2.19) CCSO Nameserver Client class
+Net/POP3.pm			(v2.11) Post Office Protocol
+Net/SMTP.pm			(v2.10) Simple Mail Transfer Protocol Client
+Net/SNPP.pm			(v1.10) Simple Network Pager Protocol Client
 Net/Time.pm			(v2.05) time & nettime protocols
 README
 README.config
