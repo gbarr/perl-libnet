@@ -21,7 +21,7 @@ use Net::Cmd;
 use Net::Config;
 # use AutoLoader qw(AUTOLOAD);
 
-$VERSION = "2.52"; # $Id: //depot/libnet/Net/FTP.pm#39 $
+$VERSION = "2.53"; # $Id: //depot/libnet/Net/FTP.pm#40 $
 @ISA     = qw(Exporter Net::Cmd IO::Socket::INET);
 
 # Someday I will "use constant", when I am not bothered to much about
@@ -368,8 +368,9 @@ sub get
  my($loc,$len,$buf,$resp,$localfd,$data);
  local *FD;
 
- $localfd = ref($local) ? fileno($local)
-			: undef;
+ $localfd = ref($local) || ref(\$local) eq "GLOB"
+             ? fileno($local)
+	     : undef;
 
  ($local = $remote) =~ s#^.*/##
 	unless(defined $local);
@@ -597,8 +598,9 @@ sub _store_cmd
  my($loc,$sock,$len,$buf,$localfd);
  local *FD;
 
- $localfd = ref($local) ? fileno($local)
-			: undef;
+ $localfd = ref($local) || ref(\$local) eq "GLOB"
+             ? fileno($local)
+	     : undef;
 
  unless(defined $remote)
   {

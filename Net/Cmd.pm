@@ -13,7 +13,7 @@ use strict;
 use vars qw(@ISA @EXPORT $VERSION);
 use Carp;
 
-$VERSION = "2.15";
+$VERSION = "2.16";
 @ISA     = qw(Exporter);
 @EXPORT  = qw(CMD_INFO CMD_OK CMD_MORE CMD_REJECT CMD_ERROR CMD_PENDING);
 
@@ -168,7 +168,7 @@ sub command
   {
    local $SIG{PIPE} = 'IGNORE';
 
-   my $str =  join(" ", map { tr/\n/ /; $_; } @_) . "\015\012";
+   my $str =  join(" ", map { /\n/ ? do { my $n = $_; $n =~ tr/\n/ /; $n } : $_; } @_) . "\015\012";
    my $len = length $str;
    my $swlen;
    
