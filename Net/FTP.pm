@@ -21,7 +21,7 @@ use Net::Cmd;
 use Net::Config;
 # use AutoLoader qw(AUTOLOAD);
 
-$VERSION = "2.54"; # $Id: //depot/libnet/Net/FTP.pm#43 $
+$VERSION = "2.55"; # $Id: //depot/libnet/Net/FTP.pm#44 $
 @ISA     = qw(Exporter Net::Cmd IO::Socket::INET);
 
 # Someday I will "use constant", when I am not bothered to much about
@@ -49,8 +49,7 @@ sub new
  my $host = $peer;
  my $fire = undef;
 
- # Should I use Net::Ping here ?? --GMB
- if(exists($arg{Firewall}) || !defined(inet_aton($peer)))
+ if(exists($arg{Firewall}) || Net::Config->requires_firewall($peer))
   {
    $fire = $arg{Firewall}
 	|| $ENV{FTP_FIREWALL}

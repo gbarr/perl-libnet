@@ -6,7 +6,7 @@ use strict;
 
 @EXPORT  = qw(%NetConfig);
 @ISA     = qw(Net::LocalCfg Exporter);
-$VERSION = "1.00";
+$VERSION = "1.01";
 
 eval { require Net::LocalCfg };
 
@@ -50,7 +50,8 @@ while(($k,$v) = each %NetConfig) {
 }
 
 # Take a hostname and determine if it is inside te firewall
-sub is_external {
+
+sub requires_firewall {
     shift; # ignore package
     my $host = shift;
 
@@ -75,6 +76,9 @@ sub is_external {
 
     return 0;
 }
+
+use vars qw(*is_external);
+*is_external = \&requires_firewall;
 
 1;
 
@@ -114,16 +118,16 @@ C<Net::LocalCfg> so you can override these methods if you want.
 
 =over 4
 
-=item is_external HOST
+=item requires_firewall HOST
 
 Attempts to determine if a given host is outside your firewall. Possible
 return values are.
 
   -1  Cannot lookup hostname
-   0  Host is inside firewall (or there is not ftp_firewall entry)
+   0  Host is inside firewall (or there is no ftp_firewall entry)
    1  Host is outside the firewall
 
-This is done by using hostanme lookup and the C<local_netmask> entry in
+This is done by using hostname lookup and the C<local_netmask> entry in
 the configuration data.
 
 =back
@@ -181,7 +185,7 @@ a I<true> value.
 =item local_netmask
 
 A reference to a list of netmask strings in the form C<"134.99.4.0/24">.
-These are used by the C<is_external> function to determine if a given
+These are used by the C<requires_firewall> function to determine if a given
 host is inside or outside your firewall.
 
 =back
