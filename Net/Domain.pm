@@ -1,4 +1,4 @@
-# Net::Domain.pm
+# Net::Domain.pm $Id: //depot/libnet/Net/Domain.pm#13 $
 #
 # Copyright (c) 1995-1998 Graham Barr <gbarr@pobox.com>. All rights reserved.
 # This program is free software; you can redistribute it and/or
@@ -16,7 +16,7 @@ use Net::Config;
 @ISA = qw(Exporter);
 @EXPORT_OK = qw(hostname hostdomain hostfqdn domainname);
 
-$VERSION = "2.13"; # $Id: //depot/libnet/Net/Domain.pm#12 $
+$VERSION = "2.14";
 
 my($host,$domain,$fqdn) = (undef,undef,undef);
 
@@ -165,7 +165,7 @@ sub _hostdomain {
         };
 
 	chop($dom = `domainname 2>/dev/null`)
-		unless(defined $dom);
+		unless(defined $dom || $^O eq 'MSWin32');
 
 	if(defined $dom) {
 	    my @h = ();
@@ -327,5 +327,7 @@ Adapted from Sys::Hostname by David Sundstrom <sunds@asictest.sc.ti.com>
 Copyright (c) 1995-1998 Graham Barr. All rights reserved.
 This program is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
+
+$Id: //depot/libnet/Net/Domain.pm#13 $
 
 =cut
