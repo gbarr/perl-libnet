@@ -1,7 +1,19 @@
-Copyright (c) 1995 Graham Barr <Graham.Barr@tiuk.ti.com>. All rights
-reserved. This program is free software; you can redistribute it and/or
-modify it under the same terms as Perl itself.
+This is the README file for Net::SMTP
+
+This module implements a client interface to the SMTP protocol, enabling
+a perl5 application to talk to SMTP servers. The documentation assumes
+that you are familiar with the SMTP protocol described in RFC821.
+
+You install the library by running these commands:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
 
 Please report any bugs/suggestions to <Graham.Barr@tiuk.ti.com>.
 
+Copyright (c) 1995 Graham Barr <Graham.Barr@tiuk.ti.com>. All rights
+reserved. This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
 

@@ -1,5 +1,5 @@
 # This -*- perl -*- script makes the Makefile
-# $Id: Makefile.PL,v 1.3 1995/11/21 08:09:01 gbarr Exp gbarr $
+# $Id: Makefile.PL,v 1.3 1995/11/21 08:09:01 gbarr Exp $
 
 use ExtUtils::MakeMaker;
 use ExtUtils::Manifest qw(maniread);

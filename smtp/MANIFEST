@@ -1,5 +1,5 @@
 MANIFEST			This file
 Makefile.PL			Makemaker makefile
 README				Copyright
-SMTP.pm
+SMTP.pm				(v1.07) 
 t/dummy.t

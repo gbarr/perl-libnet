@@ -8,20 +8,61 @@ package Net::SMTP;
 
 =head1 NAME
 
-SMTP - implements SMTP Client
+Net::SMTP - Simple Mail transfer Protocol Client
 
 =head1 SYNOPSIS
 
-use Net::SMTP;
+ use Net::SMTP;
 
-$smtp = Net::SMTP->new(<host>,[%args]);
+ # Constructors
+ $smtp = Net::SMTP->new('mailhost');
+ $smtp = Net::SMTP->new('mailhost', Timeout => 60);
 
 =head1 DESCRIPTION
 
-This package provides a class object which can be used for connecting to remote
-SMTP servers and transfering mail.
+This module implements a client interface to the SMTP protocol, enabling
+a perl5 application to talk to SMTP servers. This documentation assumes
+that you are familiar with the SMTP protocol described in RFC821.
 
-=head2 NOTE: C<This Documentation is VERY incomplete>
+A new Net::SMTP object must be created with the I<new> method. Once
+this has been done, all SMTP commands are accessed through this object.
+
+=head1 EXAMPLES
+
+This example prints the mail domain name of the SMTP server known as mailhost:
+
+ #!/usr/local/bin/perl -w
+
+ use Net::SMTP;
+
+ $smtp = Net::SMTP->new('mailhost');
+
+ print $smtp->domain,"\n";
+
+ $smtp->quit;
+
+This example sends a small message to the postmaster at the SMTP server
+known as mailhost:
+
+ #!/usr/local/bin/perl -w
+
+ use Net::SMTP;
+
+ $smtp = Net::SMTP->new('mailhost');
+
+ $smtp->mail($ENV{USER});
+
+ $smtp->to('postmaster');
+
+ $smtp->data();
+
+ $smtp->datasend("To: postmaster\n");
+ $smtp->datasend("\n");
+ $smtp->datasend("A simple test message\n");
+
+ $smtp->dataend();
+
+ $smtp->quit;
 
 =cut
 
@@ -29,17 +70,63 @@ require 5.001;
 use Socket 1.3;
 use Carp;
 
-$VERSION = sprintf("%d.%02d", q$Revision: 1.6 $ =~ /(\d+)\.(\d+)/);
+$VERSION = sprintf("%d.%02d", q$Revision: 1.7 $ =~ /(\d+)\.(\d+)/);
 sub Version { $VERSION }
 
-$socksym = "smtp00000";
+BEGIN
+{
+ if(eval { require Symbol })
+  {
+   import Symbol;
+  }
+ else
+  {
+   # Compatability :!?
+   $socksym = "smtp00000";
+   *gensym = sub {\*{"Net::SMTP::" . $socksym++}}
+  }
+}
 
-##
-## Really WANT FileHandle::new to return this !!!
-##
-sub gensym {\*{"Net::SMTP::" . $socksym++}}
+=head1 CONSTRUCTOR
 
-sub new {
+=head2 new ( $hostname, [ %options ] )
+
+This is the constructor for a new Net::SMTP object. C<hostname> is the
+name of the remote host to which a SMTP connection is required.
+
+Possible options are:
+
+=over 4
+
+=item Hello
+
+SMTP requires that you identify yourself. This option
+specifies a string to pass as your mail domain. If not
+given a guess will be taken.
+
+=item Timeout
+
+Maximum time, in seconds, to wait for a response from the
+SMTP server (default: 120)
+
+=item Debug
+
+Enable debugging information
+
+=back
+
+Example:
+
+
+ $smtp = Net::SMTP->new('mailhost',
+                        Hello => 'my.mail.domain'
+                       );
+
+
+=cut
+
+sub new
+{
  my $pkg  = shift;
  my $host = shift;
  my %arg  = @_;
@@ -58,28 +145,28 @@ sub new {
 
  croak "connect: $!" unless(connect($sock, $sin));
 
- my $me = {
-           SOCK    => $sock, 			# Command socket connection
+ my $me = $sock;
 
-           Resp    => [], 			# Last response text
-           Code    => 0, 			# Last response code
 
-           Timeout => $arg{Timeout} || 120, 	# Timeout value
-           Debug   => $arg{Debug} || 0 		# Output debug information
-          };
+ @{*$me} = ();					# Last response text
+
+ %{*$me} = (
+            Code    => 0, 			# Last response code
+            Timeout => $arg{Timeout} || 120, 	# Timeout value
+            Debug   => $arg{Debug} || 0 	# Output debug information
+           );
 
  bless $me, $pkg;
 
+ select((select($me), $| = 1)[$[]);
 
- select((select($sock), $| = 1)[$[]);
+ unless($me->response() == 2)
+  {
+   close($me);
+   return undef;
+  }
 
- unless($me->response() == 2) {
-  close($sock);
-  undef $me;
-  return undef;
- }
-
- ($me->{Domain}) = $me->message =~ /\A\s*(\S+)/;
+ (${*$me}{Domain}) = $me->message =~ /\A\s*(\S+)/;
 
  $me->hello($arg{Hello} || "");
 
@@ -90,7 +177,9 @@ sub new {
 ## User interface methods
 ##
 
-=item * debug( [level] )
+=head1 METHODS
+
+=head2 debug ( [ $level ] )
 
 Turn the printing of debug information on/off for this object. If no
 argument is given then the current state is returned. Otherwise the
@@ -98,46 +187,46 @@ state is changed to C<level> and the previous state returned.
 
 =cut
 
-sub debug {
+sub debug
+{
  my $me = shift;
- my $debug = $me->{Debug};
- 
- $me->{Debug} = 0 + shift if(@_);
+ my $debug = ${*$me}{Debug};
+
+ ${*$me}{Debug} = 0 + shift
+	if(@_);
 
  $debug;
 }
 
-=item * quit
+=head2 domain
 
-Send the QUIT command to the remote SMTP server and close the socket connection.
+Returns the domain that the remote SMTP server identified itself as during
+connection.
 
 =cut
 
-sub quit {
+sub domain
+{
  my $me = shift;
 
- return undef unless($me->QUIT);
-
- close($me->{SOCK});
- delete $me->{SOCK};
-
- return 1;
+ return ${*$me}{Domain} || undef;
 }
 
-sub domain {
+=head2 hello ( $domain )
+
+Tell the remoter server the mail domain which you are in using the HELO
+command. Returns I<true> if command succeeded.
+
+=cut
+
+sub hello
+{
  my $me = shift;
- return $me->{Domain} || undef;
-}
-
-sub hello { 
- my $me = shift;
- my $domain = shift;
-
- $domain = eval {
-                 require Net::Domain;
-                 Net::Domain::domainname();
-                } unless(defined $domain && $domain);
-
+ my $domain = shift ||
+	      eval {
+		    require Net::Domain;
+		    Net::Domain::hostdomain();
+		   };
  my $ok = $me->HELO($domain || "");
  my $remote = undef;
 
@@ -146,199 +235,365 @@ sub hello {
  return $remote;
 }
 
-sub mail { shift->MAIL(shift || "") }
+=head2 mail ( $address )
 
-sub reset         { shift->RSET() }
-sub send          { shift->SEND(shift || "") }
+=head2 send ( $address )
+
+=head2 send_or_mail ( $address )
+
+=head2 send_and_mail ( $address )
+
+Send the appropriate command to the server MAIL, SEND, SOML or SAML.
+Returns I<true> if command succeeded.
+
+=cut
+
+sub mail	  { shift->MAIL(shift || "") }
+sub send	  { shift->SEND(shift || "") }
 sub send_or_mail  { shift->SOML(shift || "") }
 sub send_and_mail { shift->SAML(shift || "") }
+
+=head2 reset
+
+Send the RSET command to the server. Returns I<true> if command
+succeeded.
+
+=cut
+
+sub reset
+{
+ my $me = shift;
+
+ $me->dataend()
+	if(exists ${*$me}{LASTch});
+
+ $me->RSET();
+}
+
+=head2 recipient ( $address [, $address [ ...]] )
+
+Send a RCPT command to the server for each address given. Returns I<true>
+upon success or I<false> upon encountering a failure.
+
+=cut
 
 sub recipient
 {
  my $smtp = shift;
  my $ok = 1;
 
- while($ok && scalar(@_)) {
-  $smtp->RCPT(shift);
- } 
-
- $ok;
+ while($ok && scalar(@_))
+  {
+   $ok = $smtp->RCPT(shift);
+  }
+ return $ok;
 }
+
+=head2 to
+
+A synonym for recipient
+
+=cut
 
 *to = \&recipient;
 
-sub data {
+=head2 data ( [ @data ] )
+
+Send a DATA command to the server. If C<@data> is not empty then its
+contents are sent as the data, followed by the C<".\r\n"> termination string.
+If C<@data> is empty, or not given, then data must be sent using datasend and
+terminated with a call to dataend. Returns I<true> if command succeeded.
+
+B<WARNING>: Calling data with an empty list, or no arguments, will cause
+all subsequent commands to be entered as data until dataend is called. If it
+is intended that an empty list sends an empty message then call as
+
+ $smtp->data( @data, "");
+
+which will not alter the contents on the message but will ensure that the
+termination string is sent.
+
+=cut
+
+sub data
+{
  my $me = shift;
- my $data = shift;
+ my $ok = $me->DATA();
 
- return 0 unless(defined $data);
+ ${*$me}{LASTch} = " ";
 
- $data = [$data] unless(ref($data));
+ return $ok
+	unless($ok && @_);
 
- my $sock = $me->{SOCK};
+ $me->datasend(@_);
 
- return 0 unless($me->DATA());
+ $me->dataend;
+}
 
- local $_;
+=head2 datasend ( @data )
 
- foreach (@$data)
+Sends contents of C<@data> to the server.
+Returns I<true> if all the data was sucessfully sent.
+
+=cut
+
+sub datasend
+{
+ my $me = shift;
+
+ return 0 
+   unless(exists ${*$me}{LASTch} || $me->data());
+
+ my $line = ${*$me}{LASTch} . join("" ,@_);
+
+ print STDERR substr($line,1)
+	if($me->debug);
+
+ $line =~ s/\n\./\n../sgo;
+ $line =~ s/(?!\r)\n/\r\n/sgo;
+ 
+ ${*$me} = substr($line,-1);
+ 
+ my $len = length($line) - 1;
+ 
+ return $len < 1 ||
+	syswrite($me, $line, $len, 1) == $len;
+}
+
+=head2 dataend
+
+Terminate the sending of data by sending the C<".\r\n"> termination string.
+Returns I<true> if the server accepts the data.
+
+=cut
+
+sub dataend
+{
+ my $me = shift;
+
+ return 0
+	unless(exists ${*$me}{LASTch});
+
+ if(${*$me}{LASTch} eq "\r")
   {
-   $me->SMTPWRITE($_);
+   syswrite($me,"\n",1);
+  }
+ elsif(${*$me}{LASTch} ne "\n")
+  {
+   syswrite($me,"\r\n",2);
   }
 
- print $sock ".\r\n";
+ syswrite($me,".\r\n",3);
+
+ delete ${*$me}{LASTch};
 
  2 == $me->response();
 }
 
-sub SMTPWRITE {
- my $me = shift;
- my $line = shift;
- my $sock = $me->{SOCK};
- my $debug = $me->debug;
- local $_;
+=head2 expand ( $address )
 
- foreach (split(/\r?\n/, $line))
-  {
-   my $dot = (/\A\./o) ? "." : "";
+Send the EXPN command to the server. Returns an array of the lines
+returned by the server.
 
-   print STDERR $dot,$_,"\n" if($debug > 1);
-   print $sock $dot,$_,"\r\n";
-  }
-}
+=cut
 
-sub expand {
+sub expand
+{
  my $me = shift;
 
- if($me->EXPN(@_)) {
-  my(@r);
-  foreach $ln (@{$me->{Resp}}) {
-    push(@r, [ $1, $2 ]) if($ln =~ /\A\s*(\S.*\S)?\s*<([^>]*)>/);
-  }
-  return @r;
- }
+ my @r = $me->EXPN(@_)  ? @{*$me}
+			: ();
 
- return undef;
+ return @r;
 }
 
-sub verify {
+=head2 verify ( $address )
+
+Send the VRFY command to the server. Returns I<true> upon success.
+
+=cut
+
+sub verify { shift->VRFY(@_) }
+
+=head2 help ( [ $subject ] )
+
+Request help text from the server. Returns the text or undef upon failure
+
+=cut
+
+sub help
+{
  my $me = shift;
 
- if($me->VRFY(@_)) {
-  my(@r);
-  foreach $ln (@{$me->{Resp}}) {
-    push(@r, [ $1, $2 ]) if($ln =~ /\A\s*(\S.*\S)?\s*<([^>]*)>/);
-  }
-  return @r;
- }
-
- return undef;
+ return $me->HELP(@_) ? $me->message
+		      : undef;
 }
 
-sub help {
+=head2 quit
+
+Send the QUIT command to the remote SMTP server and close the socket connection.
+
+=cut
+
+sub quit
+{
  my $me = shift;
 
- return $me->message if($me->HELP(@_));
+ return undef
+	unless($me->QUIT);
 
- return undef;
+ close($me);
+
+ return 1;
 }
+
 
 ##
 ## Communication methods
 ##
 
-sub timeout {
- my $me = shift;
- my $timeout = $me->{Timeout};
+=head2 timeout ( $timeout )
 
- $me->{Timeout} = 0 + shift if(@_);
+Set the timeout use for communications. Returns the previous value.
+
+=cut
+
+sub timeout
+{
+ my $me = shift;
+ my $timeout = ${*$me}{Timeout};
+
+ ${*$me}{Timeout} = 0 + shift if(@_);
 
  $timeout;
 }
 
-sub message {
+=head2 message
+
+Returns the message text from the last responce that the server gave.
+
+=cut
+
+sub message
+{
  my $me = shift;
- join("\n", @{$me->{Resp}});
+ join("\n", @{*$me});
 }
 
-sub ok {
+=head2 code
+
+Returns the last responce code from the server.
+
+=cut
+
+sub code
+{
  my $me = shift;
- my $code = $me->{Code} || 0;
+ return ${*$me}{Code} || 0;
+}
+
+=head2 ok
+
+Returns I<true> if the last responce code was not an error code.
+
+=cut
+
+sub ok
+{
+ my $me = shift;
+ my $code = ${*$me}{Code} || 0;
 
  0 < $code && $code < 400;
 }
 
-sub cmd {
+##
+## Private methods
+##
+
+sub cmd
+{
  my $me = shift;
- my $sock = $me->{SOCK};
 
+ croak "Cannot send commands while sending data"
+	if(exists ${*$me}{LASTch});
 
- if(scalar(@_)) {     
+ if(scalar(@_)) {
   my $cmd = join(" ", @_);
 
-  print $sock $cmd,"\r\n";
+  syswrite($me,$cmd . "\r\n",2 + length($cmd));
 
-  printf STDERR "$me>> %s\n", $cmd if($me->debug);
+  print STDERR "$me>> $cmd\n"
+	if($me->debug);
  }
 
- $me->response();                                          
+ $me->response();
 }
 
-sub response {
+sub response
+{
  my $me = shift;
- my $sock = $me->{SOCK};
- my $timeout = $me->{Timeout};
- my($code,@resp,$rin,$rout,$partial,@buf,$buf);
+ my $timeout = ${*$me}{Timeout};
+ my($code,@resp,$rin,$rout,$partial,@buf,$buf,$more);
 
  $rin = '';
- vec($rin,fileno($sock),1) = 1;
+ vec($rin,fileno($me),1) = 1;
  $more = 0;
  @resp = ();
  $partial = '';
  $buf = "";
 
- do {
-  if (($timeout==0) || select($rout=$rin, undef, undef, $timeout)) {
-   unless(sysread($sock, $buf, 1024)) {
-    carp "Unexpected EOF on command channel";
-    return undef;
-   } 
+ do
+  {
+   if (($timeout==0) || select($rout=$rin, undef, undef, $timeout))
+    {
+     unless(sysread($me, $buf, 1024))
+      {
+       carp "Unexpected EOF on command channel";
+       return undef;
+      }
 
-   substr($buf,0,0) = $partial;    ## prepend from last sysread
+     substr($buf,0,0) = $partial;    ## prepend from last sysread
 
-   @buf = split(/\r?\n/, $buf);  ## break into lines
+     @buf = split(/\r?\n/, $buf);  ## break into lines
 
-   $partial = (substr($buf, -1, 1) eq "\n") ? ''
-                                            : pop(@buf); 
+     $partial = (substr($buf, -1, 1) eq "\n") ? ''
+					      : pop(@buf);
 
-   foreach $cmd (@buf) {
-    print STDERR "$me<< $cmd\n" if($me->debug);
+     foreach $cmd (@buf)
+      {
+       print STDERR "$me<< $cmd\n"
+		if($me->debug);
 
-    ($code,$more) = ($1,$2) if $cmd =~ /^(\d\d\d)(.)/;
-    push(@resp,$');
-   } 
+       ($code,$more) = ($1,$2)
+		if $cmd =~ /^(\d\d\d)(.)/;
+       push(@resp,$');
+      }
+    }
+   else
+    {
+     carp "$me: Timeout" if($me->debug);
+     return undef;
+    }
   }
-  else {
-   carp "$me: Timeout" if($me->debug);
-   return undef;
-  }
- } while(length($partial) || (defined $more && $more eq "-"));
+ while(length($partial) || (defined $more && $more eq "-"));
 
- $me->{Code} = $code;
- $me->{Resp} = [ @resp ];
+ ${*$me}{Code} = $code;
+ @{*$me} = @resp;
 
  substr($code,0,1);
 }
-
 
 ##
 ## RFC821 commands
 ##
 
-sub not_supported {
+sub not_supported
+{
  my $me = shift;
- $me->{Code} = 502;
- $me->{Resp} = [ "Not Supported\n" ];
+
+ ${*$me}{Code} = 502;
+ @{*$me} = ( "Not Supported\n" );
+
  0;
 }
 
@@ -357,15 +612,13 @@ sub NOOP { 2 == shift->cmd("NOOP") } 			# NOOP
 sub QUIT { 2 == shift->cmd("QUIT") } 			# QUIT
 sub TURN { shift->not_supported; } 			# TURN
 
-=back
-
 =head2 AUTHOR
 
 Graham Barr <Graham.Barr@tiuk.ti.com>
 
 =head2 REVISION
 
-$Revision: 1.6 $
+$Revision: 1.7 $
 
 =head2 COPYRIGHT
 
