@@ -1,4 +1,4 @@
-# Net::FTP.pm $Id: //depot/libnet/Net/FTP.pm#50 $
+# Net::FTP.pm $Id: //depot/libnet/Net/FTP.pm#51 $
 #
 # Copyright (c) 1995-8 Graham Barr <gbarr@pobox.com>. All rights reserved.
 # This program is free software; you can redistribute it and/or
@@ -487,10 +487,20 @@ sub get
 
  print $hashh "\n" if $hashh;
 
- close($loc)
-	unless defined $localfd;
+ unless (defined $localfd)
+  {
+   unless (close($loc))
+    {
+     carp "Cannot close file $local (perhaps disk space) $!\n";
+     return undef;
+    }
+  }
 
- $data->close(); # implied $ftp->response
+ unless ($data->close()) # implied $ftp->response
+  {
+   carp "Unable to close datastream";
+   return undef;
+  }
 
  return $local;
 }
@@ -1346,7 +1356,7 @@ not be transfered, and the remaining bytes will be appended to
 the local file if it already exists.
 
 Returns C<LOCAL_FILE>, or the generated local file name if C<LOCAL_FILE>
-is not given.
+is not given. If an error was encountered undef is returned.
 
 =item put ( LOCAL_FILE [, REMOTE_FILE ] )
 
@@ -1656,6 +1666,6 @@ Copyright (c) 1995-1998 Graham Barr. All rights reserved.
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.
 
-$Id: //depot/libnet/Net/FTP.pm#50 $
+$Id: //depot/libnet/Net/FTP.pm#51 $
 
 =cut
