@@ -22,7 +22,7 @@ use Net::Config;
 use Fcntl qw(O_WRONLY O_RDONLY O_APPEND O_CREAT O_TRUNC);
 # use AutoLoader qw(AUTOLOAD);
 
-$VERSION = "2.58"; # $Id: //depot/libnet/Net/FTP.pm#58 $
+$VERSION = "2.58"; # $Id: //depot/libnet/Net/FTP.pm#59 $
 @ISA     = qw(Exporter Net::Cmd IO::Socket::INET);
 
 # Someday I will "use constant", when I am not bothered to much about
@@ -55,6 +55,7 @@ sub new
 
  my $host = $peer;
  my $fire = undef;
+ my $fire_type = undef;
 
  if(exists($arg{Firewall}) || Net::Config->requires_firewall($peer))
   {
@@ -67,6 +68,9 @@ sub new
     {
      $peer = $fire;
      delete $arg{Port};
+	 $fire_type = $arg{FirewallType}
+	 || $ENV{FTP_FIREWALL_TYPE}
+	 || undef;
     }
   }
 
@@ -84,6 +88,8 @@ sub new
 
  ${*$ftp}{'net_ftp_firewall'} = $fire
 	if(defined $fire);
+ ${*$ftp}{'net_ftp_firewall_type'} = $fire_type
+	if(defined $fire_type);
 
  ${*$ftp}{'net_ftp_passive'} = int
 	exists $arg{Passive}
@@ -251,7 +257,9 @@ sub login {
   $user ||= "anonymous";
   $ruser = $user;
 
-  $fwtype = $NetConfig{'ftp_firewall_type'} || 0;
+  $fwtype = ${*$ftp}{'net_ftp_firewall_type'}
+  || $NetConfig{'ftp_firewall_type'}
+  || 0;
 
   if ($fwtype && defined ${*$ftp}{'net_ftp_firewall'}) {
     if ($fwtype == 1 || $fwtype == 7) {
@@ -1264,6 +1272,11 @@ connection is made to the firewall machine and the string C<@hostname> is
 appended to the login identifier. This kind of setup is also refered to
 as a ftp proxy.
 
+B<FirewallType> - The type of firewall running on the machine indicated by
+B<Firewall>. This can be overridden by an environment variable
+C<FTP_FIREWALL_TYPE>. For a list of permissible types, see the description of
+ftp_firewall_type in L<Net::Config>.
+
 B<BlockSize> - This is the block size that Net::FTP will use when doing
 transfers. (defaults to 10240)
 
@@ -1718,6 +1731,6 @@ under the same terms as Perl itself.
 
 =for html <hr>
 
-I<$Id: //depot/libnet/Net/FTP.pm#58 $>
+I<$Id: //depot/libnet/Net/FTP.pm#59 $>
 
 =cut
