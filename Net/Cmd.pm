@@ -13,7 +13,7 @@ use strict;
 use vars qw(@ISA @EXPORT $VERSION);
 use Carp;
 
-$VERSION = "2.17";
+$VERSION = "2.18";
 @ISA     = qw(Exporter);
 @EXPORT  = qw(CMD_INFO CMD_OK CMD_MORE CMD_REJECT CMD_ERROR CMD_PENDING);
 
@@ -241,9 +241,7 @@ sub getline
 
      my @buf = split(/\015?\012/, $buf, -1);	## break into lines
 
-     $partial = length($buf) == 0 || substr($buf, -1, 1) eq "\012"
-		? ''
-	  	: pop(@buf);
+     $partial = pop @buf;
 
      push(@{${*$cmd}{'net_cmd_lines'}}, map { "$_\n" } @buf);
 
@@ -312,6 +310,7 @@ sub response
 sub read_until_dot
 {
  my $cmd = shift;
+ my $fh  = shift;
  my $arr = [];
 
  while(1)
@@ -325,7 +324,14 @@ sub read_until_dot
 
    $str =~ s/^\.\././o;
 
-   push(@$arr,$str);
+   if (defined $fh)
+    {
+     print $fh $str;
+    }
+   else
+    {
+     push(@$arr,$str);
+    }
   }
 
  $arr;

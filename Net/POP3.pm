@@ -13,7 +13,7 @@ use Net::Cmd;
 use Carp;
 use Net::Config;
 
-$VERSION = "2.20"; # $Id: //depot/libnet/Net/POP3.pm#15 $
+$VERSION = "2.21"; # $Id: //depot/libnet/Net/POP3.pm#16 $
 
 @ISA = qw(Net::Cmd IO::Socket::INET);
 
@@ -226,13 +226,13 @@ sub list
 
 sub get
 {
- @_ == 2 or croak 'usage: $pop3->get( MSGNUM )';
+ @_ == 2 or @_ == 3 or croak 'usage: $pop3->get( MSGNUM [, FH ])';
  my $me = shift;
 
  return undef
-    unless $me->_RETR(@_);
+    unless $me->_RETR(shift);
 
- $me->read_until_dot;
+ $me->read_until_dot(@_);
 }
 
 sub delete
@@ -452,10 +452,12 @@ If called without arguments a reference to a hash is returned. The
 keys will be the C<MSGNUM>'s of all undeleted messages and the values will
 be their size in octets.
 
-=item get ( MSGNUM )
+=item get ( MSGNUM [, FH ] )
 
-Get the message C<MSGNUM> from the remote mailbox. Returns a reference to an
-array which contains the lines of text read from the server.
+Get the message C<MSGNUM> from the remote mailbox. If C<FH> is not given
+then get returns a reference to an array which contains the lines of
+text read from the server. If C<FH> is given then the lines returned
+from the server are printed to the filehandle C<FH>.
 
 =item last ()
 
