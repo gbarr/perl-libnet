@@ -21,7 +21,7 @@ use Net::Cmd;
 use Net::Config;
 # use AutoLoader qw(AUTOLOAD);
 
-$VERSION = "2.37"; # $Id: //depot/libnet/Net/FTP.pm#21 $
+$VERSION = "2.38"; # $Id: //depot/libnet/Net/FTP.pm#22 $
 @ISA     = qw(Exporter Net::Cmd IO::Socket::INET);
 
 # Someday I will "use constant", when I am not bothered to much about
@@ -142,6 +142,14 @@ sub quot
  my $cmd = shift;
 
  $ftp->command( uc $cmd, @_);
+ $ftp->response();
+}
+
+sub site
+{
+ my $ftp = shift;
+
+ $ftp->command("SITE", @_);
  $ftp->response();
 }
 
@@ -929,7 +937,6 @@ sub _AUTH { shift->command("AUTH",@_)->response() }
 sub _ALLO { shift->unsupported(@_) }
 sub _SMNT { shift->unsupported(@_) }
 sub _MODE { shift->unsupported(@_) }
-sub _SITE { shift->unsupported(@_) }
 sub _SYST { shift->unsupported(@_) }
 sub _STAT { shift->unsupported(@_) }
 sub _STRU { shift->unsupported(@_) }
@@ -1050,6 +1057,12 @@ be called with no arguments.
 This is a protocol used by some firewall ftp proxies. It is used
 to authorise the user to send data out.  If both arguments are not specified
 then C<authorize> uses C<Net::Netrc> to do a lookup.
+
+=item site (ARGS)
+
+Send a SITE command to the remote server and wait for a response.
+
+Returns most significant digit of the response code.
 
 =item type (TYPE [, ARGS])
 
@@ -1353,10 +1366,6 @@ the commands it accepts.
 
 Specifies transfer mode (stream, block or compressed) for file to be
 transferred.
-
-=item B<SITE>
-
-Request remote server site parameters.
 
 =item B<SYST>
 
