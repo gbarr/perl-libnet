@@ -10,7 +10,7 @@ use Carp;
 require Net::FTP::dataconn;
 
 @ISA = qw(Net::FTP::dataconn);
-$VERSION = "1.12"; # $Id: //depot/libnet/Net/FTP/A.pm#12 $
+$VERSION = "1.13"; # $Id: //depot/libnet/Net/FTP/A.pm#13 $
 
 sub read {
   my    $data 	 = shift;
@@ -18,7 +18,7 @@ sub read {
   my    $size 	 = shift || croak 'read($buf,$size,[$offset])';
   my    $timeout = @_ ? shift : $data->timeout;
 
-  if (length(${*$data}) < $size) {
+  if (length(${*$data}) < $size && !${*$data}{'net_ftp_eof'}) {
     my $blksize = ${*$data}{'net_ftp_blksize'};
     $blksize = $size if $size > $blksize;
 
