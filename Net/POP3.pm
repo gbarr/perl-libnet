@@ -1,6 +1,6 @@
 # Net::POP3.pm
 #
-# Copyright (c) 1995-2003 Graham Barr <gbarr@pobox.com>. All rights reserved.
+# Copyright (c) 1995-2004 Graham Barr <gbarr@pobox.com>. All rights reserved.
 # This program is free software; you can redistribute it and/or
 # modify it under the same terms as Perl itself.
 
@@ -13,7 +13,7 @@ use Net::Cmd;
 use Carp;
 use Net::Config;
 
-$VERSION = "2.26";
+$VERSION = "2.27";
 
 @ISA = qw(Net::Cmd IO::Socket::INET);
 
@@ -237,7 +237,9 @@ sub getfh
 sub delete
 {
  @_ == 2 or croak 'usage: $pop3->delete( MSGNUM )';
- $_[0]->_DELE($_[1]);
+ my $me = shift;
+ return  0 unless $me->_DELE(@_);
+ ${*$me}{'net_pop3_deleted'} = 1;
 }
 
 sub uidl
@@ -335,7 +337,7 @@ sub DESTROY
 {
  my $me = shift;
 
- if(defined fileno($me))
+ if(defined fileno($me) and ${*$me}{'net_pop3_deleted'})
   {
    $me->reset;
    $me->quit;
