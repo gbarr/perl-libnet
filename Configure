@@ -491,22 +491,22 @@ sub set
  require File::Copy;
     
  my $mod = $INC{'Net/Config.pm'} or
-	Carp::croak "Can't find myself";
+	Carp::croak("Can't find myself");
 
  my $bak = $mod . "~";
 
  print "Updating $mod...\n";
 
  File::Copy::copy($mod,$bak) or
-	Carp::croak "Cannot create backup file $bak: $!";
+	Carp::croak("Cannot create backup file $bak: $!");
 
  print "...backup at $bak\n";
 
  my $old = new IO::File $bak,"r" or
-	Carp::croak "Can't open $bak: $!";
+	Carp::croak("Can't open $bak: $!");
 
  my $new = new IO::File $mod,"w" or
-	Carp::croak "Can't open $mod: $!";
+	Carp::croak("Can't open $mod: $!");
 
  # If we fail below, then we must restore from backup
  local $SIG{'__DIE__'} = sub {
