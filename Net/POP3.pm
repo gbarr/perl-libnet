@@ -13,7 +13,7 @@ use Net::Cmd;
 use Carp;
 use Net::Config;
 
-$VERSION = "2.17"; # $Id: //depot/libnet/Net/POP3.pm#11 $
+$VERSION = "2.18"; # $Id: //depot/libnet/Net/POP3.pm#12 $
 
 @ISA = qw(Net::Cmd IO::Socket::INET);
 
@@ -318,7 +318,7 @@ sub response
   }
  else
   {
-   $str =~ s/^\+ERR\s+//io;
+   $str =~ s/^-ERR\s+//io;
   }
 
  ${*$cmd}{'net_cmd_resp'} = [ $str ];
