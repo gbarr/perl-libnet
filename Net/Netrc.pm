@@ -11,7 +11,7 @@ use strict;
 use FileHandle;
 use vars qw($VERSION);
 
-$VERSION = "2.08"; # $Id: //depot/libnet/Net/Netrc.pm#4$
+$VERSION = "2.09"; # $Id: //depot/libnet/Net/Netrc.pm#4$
 
 my %netrc = ();
 
@@ -102,6 +102,8 @@ TOKEN:
         {
          next TOKEN unless $mach;
          my $value = shift @tok;
+         # Following line added by rmerrell to remove '/' escape char in .netrc
+         $value =~ s/\/\\/\\/g;
          $mach->{$1} = $value;
         }
        elsif($tok eq "macdef")
