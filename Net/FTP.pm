@@ -21,7 +21,7 @@ use Net::Cmd;
 use Net::Config;
 # use AutoLoader qw(AUTOLOAD);
 
-$VERSION = "2.52"; # $Id: //depot/libnet/Net/FTP.pm#37 $
+$VERSION = "2.52"; # $Id: //depot/libnet/Net/FTP.pm#38 $
 @ISA     = qw(Exporter Net::Cmd IO::Socket::INET);
 
 # Someday I will "use constant", when I am not bothered to much about
@@ -191,32 +191,31 @@ sub mdtm
     : undef;
 }
 
-sub size
-{
- my $ftp  = shift;
- my $file = shift;
- my $io;
- if($ftp->supported("SIZE")) {
-	return $ftp->_SIZE($file)
-	    ? ($ftp->message =~ /(\d+)/)[0]
-	    : undef;
+sub size {
+  my $ftp  = shift;
+  my $file = shift;
+  my $io;
+  if($ftp->supported("SIZE")) {
+    return $ftp->_SIZE($file)
+	? ($ftp->message =~ /(\d+)/)[0]
+	: undef;
  }
  elsif($ftp->supported("STAT")) {
-	my @msg;
-	return undef
-	    unless $ftp->_STAT($file) && (@msg = $ftp->message) == 3;
-	my $line;
-	foreach $line (@msg) {
-	    return (split(/\s+/,$line))[4]
-		if $line =~ /^[-rw]{10}/
-	}
+   my @msg;
+   return undef
+       unless $ftp->_STAT($file) && (@msg = $ftp->message) == 3;
+   my $line;
+   foreach $line (@msg) {
+     return (split(/\s+/,$line))[4]
+	 if $line =~ /^[-rw]{10}/
+   }
  }
- elsif($io = $ftp->list($file)) {
-	my $line;
-	$io->read($line,1024);
-	$io->close;
-	return (split(/\s+/,$1))[4]
-	    if $line =~ /^([-rw]{10}.*)\n/s;
+ else {
+   my @files = $ftp->dir($file);
+   if(@files) {
+     return (split(/\s+/,$1))[4]
+	 if $files[0] =~ /^([-rw]{10}.*)$/;
+   }
  }
  undef;
 }
