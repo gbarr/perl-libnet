@@ -13,7 +13,7 @@ use strict;
 
 @EXPORT  = qw(%NetConfig);
 @ISA     = qw(Net::LocalCfg Exporter);
-$VERSION = "1.06"; # $Id: //depot/libnet/Net/Config.pm#11 $
+$VERSION = "1.07"; # $Id: //depot/libnet/Net/Config.pm#12 $
 
 eval { local $SIG{__DIE__}; require Net::LocalCfg };
 
@@ -55,11 +55,11 @@ if ($< == $> and !$CONFIGURE)  {
 }
 my ($k,$v);
 while(($k,$v) = each %NetConfig) {
-    $v = [ $v ]
-	if($k =~ /_hosts$/ && !ref($v));
+	$NetConfig{$k} = [ $v ]
+		if($k =~ /_hosts$/ && !ref($v));
 }
 
-# Take a hostname and determine if it is inside te firewall
+# Take a hostname and determine if it is inside the firewall
 
 sub requires_firewall {
     shift; # ignore package
@@ -285,6 +285,6 @@ If true then C<Configure> will check each hostname given that it exists
 
 =for html <hr>
 
-I<$Id: //depot/libnet/Net/Config.pm#11 $>
+I<$Id: //depot/libnet/Net/Config.pm#12 $>
 
 =cut
