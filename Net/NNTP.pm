@@ -14,7 +14,7 @@ use Carp;
 use Time::Local;
 use Net::Config;
 
-$VERSION = "2.19"; # $Id: //depot/libnet/Net/NNTP.pm#11 $
+$VERSION = "2.19"; # $Id: //depot/libnet/Net/NNTP.pm#12 $
 @ISA     = qw(Net::Cmd IO::Socket::INET);
 
 sub new
@@ -514,9 +514,14 @@ sub _msg_arg
   {
    if(ref($spec))
     {
-     $arg = $spec->[0] . "-";
-     $arg .= $spec->[1]
-	if defined $spec->[1] && $spec->[1] > $spec->[0];
+     $arg = $spec->[0];
+     if(defined $spec->[1])
+      {
+       $arg .= "-"
+	  if $spec->[1] != $spec->[0];
+       $arg .= $spec->[1]
+	  if $spec->[1] > $spec->[0];
+      }
     }
    else
     {
@@ -1059,6 +1064,6 @@ it under the same terms as Perl itself.
 
 =for html <hr>
 
-I<$Id: //depot/libnet/Net/NNTP.pm#11 $>
+I<$Id: //depot/libnet/Net/NNTP.pm#12 $>
 
 =cut
