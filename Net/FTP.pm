@@ -21,7 +21,7 @@ use Net::Cmd;
 use Net::Config;
 # use AutoLoader qw(AUTOLOAD);
 
-$VERSION = "2.34"; # $Id: //depot/libnet/Net/FTP.pm#18 $
+$VERSION = "2.35"; # $Id: //depot/libnet/Net/FTP.pm#19 $
 @ISA     = qw(Exporter Net::Cmd IO::Socket::INET);
 
 # Someday I will "use constant", when I am not bothered to much about
@@ -318,6 +318,9 @@ sub get
  ($local = $remote) =~ s#^.*/##
 	unless(defined $local);
 
+ croak("Bad remote filename '$remote'\n")
+	if $remote =~ /[\s\r\n]/s;
+
  ${*$ftp}{'net_ftp_rest'} = $where
 	if ($where);
 
@@ -468,6 +471,9 @@ sub _store_cmd
 
    ($remote = $local) =~ s%.*/%%;
   }
+
+ croak("Bad remote filename '$remote'\n")
+	if $remote =~ /[\s\r\n]/s;
 
  if(defined $localfd)
   {
@@ -709,6 +715,12 @@ sub _data_cmd
  my $cmd = uc shift;
  my $ok = 1;
  my $where = delete ${*$ftp}{'net_ftp_rest'} || 0;
+ my $arg;
+
+ for $arg (@_) {
+   croak("Bad argument '$arg'\n")
+	if $arg =~ /[\r\n]/s;
+ }
 
  if(${*$ftp}{'net_ftp_passive'} &&
      !defined ${*$ftp}{'net_ftp_pasv'} &&
@@ -990,10 +1002,10 @@ B<Timeout> - Set a timeout value (defaults to 120)
 
 B<Debug> - debug level (see the debug method in L<Net::Cmd>)
 
-B<Passive> - If set to I<true> then all data transfers will be done using 
-passive mode. This is required for some I<dumb> servers, and some
-firewall configurations.  This can also be set by the environment
-variable C<FTP_PASSIVE>.
+B<Passive> - If set to a non-zero value then all data transfers will be done
+using passive mode. This is not usually required except for some I<dumb>
+servers, and some firewall configurations. This can also be set by the
+environment variable C<FTP_PASSIVE>.
 
 If the constructor fails undef will be returned and an error message will
 be in $@
