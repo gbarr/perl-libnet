@@ -21,7 +21,7 @@ use Net::Cmd;
 use Net::Config;
 use AutoLoader qw(AUTOLOAD);
 
-$VERSION = "2.26"; # $Id:$
+$VERSION = "2.26"; # $Id: //depot/libnet/Net/FTP.pm#9 $
 @ISA     = qw(Exporter Net::Cmd IO::Socket::INET);
 
 1;
