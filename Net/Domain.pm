@@ -16,7 +16,7 @@ use Net::Config;
 @ISA = qw(Exporter);
 @EXPORT_OK = qw(hostname hostdomain hostfqdn domainname);
 
-$VERSION = "2.15"; # $Id: //depot/libnet/Net/Domain.pm#16 $
+$VERSION = "2.16"; # $Id: //depot/libnet/Net/Domain.pm#17 $
 
 my($host,$domain,$fqdn) = (undef,undef,undef);
 
@@ -224,13 +224,14 @@ sub domainname {
     # eleminate DNS lookups
 
     return $fqdn = $host . "." . $domain
-	if($host && $domain && $host !~ /\./ && $domain =~ /\./);
+	if(defined $host and defined $domain
+		and $host !~ /\./ and $domain =~ /\./);
 
     # For hosts that have no name, just an IP address
-    return $fqdn = $host if $host && $host =~ /^\d+(\.\d+){3}$/;
+    return $fqdn = $host if defined $host and $host =~ /^\d+(\.\d+){3}$/;
 
-    my @host   = split(/\./, $host || '');
-    my @domain = split(/\./, $domain || '');
+    my @host   = defined $host   ? split(/\./, $host)   : ('localhost');
+    my @domain = defined $domain ? split(/\./, $domain) : ('');
     my @fqdn   = ();
 
     # Determine from @host & @domain the FQDN
@@ -330,6 +331,6 @@ it under the same terms as Perl itself.
 
 =for html <hr>
 
-I<$Id: //depot/libnet/Net/Domain.pm#16 $>
+I<$Id: //depot/libnet/Net/Domain.pm#17 $>
 
 =cut
