@@ -17,7 +17,7 @@ use IO::Select;
 @ISA = qw(Exporter);
 @EXPORT_OK = qw(inet_time inet_daytime);
 
-$VERSION = "2.07";
+$VERSION = "2.08";
 
 $TIMEOUT = 120;
 
@@ -41,8 +41,10 @@ sub _socket
     	    	    	      ) and last;
   }
 
+ return unless $me;
+
  $me->send("\n")
-	if(defined $me && $proto eq 'udp');
+	if $proto eq 'udp';
 
  $timeout = $TIMEOUT
 	unless defined $timeout;
