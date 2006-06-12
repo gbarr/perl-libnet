@@ -448,7 +448,7 @@ sub auth {
 
     # We should probably allow the user to pass the host, but I don't
     # currently know and SASL mechanisms that are used by smtp that need it
-    my $hostname = ${*$self}{'net_pop3_host'};
+    my ( $hostname ) = split /:/ , ${*$self}{'net_pop3_host'};
     my $client = eval { $sasl->client_new('pop',$hostname,0) };
     
     unless ($client) {
