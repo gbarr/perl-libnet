@@ -4,7 +4,7 @@
 
 $NAME     = 'Net';
 $DISTNAME = "libnet";
-$VERSION  = "1.19";
+$VERSION  = "1.20";
 
 BEGIN { require 5.002 }
 
@@ -101,15 +101,13 @@ WriteMakefile(
 );
 
 sub MY::postamble {
-                                                                                                    
-<<EOS;
-                                                                                                    
-distdir : run_cpansign
-                                                                                                    
+  return <<'POSTAMBLE';
+
+mydist : manifest run_cpansign dist
+
 run_cpansign :
 	cpansign -s
-                                                                                                    
-EOS
-                                                                                                    
-}
 
+POSTAMBLE
+
+}
