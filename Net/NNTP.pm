@@ -14,7 +14,7 @@ use Carp;
 use Time::Local;
 use Net::Config;
 
-$VERSION = "2.23";
+$VERSION = "2.24";
 @ISA     = qw(Net::Cmd IO::Socket::INET);
 
 sub new
@@ -120,7 +120,7 @@ sub article
  my $nntp = shift;
  my @fh;
 
- @fh = (pop) if @_ == 2 || (@_ && ref($_[0]) || ref(\$_[0]) eq 'GLOB');
+ @fh = (pop) if @_ == 2 || (@_ && (ref($_[0]) || ref(\$_[0]) eq 'GLOB'));
 
  $nntp->_ARTICLE(@_)
     ? $nntp->read_until_dot(@fh)
