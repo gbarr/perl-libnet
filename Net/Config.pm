@@ -13,7 +13,7 @@ use strict;
 
 @EXPORT  = qw(%NetConfig);
 @ISA     = qw(Net::LocalCfg Exporter);
-$VERSION = "1.10"; # $Id: //depot/libnet/Net/Config.pm#17 $
+$VERSION = "1.11";
 
 eval { local $SIG{__DIE__}; require Net::LocalCfg };
 
@@ -27,8 +27,8 @@ eval { local $SIG{__DIE__}; require Net::LocalCfg };
     time_hosts => [],
     inet_domain => undef,
     ftp_firewall => undef,
-    ftp_ext_passive => 0,
-    ftp_int_passive => 0,
+    ftp_ext_passive => 1,
+    ftp_int_passive => 1,
     test_hosts => 1,
     test_exist => 1,
 );
