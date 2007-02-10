@@ -16,7 +16,7 @@ use IO::Socket;
 use Net::Cmd;
 use Net::Config;
 
-$VERSION = "2.30";
+$VERSION = "2.31";
 
 @ISA = qw(Net::Cmd IO::Socket::INET);
 
@@ -309,6 +309,34 @@ sub mail
        else
         {
 	 carp 'Net::SMTP::mail: DSN option not supported by host';
+        }
+      }
+
+     if(defined($v = delete $opt{ENVID}))
+      {
+       # expected to be in a format as required by RFC 3461, xtext-encoded
+       if(exists $esmtp->{DSN})
+        {
+	 $opts .= " ENVID=$v"
+        }
+       else
+        {
+	 carp 'Net::SMTP::mail: DSN option not supported by host';
+        }
+      }
+
+     if(defined($v = delete $opt{AUTH}))
+      {
+       # expected to be in a format as required by RFC 2554,
+       # rfc2821-quoted and xtext-encoded, or <>
+       if(exists $esmtp->{AUTH})
+        {
+	 $v = '<>'  if !defined($v) || $v eq '';
+	 $opts .= " AUTH=$v"
+        }
+       else
+        {
+	 carp 'Net::SMTP::mail: AUTH option not supported by host';
         }
       }
 
@@ -720,11 +748,16 @@ in hash like fashion, using key and value pairs.  Possible options are:
  Return      => "FULL" | "HDRS"
  Bits        => "7" | "8" | "binary"
  Transaction => <ADDRESS>
- Envelope    => <ENVID>
+ Envelope    => <ENVID>     # xtext-encodes its argument
+ ENVID       => <ENVID>     # similar to Envelope, but expects argument encoded
  XVERP       => 1
+ AUTH        => <submitter> # encoded address according to RFC 2554
 
 The C<Return> and C<Envelope> parameters are used for DSN (Delivery
 Status Notification).
+
+The submitter address in C<AUTH> option is expected to be in a format as
+required by RFC 2554, in an RFC2821-quoted form and xtext-encoded, or <> .
 
 =item reset ()
 
@@ -795,6 +828,7 @@ ORcpt is also part of the SMTP DSN extension according to RFC3461.
 It is used to pass along the original recipient that the mail was first
 sent to.  The machine that generates a DSN will use this address to inform
 the sender, because he can't know if recipients get rewritten by mail servers.
+It is expected to be in a format as required by RFC3461, xtext-encoded.
 
 =item to ( ADDRESS [, ADDRESS [...]] )
 
