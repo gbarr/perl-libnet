@@ -23,7 +23,7 @@ BEGIN {
 
 my $doUTF8 = eval { require utf8 };
 
-$VERSION = "2.27";
+$VERSION = "2.28";
 @ISA     = qw(Exporter);
 @EXPORT  = qw(CMD_INFO CMD_OK CMD_MORE CMD_REJECT CMD_ERROR CMD_PENDING);
 
@@ -395,7 +395,7 @@ sub datasend
  my $arr = @_ == 1 && ref($_[0]) ? $_[0] : \@_;
  my $line = join("" ,@$arr);
 
- utf8::encode($line) if $doUTF8;
+ utf8::encode($line) if $doUTF8 and utf8::is_utf8($line);
 
  return 0 unless defined(fileno($cmd));
 
