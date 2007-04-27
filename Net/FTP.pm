@@ -1161,6 +1161,30 @@ sub pasv_wait {
 }
 
 
+sub feature {
+  @_ == 2 or croak 'usage: $ftp->feature( NAME )';
+  my ($ftp, $feat) = @_;
+
+  my $feature = ${*$ftp}{net_ftp_feature} ||= do {
+    my @feat;
+
+    # Example response
+    # 211-Features:
+    #  MDTM
+    #  REST STREAM
+    #  SIZE
+    # 211 End
+
+    @feat = map { /^\s+(.*\S)/ } $ftp->message
+      if $ftp->_FEAT;
+
+    \@feat;
+  };
+
+  return grep { /^\Q$feat\E\b/i } @$feature;
+}
+
+
 sub cmd { shift->command(@_)->response() }
 
 ########################################
@@ -1188,6 +1212,7 @@ sub _MDTM { shift->command("MDTM", @_)->response() == CMD_OK }
 sub _SIZE { shift->command("SIZE", @_)->response() == CMD_OK }
 sub _HELP { shift->command("HELP", @_)->response() == CMD_OK }
 sub _STAT { shift->command("STAT", @_)->response() == CMD_OK }
+sub _FEAT { shift->command("FEAT", @_)->response() == CMD_OK }
 sub _APPE { shift->command("APPE", @_)->response() == CMD_INFO }
 sub _LIST { shift->command("LIST", @_)->response() == CMD_INFO }
 sub _NLST { shift->command("NLST", @_)->response() == CMD_INFO }
@@ -1536,6 +1561,21 @@ file handle glob, then \*STDERR is used.  The second argument is the number
 of bytes per hash mark printed, and defaults to 1024.  In all cases the
 return value is a reference to an array of two:  the filehandle glob reference
 and the bytes per hash mark.
+
+=item feature ( NAME )
+
+Determine if the server supports the specified feature. The return
+value is a list of lines the server responded with to describe the
+options that it supports for the given feature. If the feature is
+unsupported then the empty list is returned.
+
+  if ($ftp->feature( 'MDTM' )) {
+    # Do something
+  }
+
+  if (grep { /\bTLS\b/ } $ftp->feature('AUTH')) {
+    # Server supports TLS
+  }
 
 =back
 
