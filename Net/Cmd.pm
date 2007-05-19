@@ -386,7 +386,11 @@ sub datasend {
   my $arr  = @_ == 1 && ref($_[0]) ? $_[0] : \@_;
   my $line = join("", @$arr);
 
-  utf8::encode($line) if $doUTF8 and utf8::is_utf8($line);
+  if ($doUTF8) {
+    # encode to individual utf8 bytes if
+    # $line is a string (in internal UTF-8)
+    utf8::encode($line) if utf8::is_utf8($line);
+  }
 
   return 0 unless defined(fileno($cmd));
 
