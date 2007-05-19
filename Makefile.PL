@@ -4,7 +4,7 @@
 
 $NAME     = 'Net';
 $DISTNAME = "libnet";
-$VERSION  = "1.20";
+$VERSION  = "1.21";
 
 BEGIN { require 5.002 }
 
@@ -97,16 +97,14 @@ WriteMakefile(
 		Socket     => 1.3,
 		IO::Socket => 1.05
 	      },
+  dist => { DIST_DEFAULT => 'mydist', },
   @ppd,
 );
 
 sub MY::postamble {
   return <<'POSTAMBLE';
 
-mydist : manifest run_cpansign dist
-
-run_cpansign :
-	cpansign -s
+mydist : distmeta distsignature tardist
 
 POSTAMBLE
 
