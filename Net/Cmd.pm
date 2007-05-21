@@ -22,9 +22,9 @@ BEGIN {
   }
 }
 
-my $doUTF8 = eval { require utf8 };
+my $doUTF8 = ($] > 5.008) && eval { require utf8 };
 
-$VERSION = "2.28";
+$VERSION = "2.29";
 @ISA     = qw(Exporter);
 @EXPORT  = qw(CMD_INFO CMD_OK CMD_MORE CMD_REJECT CMD_ERROR CMD_PENDING);
 
