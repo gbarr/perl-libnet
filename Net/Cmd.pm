@@ -22,7 +22,20 @@ BEGIN {
   }
 }
 
-my $doUTF8 = ($] > 5.008) && eval { require utf8 };
+BEGIN {
+  if (!eval { require utf8 }) {
+    *is_utf8 = sub { 0 };
+  }
+  elsif (eval { utf8::is_utf8(undef); 1 }) {
+    *is_utf8 = \&utf8::is_utf8;
+  }
+  elsif (eval { require Encode; Encode::is_utf8(undef); 1 }) {
+    *is_utf8 = \&Encode::is_utf8;
+  }
+  else {
+    *is_utf8 = sub { $_[0] =~ /[^\x00-\xff]/ };
+  }
+}
 
 $VERSION = "2.29";
 @ISA     = qw(Exporter);
@@ -386,11 +399,9 @@ sub datasend {
   my $arr  = @_ == 1 && ref($_[0]) ? $_[0] : \@_;
   my $line = join("", @$arr);
 
-  if ($doUTF8) {
-    # encode to individual utf8 bytes if
-    # $line is a string (in internal UTF-8)
-    utf8::encode($line) if utf8::is_utf8($line);
-  }
+  # encode to individual utf8 bytes if
+  # $line is a string (in internal UTF-8)
+  utf8::encode($line) if is_utf8($line);
 
   return 0 unless defined(fileno($cmd));
 
