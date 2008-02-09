@@ -1350,7 +1350,7 @@ transfers. (defaults to 10240)
 B<Port> - The port number to connect to on the remote machine for the
 FTP connection
 
-B<Timeout> - Set a timeout value (defaults to 120)
+B<Timeout> - Set a timeout value in seconds (defaults to 120)
 
 B<Debug> - debug level (see the debug method in L<Net::Cmd>)
 
