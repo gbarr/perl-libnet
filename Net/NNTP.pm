@@ -14,7 +14,7 @@ use Carp;
 use Time::Local;
 use Net::Config;
 
-$VERSION = "2.24";
+$VERSION = "2.24_1";
 @ISA     = qw(Net::Cmd IO::Socket::INET);
 
 
@@ -213,16 +213,18 @@ sub nntpstat {
 sub group {
   @_ == 1 || @_ == 2 or croak 'usage: $nntp->group( [ GROUP ] )';
   my $nntp = shift;
-  my $grp  = ${*$nntp}{'net_nntp_group'} || undef;
+  my $grp  = ${*$nntp}{'net_nntp_group'};
 
   return $grp
     unless (@_ || wantarray);
 
   my $newgrp = shift;
 
-  return wantarray ? () : undef
-    unless $nntp->_GROUP($newgrp || $grp || "")
-    && $nntp->message =~ /(\d+)\s+(\d+)\s+(\d+)\s+(\S+)/;
+  $newgrp = (defined($grp) and length($grp)) ? $grp : ""
+    unless defined($newgrp) and length($newgrp);
+
+  return 
+    unless $nntp->_GROUP($newgrp) and $nntp->message =~ /(\d+)\s+(\d+)\s+(\d+)\s+(\S+)/;
 
   my ($count, $first, $last, $group) = ($1, $2, $3, $4);
 
