@@ -59,7 +59,9 @@ sub new {
   $obj->debug(exists $arg{Debug} ? $arg{Debug} : undef);
 
   unless ($obj->response() == CMD_OK) {
+    my $err = ref($obj) . ": " . $obj->code . " " . $obj->message;
     $obj->close();
+    $@ = $err;
     return undef;
   }
 
@@ -70,7 +72,9 @@ sub new {
   (${*$obj}{'net_smtp_domain'}) = $obj->message =~ /\A\s*(\S+)/;
 
   unless ($obj->hello($arg{Hello} || "")) {
+    my $err = ref($obj) . ": " . $obj->code . " " . $obj->message;
     $obj->close();
+    $@ = $err;
     return undef;
   }
 
@@ -596,6 +600,9 @@ known as mailhost:
 
 This is the constructor for a new Net::SMTP object. C<HOST> is the
 name of the remote host to which an SMTP connection is required.
+
+On failure C<undef> will be returned and C<$@> will contain the reason
+for the failure.
 
 C<HOST> is optional. If C<HOST> is not given then it may instead be
 passed as the C<Host> option described below. If neither is given then
