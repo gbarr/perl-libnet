@@ -21,7 +21,7 @@ use Net::Cmd;
 use Net::Config;
 use Fcntl qw(O_WRONLY O_RDONLY O_APPEND O_CREAT O_TRUNC);
 
-$VERSION = '2.77';
+$VERSION = '2.77_1';
 @ISA     = qw(Exporter Net::Cmd IO::Socket::INET);
 
 # Someday I will "use constant", when I am not bothered to much about
@@ -688,7 +688,7 @@ sub _store_cmd {
 
   my $localfd = ref($local) || ref(\$local) eq "GLOB";
 
-  unless (defined $remote) {
+  if (!defined($remote) and 'STOU' ne uc($cmd)) {
     croak 'Must specify remote filename with stream input'
       if $localfd;
 
@@ -708,7 +708,7 @@ sub _store_cmd {
     $ftp->_ALLO($size) if $size;
   }
   croak("Bad remote filename '$remote'\n")
-    if $remote =~ /[\r\n]/s;
+    if defined($remote) and $remote =~ /[\r\n]/s;
 
   if ($localfd) {
     $loc = $local;
@@ -730,7 +730,7 @@ sub _store_cmd {
   delete ${*$ftp}{'net_ftp_port'};
   delete ${*$ftp}{'net_ftp_pasv'};
 
-  $sock = $ftp->_data_cmd($cmd, $remote)
+  $sock = $ftp->_data_cmd($cmd, grep { defined } $remote)
     or return undef;
 
   $remote = ($ftp->message =~ /FILE:\s*(.*)/)[0]
