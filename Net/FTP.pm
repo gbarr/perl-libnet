@@ -124,6 +124,12 @@ sub host {
   ${*$me}{'net_ftp_host'};
 }
 
+sub passive {
+  my $ftp = shift;
+  return ${*$ftp}{'net_ftp_passive'} unless @_;
+  ${*$ftp}{'net_ftp_passive'} = shift;
+}
+
 
 sub hash {
   my $ftp = shift;    # self
@@ -1438,6 +1444,10 @@ to change the directory to the root directory.
 =item cdup ()
 
 Change directory to the parent of the current directory.
+
+=item passive ( [ PASSIVE ] )
+
+Set or get if data connections will be initiated in passive mode.
 
 =item pwd ()
 
