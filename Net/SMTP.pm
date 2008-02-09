@@ -16,7 +16,7 @@ use IO::Socket;
 use Net::Cmd;
 use Net::Config;
 
-$VERSION = "2.31";
+$VERSION = "2.31_1";
 
 @ISA = qw(Net::Cmd IO::Socket::INET);
 
@@ -176,7 +176,7 @@ sub hello {
     my $ln;
     foreach $ln (@msg) {
       $h->{uc $1} = $2
-        if $ln =~ /(\w+)\b[= \t]*([^\n]*)/;
+        if $ln =~ /([-\w]+)\b[= \t]*([^\n]*)/;
     }
   }
   elsif ($me->status == CMD_ERROR) {
