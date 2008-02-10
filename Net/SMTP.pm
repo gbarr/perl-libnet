@@ -290,7 +290,7 @@ sub mail {
 
       if (defined($v = delete $opt{Envelope})) {
         if (exists $esmtp->{DSN}) {
-          $v =~ s/([^\041-\176]|=|\+)/sprintf "+%02x", ord($1)/sge;
+          $v =~ s/([^\041-\176]|=|\+)/sprintf "+%02X", ord($1)/sge;
           $opts .= " ENVID=$v";
         }
         else {
