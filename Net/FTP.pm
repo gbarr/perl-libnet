@@ -858,6 +858,9 @@ sub supported {
   return $hash->{$cmd}
     if exists $hash->{$cmd};
 
+  return $hash->{$cmd} = 1
+    if $ftp->feature($cmd);
+
   return $hash->{$cmd} = 0
     unless $ftp->_HELP($cmd);
 
