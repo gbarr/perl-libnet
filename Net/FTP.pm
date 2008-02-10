@@ -711,7 +711,7 @@ sub _store_cmd {
     # a pipe, or device) and if so get the file size from stat, and send
     # an ALLO command before sending the STOR, STOU, or APPE command.
     my $size = do { local $^W; -f $local && -s _ };    # no ALLO if sending data from a pipe
-    $ftp->_ALLO($size) if $size;
+    ${*$ftp}{'net_ftp_allo'} = $size if $size;
   }
   croak("Bad remote filename '$remote'\n")
     if defined($remote) and $remote =~ /[\r\n]/s;
@@ -1042,6 +1042,11 @@ sub _data_cmd {
 
   return undef
     unless $ok;
+
+  if ($cmd =~ /(STOR|APPE|STOU)/ and exists ${*$ftp}{net_ftp_allo}) {
+    $ftp->_ALLO(delete ${*$ftp}{net_ftp_allo})
+      or return undef;
+  }
 
   $ftp->command($cmd, @_);
 
