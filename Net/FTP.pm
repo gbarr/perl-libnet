@@ -107,7 +107,8 @@ sub new {
 
   unless ($ftp->response() == CMD_OK) {
     $ftp->close();
-    $@ = $ftp->message;
+    # keep @$ if no message. Happens, when response did not start with a code.
+    $@ = $ftp->message || $@;
     undef $ftp;
   }
 
@@ -1091,7 +1092,7 @@ sub command {
 
 sub response {
   my $ftp  = shift;
-  my $code = $ftp->SUPER::response();
+  my $code = $ftp->SUPER::response() || 5;    # assume 500 if undef
 
   delete ${*$ftp}{'net_ftp_pasv'}
     if ($code != CMD_MORE && $code != CMD_INFO);
@@ -1107,8 +1108,9 @@ sub parse_response {
   my $ftp = shift;
 
   # Darn MS FTP server is a load of CRAP !!!!
+  # Expect to see undef here.
   return ()
-    unless ${*$ftp}{'net_cmd_code'} + 0;
+    unless 0 + (${*$ftp}{'net_cmd_code'} || 0);
 
   (${*$ftp}{'net_cmd_code'}, 1);
 }

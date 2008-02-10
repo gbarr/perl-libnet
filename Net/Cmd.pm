@@ -353,6 +353,7 @@ sub response {
     ($code, $more) = $cmd->parse_response($str);
     unless (defined $code) {
       $cmd->ungetline($str);
+      $@ = $str;   # $@ used as tunneling hack
       last;
     }
 
@@ -363,6 +364,7 @@ sub response {
     last unless ($more);
   }
 
+  return undef unless defined $code;
   substr($code, 0, 1);
 }
 
