@@ -739,7 +739,7 @@ sub _store_cmd {
   $sock = $ftp->_data_cmd($cmd, grep { defined } $remote)
     or return undef;
 
-  $remote = ($ftp->message =~ /FILE:\s*(.*)/)[0]
+  $remote = ($ftp->message =~ /\w+\s*:\s*(.*)/)[0]
     if 'STOU' eq uc $cmd;
 
   my $blksize = ${*$ftp}{'net_ftp_blksize'};
