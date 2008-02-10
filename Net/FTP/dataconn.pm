@@ -63,7 +63,7 @@ sub close {
 
   if (exists ${*$data}{'net_ftp_bytesread'} && !${*$data}{'net_ftp_eof'}) {
     my $junk;
-    $data->read($junk, 1, 0);
+    eval { local($SIG{__DIE__}); $data->read($junk, 1, 0) };
     return $data->abort unless ${*$data}{'net_ftp_eof'};
   }
 
