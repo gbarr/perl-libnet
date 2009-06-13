@@ -21,7 +21,7 @@ use Net::Cmd;
 use Net::Config;
 use Fcntl qw(O_WRONLY O_RDONLY O_APPEND O_CREAT O_TRUNC);
 
-$VERSION = '2.77_1';
+$VERSION = '2.77_2';
 @ISA     = qw(Exporter Net::Cmd IO::Socket::INET);
 
 # Someday I will "use constant", when I am not bothered to much about
@@ -1015,22 +1015,24 @@ sub _data_cmd {
   {
     my $data = undef;
 
-    $ok = defined $ftp->pasv;
-    $ok = $ftp->_REST($where)
-      if $ok && $where;
+    return undef unless defined $ftp->pasv;
+    $data = $ftp->_dataconn() or return undef;
 
-    if ($ok) {
-      $ftp->command($cmd, @_);
-      $data = $ftp->_dataconn();
-      $ok   = CMD_INFO == $ftp->response();
-      if ($ok) {
-        $data->reading
-          if $data && $cmd =~ /RETR|LIST|NLST/;
-        return $data;
-      }
-      $data->_close
-        if $data;
+    if ($where and !$ftp->_REST($where)) {
+      my ($status, $message) = ($ftp->status, $ftp->message);
+      $ftp->abort;
+      $ftp->set_status($status, $message);
+      return undef;
     }
+
+    $ftp->command($cmd, @_);
+    if (CMD_INFO == $ftp->response()) {
+      $data->reading
+        if $cmd =~ /RETR|LIST|NLST/;
+      return $data;
+    }
+    $data->_close;
+
     return undef;
   }
 
