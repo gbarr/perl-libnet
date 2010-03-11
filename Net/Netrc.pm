@@ -11,7 +11,7 @@ use strict;
 use FileHandle;
 use vars qw($VERSION);
 
-$VERSION = "2.12";
+$VERSION = "2.13";
 
 my %netrc = ();
 
@@ -30,7 +30,15 @@ sub _readrc {
     # Some OS's don't have `getpwuid', so we default to $ENV{HOME}
     $home = eval { (getpwuid($>))[7] } || $ENV{HOME};
     $home ||= $ENV{HOMEDRIVE} . ($ENV{HOMEPATH} || '') if defined $ENV{HOMEDRIVE};
-    $file = $home . "/.netrc";
+    if (-e $home . "/.netrc") {
+      $file = $home . "/.netrc";
+    }
+    elsif (-e $home . "/_netrc") {
+      $file = $home . "/_netrc";
+    }
+    else {
+      return;
+    }
   }
 
   my ($login, $pass, $acct) = (undef, undef, undef);
