@@ -590,6 +590,9 @@ sub rmdir {
   return undef
     unless @filelist;    # failed, it is probably not a directory
 
+  return $ftp->delete($dir)
+    if @filelist == 1 and $dir eq $filelist[0];
+
   # Go thru and delete each file or the directory
   my $file;
   foreach $file (map { m,/, ? $_ : "$dir/$_" } @filelist) {
