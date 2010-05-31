@@ -4,7 +4,7 @@
 
 $NAME     = 'Net';
 $DISTNAME = "libnet";
-$VERSION  = "1.22";
+$VERSION  = "1.22_01";
 
 BEGIN { require 5.002 }
 
@@ -98,6 +98,16 @@ WriteMakefile(
 		IO::Socket => 1.05
 	      },
   dist => { DIST_DEFAULT => 'mydist', },
+  (eval { ExtUtils::MakeMaker->VERSION(6.21) } ? (LICENSE => 'perl') : ()),
+  ( eval { ExtUtils::MakeMaker->VERSION(6.46) } ? (
+      META_MERGE => {
+        resources => {    ##
+          repository => 'http://github.com/gbarr/perl-libnet',
+        },
+      }
+      )
+    : ()
+  ),
   @ppd,
 );
 
