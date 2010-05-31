@@ -9,7 +9,7 @@ package Net::Netrc;
 use Carp;
 use strict;
 use FileHandle;
-use vars qw($VERSION);
+use vars qw($VERSION $TESTING);
 
 $VERSION = "2.13";
 
@@ -37,7 +37,7 @@ sub _readrc {
       $file = $home . "/_netrc";
     }
     else {
-      return;
+      return unless $TESTING;
     }
   }
 
