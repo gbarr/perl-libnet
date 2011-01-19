@@ -657,7 +657,9 @@ debug level for a given class.
 
 =item message ()
 
-Returns the text message returned from the last command
+Returns the text message returned from the last command. In a scalar
+context it returns a single string, in a list context it will return
+each line as a separate element
 
 =item code ()
 
