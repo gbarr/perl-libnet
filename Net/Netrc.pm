@@ -311,7 +311,7 @@ Return the account information for the netrc entry
 
 =item lpa ()
 
-Return a list of login, password and account information fir the netrc entry
+Return a list of login, password and account information for the netrc entry
 
 =back
 

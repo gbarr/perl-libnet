@@ -1821,7 +1821,7 @@ L<Net::Netrc>
 L<Net::Cmd>
 
 ftp(1), ftpd(8), RFC 959
-http://www.cis.ohio-state.edu/htbin/rfc/rfc959.html
+http://www.ietf.org/rfc/rfc959.txt
 
 =head1 USE EXAMPLES
 
