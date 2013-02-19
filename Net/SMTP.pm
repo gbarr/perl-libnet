@@ -579,16 +579,18 @@ known as mailhost:
 
     use Net::SMTP;
 
-    $smtp = Net::SMTP->new('mailhost');
+    my $smtp = Net::SMTP->new('mailhost');
 
     $smtp->mail($ENV{USER});
-    $smtp->to('postmaster');
-
-    $smtp->data();
-    $smtp->datasend("To: postmaster\n");
-    $smtp->datasend("\n");
-    $smtp->datasend("A simple test message\n");
-    $smtp->dataend();
+    if ($smtp->to('postmaster')) {
+     $smtp->data();
+     $smtp->datasend("To: postmaster\n");
+     $smtp->datasend("\n");
+     $smtp->datasend("A simple test message\n");
+     $smtp->dataend();
+    } else {
+     print "Error: ", $smtp->message();
+    }
 
     $smtp->quit;
 
@@ -615,10 +617,13 @@ B<Hello> - SMTP requires that you identify yourself. This option
 specifies a string to pass as your mail domain. If not given localhost.localdomain
 will be used.
 
-B<Host> - SMTP host to connect to. It may be a single scalar, as defined for
-the C<PeerAddr> option in L<IO::Socket::INET>, or a reference to
+B<Host> - SMTP host to connect to. It may be a single scalar (hostname[:port]),
+as defined for the C<PeerAddr> option in L<IO::Socket::INET>, or a reference to
 an array with hosts to try in turn. The L</host> method will return the value
 which was used to connect to the host.
+
+B<Port> - port to connect to. Format - C<PeerHost> from L<IO::Socket::INET> new method.
+Default - 25.
 
 B<LocalAddr> and B<LocalPort> - These parameters are passed directly
 to IO::Socket to allow binding the socket to a local port.
@@ -695,7 +700,7 @@ Request a queue run for the DOMAIN given.
 
 =item auth ( USERNAME, PASSWORD )
 
-Attempt SASL authentication.
+Attempt SASL authentication. Requires Authen::SASL module.
 
 =item mail ( ADDRESS [, OPTIONS] )
 
@@ -830,6 +835,10 @@ Verify that C<ADDRESS> is a legitimate mailing address.
 
 Most sites usually disable this feature in their SMTP service configuration.
 Use "Debug => 1" option under new() to see if disabled.
+
+=item message ()
+
+Returns the text message returned from the last command. (Net::Cmd method)
 
 =item help ( [ $subject ] )
 
