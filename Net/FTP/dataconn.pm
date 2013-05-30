@@ -27,7 +27,7 @@ sub abort {
   return $data->close
     if ${*$data}{'net_ftp_eof'};
 
-  # for some reason if we continously open RETR connections and not
+  # for some reason if we continuously open RETR connections and not
   # read a single byte, then abort them after a while the server will
   # close our connection, this prevents the unexpected EOF on the
   # command channel -- GMB
