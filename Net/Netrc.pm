@@ -27,7 +27,7 @@ sub _readrc {
   }
   else {
 
-    # Some OS's don't have `getpwuid', so we default to $ENV{HOME}
+    # Some OS's don't have "getpwuid", so we default to $ENV{HOME}
     $home = eval { (getpwuid($>))[7] } || $ENV{HOME};
     $home ||= $ENV{HOMEDRIVE} . ($ENV{HOMEPATH} || '') if defined $ENV{HOMEDRIVE};
     if (-e $home . "/.netrc") {
@@ -47,7 +47,7 @@ sub _readrc {
 
   $netrc{default} = undef;
 
-  # OS/2 and Win32 do not handle stat in a way compatable with this check :-(
+  # OS/2 and Win32 do not handle stat in a way compatible with this check :-(
   unless ($^O eq 'os2'
     || $^O eq 'MSWin32'
     || $^O eq 'MacOS'
