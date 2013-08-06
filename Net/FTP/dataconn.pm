@@ -9,7 +9,7 @@ use vars qw(@ISA $timeout $VERSION);
 use Net::Cmd;
 use Errno;
 
-$VERSION = '0.11_01';
+$VERSION = '0.11_02';
 @ISA     = qw(IO::Socket::INET);
 
 
