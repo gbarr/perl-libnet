@@ -102,7 +102,7 @@ WriteMakefile(
   ( eval { ExtUtils::MakeMaker->VERSION(6.46) } ? (
       META_MERGE => {
         resources => {    ##
-          repository => 'http://github.com/gbarr/perl-libnet',
+          repository => 'http://github.com/steve-m-hay/perl-libnet',
         },
       }
       )
