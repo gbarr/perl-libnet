@@ -37,3 +37,4 @@ t/netrc.t
 t/nntp.t
 t/require.t
 t/smtp.t
+t/time.t
