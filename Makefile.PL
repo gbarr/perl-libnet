@@ -4,7 +4,7 @@
 
 $NAME     = 'Net';
 $DISTNAME = "libnet";
-$VERSION  = "1.22_01";
+$VERSION  = "1.22_02";
 
 BEGIN { require 5.002 }
 
@@ -114,7 +114,7 @@ WriteMakefile(
 sub MY::postamble {
   return <<'POSTAMBLE';
 
-mydist : distmeta distsignature tardist
+mydist : distmeta tardist
 
 POSTAMBLE
 

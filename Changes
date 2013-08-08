@@ -1,4 +1,4 @@
-libnet 1.22_02
+libnet 1.22_02 -- Thu Aug 08 2013
 
   * Make Net::FTP::dataconn::close() more robust [Together with changes to
     Net::FTP already made in 1.22_01, this resolves CPAN RT#37700]
