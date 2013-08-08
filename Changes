@@ -1,11 +1,13 @@
 libnet 1.22_02
 
-  * Make Net::FTP::dataconn::close() more robust
+  * Make Net::FTP::dataconn::close() more robust [Together with changes to
+    Net::FTP already made in 1.22_01, this resolves CPAN RT#37700]
   * Document scalar/list context return values from Net::Cmd::message()
   * Fix broken URL [Resolves CPAN RT#68749]
   * Fix documentation typo in Net::Netrc
   * Fix broken POD in Net::POP3
-  * Improve Net::SMTP documentation of new(), auth() and message()
+  * Improve Net::SMTP documentation of new(), auth() and message() [Resolves
+    CPAN RT#36038]
   * Add proper skips to skipped tests in ftp.t
   * Import hostname.t fix from perl core commit #adeb94125a
   * Add time.t, imported from perl core commit #c85707204c
