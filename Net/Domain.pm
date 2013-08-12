@@ -234,7 +234,7 @@ sub domainname {
   # Assumption: If the host name does not contain a period
   # and the domain name does, then assume that they are correct
   # this helps to eliminate calls to gethostbyname, and therefore
-  # eleminate DNS lookups
+  # eliminate DNS lookups
 
   return $fqdn = $host . "." . $domain
     if (defined $host
