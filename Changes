@@ -1,4 +1,6 @@
 
+  * Fix incorrect handling of CRLF in Net::FTP [Willem Monsuwé; resolves CPAN
+    RT#41642/62029]
   * POD fixes [Dominic Hargreaves; resolves CPAN RT#91761]
 
 libnet 1.23  -- Mon Aug 12 2013
