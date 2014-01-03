@@ -1,3 +1,6 @@
+
+  * POD fixes [Dominic Hargreaves; resolves CPAN RT#91761]
+
 libnet 1.23  -- Mon Aug 12 2013
 
   * Typo fixes [David Steinbrunner; resolves CPAN RT#87681]
