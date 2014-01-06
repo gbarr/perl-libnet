@@ -1,3 +1,4 @@
+libnet 1.24  -- Mon Jan 06 2014
 
   * Fix incorrect handling of CRLF in Net::FTP [Willem Monsuwé; resolves CPAN
     RT#41642/62029]
