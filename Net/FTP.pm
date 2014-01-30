@@ -943,7 +943,8 @@ sub _dataconn {
       PeerAddr  => join(".", @port[0 .. 3]),
       PeerPort  => $port[4] * 256 + $port[5],
       LocalAddr => ${*$ftp}{'net_ftp_localaddr'},
-      Proto     => 'tcp'
+      Proto     => 'tcp',
+      Timeout   => $ftp->timeout
     );
   }
   elsif (defined ${*$ftp}{'net_ftp_listen'}) {
