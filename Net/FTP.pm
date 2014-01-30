@@ -1298,6 +1298,8 @@ C<Net::FTP> is a class implementing a simple FTP client in Perl as
 described in RFC959.  It provides wrappers for a subset of the RFC959
 commands.
 
+The Net::FTP class is a subclass of Net::Cmd and IO::Socket::INET.
+
 =head1 OVERVIEW
 
 FTP stands for File Transfer Protocol.  It is a way of transferring
@@ -1403,6 +1405,10 @@ Unless otherwise stated all methods return either a I<true> or I<false>
 value, with I<true> meaning that the operation was a success. When a method
 states that it returns a value, failure will be returned as I<undef> or an
 empty list.
+
+C<Net::FTP> inherits from C<Net::Cmd> so methods defined in C<Net::Cmd> may
+be used to send commands to the remote FTP server in addition to the methods
+documented here.
 
 =over 4
 
@@ -1701,9 +1707,6 @@ Send the QUIT command to the remote FTP server and close the socket connection.
 =back
 
 =head2 Methods for the adventurous
-
-C<Net::FTP> inherits from C<Net::Cmd> so methods defined in C<Net::Cmd> may
-be used to send commands to the remote FTP server.
 
 =over 4
 
