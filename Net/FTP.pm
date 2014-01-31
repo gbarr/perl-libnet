@@ -1167,8 +1167,11 @@ sub pasv_wait {
   vec($rin = '', fileno($ftp), 1) = 1;
   select($rout = $rin, undef, undef, undef);
 
-  $ftp->response();
-  $non_pasv->response();
+  my $dres = $ftp->response();
+  my $sres = $non_pasv->response();
+
+  return undef
+    unless $dres == CMD_OK && $sres == CMD_OK;
 
   return undef
     unless $ftp->ok() && $non_pasv->ok();
