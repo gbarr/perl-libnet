@@ -1,3 +1,14 @@
+libnet 1.25  -- Tue Feb 04 2014
+
+  * Fix Net::FTP::pasv_wait() not handling errors from Net::Cmd::reponse()
+    [bergner@cs.umu.se; resolves CPAN RT#50420]
+  * Make inheritance from Net::Cmd clearer in the documentation [Resolves CPAN
+    RT#72889]
+  * Set timeout for data connection creation in Net::FTP [Oleg G; resolves CPAN
+    RT#78926]
+  * Stop Net::Domain::domainname() from giving out warnings in android [Brian
+    Fraser]
+
 libnet 1.24  -- Mon Jan 06 2014
 
   * Fix incorrect handling of CRLF in Net::FTP [Willem Monsuwé; resolves CPAN
