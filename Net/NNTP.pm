@@ -767,7 +767,8 @@ states that it returns a value, failure will be returned as I<undef> or an
 empty list.
 
 C<Net::NNTP> inherits from C<Net::Cmd> so methods defined in C<Net::Cmd> may
-be used to send commands to the remote NNTP server.
+be used to send commands to the remote NNTP server in addition to the methods
+documented here.
 
 =over 4
 
