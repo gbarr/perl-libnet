@@ -38,3 +38,4 @@ t/nntp.t
 t/require.t
 t/smtp.t
 t/time.t
+t/external/smtp-ssl.t

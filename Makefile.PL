@@ -76,6 +76,11 @@ if ($^O eq 'os390')
    . "    CPAN/modules/by-module/Convert/Convert-EBCDIC-x.x.tar.gz\n\n";
 }
 
+my $xt = prompt( "Should I do external tests?\n".
+  "These tests will fail if there is no internet connection or if a firewall\n".
+  "blocks or modifies some traffic.\n".
+  "[y/N]", 'n' );
+
 #--- Write the Makefile
 
 my @ppd;
@@ -97,6 +102,7 @@ WriteMakefile(
 		Socket     => 1.3,
 		IO::Socket => 1.05
 	      },
+  $xt =~m{^y}i ? ( test => { TESTS => 't/*.t t/external/*.t' }):(),
   dist => { DIST_DEFAULT => 'mydist', },
   (eval { ExtUtils::MakeMaker->VERSION(6.21) } ? (LICENSE => 'perl') : ()),
   ( eval { ExtUtils::MakeMaker->VERSION(6.46) } ? (

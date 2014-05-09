@@ -18,7 +18,31 @@ use Net::Config;
 
 $VERSION = "2.33";
 
-@ISA = qw(Net::Cmd IO::Socket::INET);
+# Code for detecting if we can use SSL
+my $ssl_class = eval {
+  require IO::Socket::SSL;
+  # first version with default CA on most platforms
+  IO::Socket::SSL->VERSION(1.968);
+} && 'IO::Socket::SSL';
+my $nossl_warn = !$ssl_class &&
+  'To use SSL please install IO::Socket::SSL with version>=1.968';
+
+# Code for detecting if we can use IPv6
+my $inet6_class =
+  eval {
+    require IO::Socket::IP;
+    IO::Socket::IP->VERSION(0.20);
+  } && 'IO::Socket::IP' ||
+  eval {
+    require IO::Socket::INET6;
+    IO::Socket::INET6->VERSION(2.62);
+  } && 'IO::Socket::INET6';
+
+sub can_ssl   { $ssl_class };
+sub can_inet6 { $inet6_class };
+
+
+@ISA = ( 'Net::Cmd', $inet6_class || 'IO::Socket::INET' );
 
 
 sub new {
@@ -33,6 +57,13 @@ sub new {
     %arg  = @_;
     $host = delete $arg{Host};
   }
+
+  if ($arg{SSL}) {
+    # SSL from start
+    die $nossl_warn if !$ssl_class;
+    $arg{Port} ||= 465;
+  }
+
   my $hosts = defined $host ? $host : $NetConfig{smtp_hosts};
   my $obj;
 
@@ -53,6 +84,11 @@ sub new {
 
   return undef
     unless defined $obj;
+
+  if ($arg{SSL}) {
+    Net::SMTP::_SSLified->start_SSL($obj,SSL_verifycn_name => $host,%arg)
+      or return;
+  }
 
   $obj->autoflush(1);
 
@@ -189,9 +225,20 @@ sub hello {
   }
 
   return undef unless $ok;
+  ${*$me}{net_smtp_hello_domain} = $domain;
 
   $msg[0] =~ /\A\s*(\S+)/;
   return ($1 || " ");
+}
+
+sub starttls {
+  my $self = shift;
+  $ssl_class or die $nossl_warn;
+  $self->_STARTTLS or return;
+  Net::SMTP::_SSLified->start_SSL($self,@_) or return;
+
+  # another hello after starttls to read new ESMTP capabilities
+  return $self->hello(${*$self}{net_smtp_hello_domain});
 }
 
 
@@ -531,6 +578,26 @@ sub _BDAT { shift->command("BDAT", @_) }
 sub _TURN { shift->unsupported(@_); }
 sub _ETRN { shift->command("ETRN", @_)->response() == CMD_OK }
 sub _AUTH { shift->command("AUTH", @_)->response() == CMD_OK }
+sub _STARTTLS { shift->command("STARTTLS", @_)->response() == CMD_OK }
+
+
+{
+  package Net::SMTP::_SSLified;
+  our @ISA = ( $ssl_class ? ($ssl_class):(), 'Net::SMTP' );
+  sub starttls { die "SMTP connection is already in SSL mode" }
+  sub start_SSL {
+    my ($class,$smtp,%arg) = @_;
+    delete @arg{ grep { !m{^SSL_} } keys %arg };
+    ( $arg{SSL_verifycn_name} ||= $smtp->host )
+	=~s{(?<!:):[\w()]+$}{}; # strip port
+    $arg{SSL_verifycn_scheme} ||= 'smtp';
+    my $ok = $class->SUPER::start_SSL($smtp,%arg);
+    $@ = $ssl_class->errstr if !$ok;
+    return $ok;
+  }
+}
+
+
 
 1;
 
@@ -623,7 +690,12 @@ an array with hosts to try in turn. The L</host> method will return the value
 which was used to connect to the host.
 
 B<Port> - port to connect to. Format - C<PeerHost> from L<IO::Socket::INET> new method.
-Default - 25.
+Default - 25 for plain SMTP and 465 for immediate SSL.
+
+B<SSL> - If the connection should be done from start with SSL, contrary to later
+upgrade with C<starttls>.
+You can use SSL arguments as documented in L<IO::Socket::SSL>, but it will
+usually use the right arguments already.
 
 B<LocalAddr> and B<LocalPort> - These parameters are passed directly
 to IO::Socket to allow binding the socket to a local port.
@@ -653,6 +725,14 @@ Example:
 			   Hello => 'my.mail.domain',
 			   Timeout => 30,
                            Debug   => 1,
+			  );
+
+    # the same with direct SSL
+    $smtp = Net::SMTP->new('mailhost',
+			   Hello => 'my.mail.domain',
+			   Timeout => 30,
+			   Debug   => 1,
+			   SSL     => 1,
 			  );
 
     # Connect to the default server from Net::config
@@ -701,6 +781,12 @@ to connect to the host.
 =item etrn ( DOMAIN )
 
 Request a queue run for the DOMAIN given.
+
+=item starttls ( SSLARGS )
+
+Upgrade existing plain connection to SSL.
+You can use SSL arguments as documented in L<IO::Socket::SSL>, but it will
+usually use the right arguments already.
 
 =item auth ( USERNAME, PASSWORD )
 
