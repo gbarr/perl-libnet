@@ -67,6 +67,8 @@ sub new {
   my $hosts = defined $host ? $host : $NetConfig{smtp_hosts};
   my $obj;
 
+  $arg{Timeout} = 120 if ! defined $arg{Timeout};
+
   my $h;
   foreach $h (@{ref($hosts) ? $hosts : [$hosts]}) {
     $obj = $type->SUPER::new(
@@ -75,9 +77,7 @@ sub new {
       LocalAddr => $arg{LocalAddr},
       LocalPort => $arg{LocalPort},
       Proto     => 'tcp',
-      Timeout   => defined $arg{Timeout}
-      ? $arg{Timeout}
-      : 120
+      Timeout   => $arg{Timeout}
       )
       and last;
   }
@@ -582,7 +582,7 @@ sub _BDAT { shift->command("BDAT", @_) }
 sub _TURN { shift->unsupported(@_); }
 sub _ETRN { shift->command("ETRN", @_)->response() == CMD_OK }
 sub _AUTH { shift->command("AUTH", @_)->response() == CMD_OK }
-sub _STARTTLS { shift->command("STARTTLS", @_)->response() == CMD_OK }
+sub _STARTTLS { shift->command("STARTTLS")->response() == CMD_OK }
 
 
 {
@@ -692,8 +692,9 @@ B<Host> - SMTP host to connect to. It may be a single scalar (hostname[:port]),
 as defined for the C<PeerAddr> option in L<IO::Socket::INET>, or a reference to
 an array with hosts to try in turn. The L</host> method will return the value
 which was used to connect to the host.
+Format - C<PeerHost> from L<IO::Socket::INET> new method.
 
-B<Port> - port to connect to. Format - C<PeerHost> from L<IO::Socket::INET> new method.
+B<Port> - port to connect to.
 Default - 25 for plain SMTP and 465 for immediate SSL.
 
 B<SSL> - If the connection should be done from start with SSL, contrary to later

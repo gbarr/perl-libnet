@@ -2,12 +2,12 @@ use strict;
 use warnings;
 use Test::More;
 use File::Temp 'tempfile';
-use Net::SMTP;
+use Net::POP3;
 
-my $debug = 0; # Net::SMTP->new( Debug => .. )
+my $debug = 0; # Net::POP3->new( Debug => .. )
 
-my $inet6class = Net::SMTP->can_inet6;
-plan skip_all => "no IPv6 support found in Net::SMTP" if ! $inet6class;
+my $inet6class = Net::POP3->can_inet6;
+plan skip_all => "no IPv6 support found in Net::POP3" if ! $inet6class;
 
 plan skip_all => "fork not supported on this platform"
   if grep { $^O =~m{$_} } qw(MacOS VOS vmesa riscos amigaos);
@@ -23,37 +23,35 @@ diag("server on $saddr");
 plan tests => 1;
 
 defined( my $pid = fork()) or die "fork failed: $!";
-exit(smtp_server()) if ! $pid;
+exit(pop3_server()) if ! $pid;
 
-my $cl = Net::SMTP->new($saddr, Debug => $debug);
-diag("created Net::SMTP object");
+my $cl = Net::POP3->new($saddr, Debug => $debug);
+diag("created Net::POP3 object");
 if (!$cl) {
-  fail("IPv6 SMTP connect failed");
+  fail("IPv6 POP3 connect failed");
 } else {
   $cl->quit;
   pass("IPv6 success");
 }
 wait;
 
-sub smtp_server {
+sub pop3_server {
   my $cl = $srv->accept or die "accept failed: $!";
-  print $cl "220 welcome\r\n";
+  print $cl "+OK localhost ready\r\n";
   while (<$cl>) {
     my ($cmd,$arg) = m{^(\S+)(?: +(.*))?\r\n} or die $_;
     $cmd = uc($cmd);
     if ($cmd eq 'QUIT' ) {
-      print $cl "250 bye\r\n";
+      print $cl "+OK bye\r\n";
       last;
-    } elsif ( $cmd eq 'HELO' ) {
-      print $cl "250 localhost\r\n";
-    } elsif ( $cmd eq 'EHLO' ) {
-      print $cl "250-localhost\r\n".
-	"250 HELP\r\n";
+    } elsif ( $cmd eq 'CAPA' ) {
+      print $cl "+OK\r\n".
+	".\r\n";
     } else {
       diag("received unknown command: $cmd");
-      print "500 unknown cmd\r\n";
+      print "-ERR unknown cmd\r\n";
     }
   }
 
-  diag("SMTP dialog done");
+  diag("POP3 dialog done");
 }
