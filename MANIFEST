@@ -43,3 +43,4 @@ t/pop3_ssl.t
 t/pop3_ipv6.t
 t/time.t
 t/external/smtp-ssl.t
+t/external/pop3-ssl.t
