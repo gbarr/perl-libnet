@@ -960,6 +960,7 @@ accept the address surrounded by angle brackets.
 =head1 SEE ALSO
 
 L<Net::Cmd>
+L<IO::Socket::SSL>
 
 =head1 AUTHOR
 

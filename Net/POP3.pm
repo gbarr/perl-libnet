@@ -602,6 +602,7 @@ Net::POP3 - Post Office Protocol 3 Client class (RFC1939)
     # Constructors
     $pop = Net::POP3->new('pop3host');
     $pop = Net::POP3->new('pop3host', Timeout => 60);
+    $pop = Net::POP3->new('pop3host', SSL => 1, Timeout => 60);
 
     if ($pop->login($username, $password) > 0) {
       my $msgnums = $pop->list; # hashref of msgnum => size
@@ -704,6 +705,12 @@ will give a true value in a boolean context, but zero in a numeric context.
 
 If there was an error authenticating the user then I<undef> will be returned.
 
+=item starttls ( SSLARGS )
+
+Upgrade existing plain connection to SSL.
+You can use SSL arguments as documented in L<IO::Socket::SSL>, but it will
+usually use the right arguments already.
+
 =item apop ( [ USER [, PASS ]] )
 
 Authenticate with the server identifying as C<USER> with password C<PASS>.
@@ -805,6 +812,7 @@ means that any messages marked to be deleted will not be.
 
 L<Net::Netrc>,
 L<Net::Cmd>
+L<IO::Socket::SSL>
 
 =head1 AUTHOR
 
