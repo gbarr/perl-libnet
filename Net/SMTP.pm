@@ -85,6 +85,7 @@ sub new {
   return undef
     unless defined $obj;
 
+  ${*$obj}{'net_smtp_arg'} = \%arg;
   if ($arg{SSL}) {
     Net::SMTP::_SSLified->start_SSL($obj,SSL_verifycn_name => $host,%arg)
       or return;
@@ -235,7 +236,10 @@ sub starttls {
   my $self = shift;
   $ssl_class or die $nossl_warn;
   $self->_STARTTLS or return;
-  Net::SMTP::_SSLified->start_SSL($self,@_) or return;
+  Net::SMTP::_SSLified->start_SSL($self,
+    %{ ${*$self}{'net_smtp_arg'} }, # (ssl) args given in new
+    @_   # more (ssl) args
+  ) or return;
 
   # another hello after starttls to read new ESMTP capabilities
   return $self->hello(${*$self}{net_smtp_hello_domain});

@@ -37,5 +37,7 @@ t/netrc.t
 t/nntp.t
 t/require.t
 t/smtp.t
+t/smtp_ssl.t
+t/smtp_ipv6.t
 t/time.t
 t/external/smtp-ssl.t
