@@ -1,23 +1,23 @@
 Changes
 Config.eg
 Configure
-Hostname.pm.eg			Example replacement for Hostname.pm
+Hostname.pm.eg                           Example replacement for Hostname.pm
 MANIFEST
 Makefile.PL
 Net/Cmd.pm
 Net/Config.pm
-Net/Domain.pm			DNS Domain name lookup
-Net/FTP.pm			File Transfer Protocol Client
+Net/Domain.pm                            DNS Domain name lookup
+Net/FTP.pm                               File Transfer Protocol Client
 Net/FTP/A.pm
 Net/FTP/E.pm
 Net/FTP/I.pm
 Net/FTP/L.pm
 Net/FTP/dataconn.pm
-Net/NNTP.pm			Network News Transfer Protocol
-Net/Netrc.pm			.netrc lookup routines
-Net/POP3.pm			Post Office Protocol
-Net/SMTP.pm			Simple Mail Transfer Protocol Client
-Net/Time.pm			time & nettime protocols
+Net/NNTP.pm                              Network News Transfer Protocol
+Net/Netrc.pm                             .netrc lookup routines
+Net/POP3.pm                              Post Office Protocol
+Net/SMTP.pm                              Simple Mail Transfer Protocol Client
+Net/Time.pm                              time & nettime protocols
 Net/libnetFAQ.pod
 README
 demos/ftp

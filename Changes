@@ -1,3 +1,13 @@
+libnet 1.26  -- TODO
+
+  * Set minimum required ExtUtils::MakeMaker version to 6.64 to ensure that all
+    parameters used are supported, to save jumping through hoops to support
+    earlier versions.  (This should not be a problem since ExtUtils::MakeMaker
+    6.64 is easily installed into Perl 5.8.1 and above, that being the whole
+    point of the new choice of minimum supported Perl version.)
+  * Set minimum required Perl version to 5.8.1.  This is in line with the
+    minimum requirement of the "Perl Toolchain".
+
 libnet 1.25  -- Tue Feb 04 2014
 
   * Fix Net::FTP::pasv_wait() not handling errors from Net::Cmd::reponse()
