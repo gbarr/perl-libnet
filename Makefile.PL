@@ -56,7 +56,35 @@ MAIN: {
             },
 
             resources => {
-                repository => 'https://github.com/steve-m-hay/perl-libnet',
+                repository => {
+                    type => 'git',
+                    url  => 'https://github.com/steve-m-hay/perl-libnet.git'
+                }
+            },
+
+            optional_features => {
+                APOP => {
+                    description => 'APOP support',
+                    prereqs => {
+                        runtime => {
+                            requires => {
+                                'Digest::MD5' => '0'
+                            }
+                        }
+                    }
+                },
+
+                AUTH => {
+                    description => 'AUTH support',
+                    prereqs => {
+                        runtime => {
+                            requires => {
+                                'Authen::SASL' => '0',
+                                'MIME::Base64' => '0'
+                            }
+                        }
+                    }
+                }
             }
         },
 
@@ -64,38 +92,38 @@ MAIN: {
 
         CONFIGURE_REQUIRES => {
             'ExtUtils::MakeMaker' => '6.64',
-            'Getopt::Std'         => 0,
-            'IO:File'             => 0,
-            'strict'              => 0,
-            'vars'                => 0,
-            'warnings'            => 0
+            'Getopt::Std'         => '0',
+            'IO:File'             => '0',
+            'perl'                => '5.008001',
+            'strict'              => '0',
+            'vars'                => '0',
+            'warnings'            => '0'
         },
 
         TEST_REQUIRES => {
-            'Cwd'                 => 0,
-            'IO::File'            => 0,
-            'strict'              => 0
+            'Cwd'      => '0',
+            'IO::File' => '0',
+            'perl'     => '5.008001',
+            'strict'   => '0'
         },
 
         PREREQ_PM => {
             %prereq_pms,
-          # 'Authen::SASL'        => 0,      # Only required for AUTH support
-            'Carp'                => 0,
-          # 'Digest::MD5'         => 0,      # Only required for APOP support
-            'Errno'               => 0,
-            'Exporter'            => 0,
-            'Fcntl'               => 0,
-            'File::Basename'      => 0,
-            'FileHandle'          => 0,
-            'IO::Select'          => 0,
-            'IO::Socket'          => '1.05',
-          # 'MIME::Base64'        => 0,      # Only required for AUTH support
-            'POSIX'               => 0,
-            'Socket'              => '1.3',
-            'Symbol'              => 0,
-            'Time::Local'         => 0,
-            'strict'              => 0,
-            'vars'                => 0
+            'Carp'           => '0',
+            'Errno'          => '0',
+            'Exporter'       => '0',
+            'Fcntl'          => '0',
+            'File::Basename' => '0',
+            'FileHandle'     => '0',
+            'IO::Select'     => '0',
+            'IO::Socket'     => '1.05',
+            'POSIX'          => '0',
+            'Socket'         => '1.3',
+            'Symbol'         => '0',
+            'Time::Local'    => '0',
+            'perl'           => '5.008001',
+            'strict'         => '0',
+            'vars'           => '0'
         },
 
         INSTALLDIRS => 'perl',
@@ -105,8 +133,8 @@ MAIN: {
         },
 
         dist => {
-            PREOP   => 'find $(DISTVNAME) -type f -print|xargs chmod 0644 && ' .
-                       'find $(DISTVNAME) -type d -print|xargs chmod 0755',
+            PREOP   => 'find $(DISTVNAME) -type d -print|xargs chmod 0755 && ' .
+                       'find $(DISTVNAME) -type f -print|xargs chmod 0644',
             TO_UNIX => 'find $(DISTVNAME) -type f -print|xargs dos2unix'
         }
     );
