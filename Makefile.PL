@@ -101,10 +101,7 @@ MAIN: {
         },
 
         TEST_REQUIRES => {
-            'Cwd'      => '0',
-            'IO::File' => '0',
-            'perl'     => '5.008001',
-            'strict'   => '0'
+            'Cwd' => '0'
         },
 
         PREREQ_PM => {
@@ -121,7 +118,6 @@ MAIN: {
             'Socket'         => '1.3',
             'Symbol'         => '0',
             'Time::Local'    => '0',
-            'perl'           => '5.008001',
             'strict'         => '0',
             'vars'           => '0'
         },
