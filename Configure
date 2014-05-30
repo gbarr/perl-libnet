@@ -114,10 +114,10 @@ sub get_hostname
    my $ans = Prompt($prompt,$def);
    $host = ($ans =~ /(\S*)/)[0];
    last
-	if(!length($host) || valid_host($host));
+        if(!length($host) || valid_host($host));
 
    $def =""
-	if $def eq $host;
+        if $def eq $host;
 
    print <<"EDQ";
 
@@ -129,8 +129,8 @@ EDQ
   }
 
  length $host
-	? $host
-	: undef;
+        ? $host
+        : undef;
 }
 
 ##
@@ -221,7 +221,7 @@ sub default_hostname
    if(defined($host) && valid_host($host))
     {
      return $host
-	unless wantarray;
+        unless wantarray;
      push(@host,$host);
     }
   }
@@ -236,7 +236,7 @@ sub default_hostname
 getopts('do:');
 
 $libnet_cfg = "libnet.cfg"
-	unless(defined($libnet_cfg = $opt_o));
+        unless(defined($libnet_cfg = $opt_o));
 
 my %oldcfg = ();
 
@@ -268,7 +268,7 @@ Do you want to modify/update your configuration (y|n) ?
 EDQ
 
  $opt_d = 1
-	unless get_bool($msg,0);
+        unless get_bool($msg,0);
  }
 
 #---------------------------------------------------------------------------
@@ -313,7 +313,7 @@ EDQ
 $msg = 'Enter a list of available NNTP hosts :';
 
 $def = $oldcfg{'nntp_hosts'} ||
-	[ default_hostname($ENV{NNTPSERVER},$ENV{NEWSHOST},'news') ];
+        [ default_hostname($ENV{NNTPSERVER},$ENV{NEWSHOST},'news') ];
 
 $cfg{'nntp_hosts'} = get_host_list($msg,$def);
 
@@ -322,7 +322,7 @@ $cfg{'nntp_hosts'} = get_host_list($msg,$def);
 $msg = 'Enter a list of available SMTP hosts :';
 
 $def = $oldcfg{'smtp_hosts'} ||
-	[ default_hostname(split(/:/,$ENV{SMTPHOSTS} || ""), 'mailhost') ];
+        [ default_hostname(split(/:/,$ENV{SMTPHOSTS} || ""), 'mailhost') ];
 
 $cfg{'smtp_hosts'} = get_host_list($msg,$def);
 
@@ -347,7 +347,7 @@ $cfg{'snpp_hosts'} = get_host_list($msg,$def);
 $msg = 'Enter a list of available PH Hosts   :'  ;
 
 $def = $oldcfg{'ph_hosts'} ||
-	[ default_hostname('dirserv') ];
+        [ default_hostname('dirserv') ];
 
 $cfg{'ph_hosts'}   =  get_host_list($msg,$def);
 
@@ -456,7 +456,7 @@ if(ref($oldcfg{'local_netmask'}))
  {
   $def = $oldcfg{'local_netmask'};
    print "Your current netmasks are :\n\n\t",
-	join("\n\t",@{$def}),"\n\n";
+        join("\n\t",@{$def}),"\n\n";
  }
 
 print "
@@ -481,9 +481,9 @@ current list and an empty line to continue with Configure.
 ###EDQ
 ###
 ###$def = $cfg{'socks_hosts'} ||
-###	[ default_hostname($ENV{SOCKS5_SERVER},
-###			   $ENV{SOCKS_SERVER},
-###			   $ENV{SOCKS4_SERVER}) ];
+###     [ default_hostname($ENV{SOCKS5_SERVER},
+###                        $ENV{SOCKS_SERVER},
+###                        $ENV{SOCKS4_SERVER}) ];
 ###
 ###$cfg{'socks_hosts'}   =  get_host_list($msg,$def);
 
@@ -553,7 +553,7 @@ What host can I use :
 EDQ
 
 $cfg{'ftp_testhost'} = get_hostname($msg,$oldcfg{'ftp_testhost'})
-	if $cfg{'test_hosts'};
+        if $cfg{'test_hosts'};
 
 
 print "\n";
@@ -561,7 +561,7 @@ print "\n";
 #---------------------------------------------------------------------------
 
 my $fh = IO::File->new($libnet_cfg, "w") or
-	die "Cannot create `$libnet_cfg': $!";
+        die "Cannot create `$libnet_cfg': $!";
 
 print "Writing $libnet_cfg\n";
 
@@ -571,22 +571,22 @@ my $key;
 foreach $key (keys %cfg) {
     my $val = $cfg{$key};
     if(!defined($val)) {
-	$val = "undef";
+        $val = "undef";
     }
     elsif(ref($val)) {
-	$val = '[' . join(",",
-	    map {
-		my $v = "undef";
-		if(defined $_) {
-		    ($v = $_) =~ s/'/\'/sog;
-		    $v = "'" . $v . "'";
-		}
-		$v;
-	    } @$val ) . ']';
+        $val = '[' . join(",",
+            map {
+                my $v = "undef";
+                if(defined $_) {
+                    ($v = $_) =~ s/'/\'/sog;
+                    $v = "'" . $v . "'";
+                }
+                $v;
+            } @$val ) . ']';
     }
     else {
-	$val =~ s/'/\'/sog;
-	$val = "'" . $val . "'" if $val =~ /\D/;
+        $val =~ s/'/\'/sog;
+        $val = "'" . $val . "'" if $val =~ /\D/;
     }
     print $fh "\t'",$key,"' => ",$val,",\n";
 }
