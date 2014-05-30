@@ -1,4 +1,4 @@
-libnet 1.26  -- TODO
+libnet 1.26  -- Fri May 30 2014
 
   * Set minimum required ExtUtils::MakeMaker version to 6.64 to ensure that all
     parameters used are supported, to save jumping through hoops to support
