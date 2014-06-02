@@ -13,9 +13,34 @@ use Net::Cmd;
 use Carp;
 use Net::Config;
 
-$VERSION = "2.31";
+$VERSION = "2.32";
 
 @ISA = qw(Net::Cmd IO::Socket::INET);
+# Code for detecting if we can use SSL
+my $ssl_class = eval {
+  require IO::Socket::SSL;
+  # first version with default CA on most platforms
+  IO::Socket::SSL->VERSION(1.968);
+} && 'IO::Socket::SSL';
+my $nossl_warn = !$ssl_class &&
+  'To use SSL please install IO::Socket::SSL with version>=1.968';
+
+# Code for detecting if we can use IPv6
+my $inet6_class =
+  eval {
+    require IO::Socket::IP;
+    IO::Socket::IP->VERSION(0.20);
+  } && 'IO::Socket::IP' ||
+  eval {
+    require IO::Socket::INET6;
+    IO::Socket::INET6->VERSION(2.62);
+  } && 'IO::Socket::INET6';
+
+sub can_ssl   { $ssl_class };
+sub can_inet6 { $inet6_class };
+
+
+@ISA = ( 'Net::Cmd', $inet6_class || 'IO::Socket::INET' );
 
 
 sub new {
@@ -34,6 +59,14 @@ sub new {
   my $obj;
   my @localport = exists $arg{ResvPort} ? (LocalPort => $arg{ResvPort}) : ();
 
+  if ($arg{SSL}) {
+    # SSL from start
+    die $nossl_warn if !$ssl_class;
+    $arg{Port} ||= 995;
+  }
+
+  $arg{Timeout} = 120 if ! defined $arg{Timeout};
+
   my $h;
   foreach $h (@{$hosts}) {
     $obj = $type->SUPER::new(
@@ -41,15 +74,20 @@ sub new {
       PeerPort => $arg{Port} || 'pop3(110)',
       Proto => 'tcp',
       @localport,
-      Timeout => defined $arg{Timeout}
-      ? $arg{Timeout}
-      : 120
+      Timeout => $arg{Timeout},
       )
       and last;
   }
 
   return undef
     unless defined $obj;
+
+  ${*$obj}{'net_pop3_arg'} = \%arg;
+  if ($arg{SSL}) {
+    Net::POP3::_SSLified->start_SSL($obj,
+      SSL_verifycn_name => $host,%arg
+    ) or return;
+  }
 
   ${*$obj}{'net_pop3_host'} = $host;
 
@@ -93,6 +131,16 @@ sub login {
     and $me->pass($pass);
 }
 
+sub starttls {
+  my $self = shift;
+  $ssl_class or die $nossl_warn;
+  $self->_STLS or return;
+  Net::POP3::_SSLified->start_SSL($self,
+    %{ ${*$self}{'net_pop3_arg'} }, # (ssl) args given in new
+    @_   # more (ssl) args
+  ) or return;
+  return 1;
+}
 
 sub apop {
   @_ >= 1 && @_ <= 3 or croak 'usage: $pop3->apop( USER, PASS )';
@@ -323,6 +371,7 @@ sub _PING { shift->command('PING', $_[0])->response() == CMD_OK }
 sub _RPOP { shift->command('RPOP', $_[0])->response() == CMD_OK }
 sub _LAST { shift->command('LAST'       )->response() == CMD_OK }
 sub _CAPA { shift->command('CAPA'       )->response() == CMD_OK }
+sub _STLS { shift->command("STLS",     )->response() == CMD_OK }
 
 
 sub quit {
@@ -520,6 +569,24 @@ sub banner {
   return ${*$this}{'net_pop3_banner'};
 }
 
+{
+  package Net::POP3::_SSLified;
+  our @ISA = ( $ssl_class ? ($ssl_class):(), 'Net::POP3' );
+  sub starttls { die "POP3 connection is already in SSL mode" }
+  sub start_SSL {
+    my ($class,$pop3,%arg) = @_;
+    delete @arg{ grep { !m{^SSL_} } keys %arg };
+    ( $arg{SSL_verifycn_name} ||= $pop3->host )
+	=~s{(?<!:):[\w()]+$}{}; # strip port
+    $arg{SSL_verifycn_scheme} ||= 'pop3';
+    my $ok = $class->SUPER::start_SSL($pop3,%arg);
+    $@ = $ssl_class->errstr if !$ok;
+    return $ok;
+  }
+}
+
+
+
 1;
 
 __END__
@@ -535,6 +602,7 @@ Net::POP3 - Post Office Protocol 3 Client class (RFC1939)
     # Constructors
     $pop = Net::POP3->new('pop3host');
     $pop = Net::POP3->new('pop3host', Timeout => 60);
+    $pop = Net::POP3->new('pop3host', SSL => 1, Timeout => 60);
 
     if ($pop->login($username, $password) > 0) {
       my $msgnums = $pop->list; # hashref of msgnum => size
@@ -579,6 +647,14 @@ B<Host> - POP3 host to connect to. It may be a single scalar, as defined for
 the C<PeerAddr> option in L<IO::Socket::INET>, or a reference to
 an array with hosts to try in turn. The L</host> method will return the value
 which was used to connect to the host.
+
+B<Port> - port to connect to.
+Default - 110 for plain POP3 and 995 for POP3s (direct SSL).
+
+B<SSL> - If the connection should be done from start with SSL, contrary to later
+upgrade with C<starttls>.
+You can use SSL arguments as documented in L<IO::Socket::SSL>, but it will
+usually use the right arguments already.
 
 B<ResvPort> - If given then the socket for the C<Net::POP3> object
 will be bound to the local port given using C<bind> when the socket is
@@ -628,6 +704,12 @@ messages on the server the string C<"0E0"> will be returned. This is
 will give a true value in a boolean context, but zero in a numeric context.
 
 If there was an error authenticating the user then I<undef> will be returned.
+
+=item starttls ( SSLARGS )
+
+Upgrade existing plain connection to SSL.
+You can use SSL arguments as documented in L<IO::Socket::SSL>, but it will
+usually use the right arguments already.
 
 =item apop ( [ USER [, PASS ]] )
 
@@ -729,7 +811,8 @@ means that any messages marked to be deleted will not be.
 =head1 SEE ALSO
 
 L<Net::Netrc>,
-L<Net::Cmd>
+L<Net::Cmd>,
+L<IO::Socket::SSL>
 
 =head1 AUTHOR
 

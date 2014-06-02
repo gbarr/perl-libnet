@@ -37,7 +37,7 @@ BEGIN {
   }
 }
 
-$VERSION = "2.30";
+$VERSION = "2.31";
 @ISA     = qw(Exporter);
 @EXPORT  = qw(CMD_INFO CMD_OK CMD_MORE CMD_REJECT CMD_ERROR CMD_PENDING);
 
@@ -52,7 +52,6 @@ sub CMD_PENDING {0}
 my %debug = ();
 
 my $tr = $^O eq 'os390' ? Convert::EBCDIC->new() : undef;
-
 
 sub toebcdic {
   my $cmd = shift;

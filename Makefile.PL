@@ -42,6 +42,14 @@ MAIN: {
     my %prereq_pms = ();
     $prereq_pms{'Convert::EBCDIC'} = '0.06' if $^O eq 'os390';
 
+    my $xt = prompt("Should I do external tests?\n" .
+        "These tests will fail if there is no internet connection or if a firewall\n" .
+        "blocks or modifies some traffic.\n" .
+        "[y/N]", 'n');
+
+    my $tests = 't/*.t';
+    $tests .= ' t/external/*.t' if $xt =~ m/^y/io;
+
     WriteMakefile(
         NAME     => 'Net',
         DISTNAME => 'libnet',
@@ -126,6 +134,10 @@ MAIN: {
 
         realclean => {
             FILES => $CfgFile
+        },
+
+        test => {
+            TESTS => $tests
         },
 
         dist => {
