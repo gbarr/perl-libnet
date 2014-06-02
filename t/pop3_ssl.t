@@ -6,6 +6,8 @@ use Net::POP3;
 
 my $debug = 0; # Net::POP3 Debug => ..
 
+my $parent = 0;
+
 plan skip_all => "no SSL support found in Net::POP3" if ! Net::POP3->can_ssl;
 
 plan skip_all => "fork not supported on this platform"
@@ -32,7 +34,7 @@ my ($fh,$cafile) = tempfile();
 print $fh IO::Socket::SSL::Utils::PEM_cert2string($ca);
 close($fh);
 
-my $parent = $$;
+$parent = $$;
 END { unlink($cafile) if $$ == $parent }
 
 my ($cert) = IO::Socket::SSL::Utils::CERT_create(
