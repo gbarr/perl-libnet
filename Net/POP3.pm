@@ -811,7 +811,7 @@ means that any messages marked to be deleted will not be.
 =head1 SEE ALSO
 
 L<Net::Netrc>,
-L<Net::Cmd>
+L<Net::Cmd>,
 L<IO::Socket::SSL>
 
 =head1 AUTHOR
