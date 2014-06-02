@@ -8,10 +8,13 @@ my $host = 'pop.gmx.net';
 my $debug = 0;
 
 plan skip_all => "no SSL support" if ! Net::POP3->can_ssl;
+{
+no warnings 'once';
 plan skip_all => "no verified SSL connection to $host:995 - $@" if ! eval {
   IO::Socket::SSL->new(PeerAddr => "$host:995", Timeout => 10)
     || die($IO::Socket::SSL::SSL_ERROR||$!);
 };
+}
 
 plan tests => 2;
 

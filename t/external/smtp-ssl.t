@@ -8,10 +8,13 @@ my $host = 'mail.gmx.net';
 my $debug = 0;
 
 plan skip_all => "no SSL support" if ! Net::SMTP->can_ssl;
+{
+no warnings 'once';
 plan skip_all => "no verified SSL connection to $host:465 - $@" if ! eval {
   IO::Socket::SSL->new("$host:465")
     || die($IO::Socket::SSL::SSL_ERROR||$!);
 };
+}
 
 plan tests => 2;
 

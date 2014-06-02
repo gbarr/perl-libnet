@@ -69,6 +69,7 @@ sub pop3_client {
     $cl->quit;
     pass("SSL POP3 connect success");
   } elsif ( ! $cl->starttls ) {
+    no warnings 'once';
     fail("starttls failed: $IO::Socket::SSL::SSL_ERROR");
   } else {
     $cl->quit;
