@@ -1,6 +1,16 @@
 libnet 1.28  -- TODO
 
-  * TODO
+  * Add support for IPv6 and SSL to Net::SMTP and Net::POP3.  These features are
+    only available if the user has
+
+      a recent IO::Socket::SSL for SSL support
+      a recent IO::Socket::IP or an older IO::Socket::INET6 for IPv6 support
+
+    If no SSL module is available it will work as before, but attempts to use
+    the SSL functionality will result in an error message.  If no IPv6 modules
+    are available it will just use IPv4 as before.  With IPv6 modules installed
+    one can of course still access IPv4 hosts.
+    [Steffen Ullrich; resolves CPAN RT#93823]
 
 libnet 1.27  -- Fri May 30 2014
 
