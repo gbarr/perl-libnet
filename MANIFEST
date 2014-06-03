@@ -4,21 +4,6 @@ Configure
 Hostname.pm.eg                           Example replacement for Hostname.pm
 MANIFEST
 Makefile.PL
-Net/Cmd.pm
-Net/Config.pm
-Net/Domain.pm                            DNS Domain name lookup
-Net/FTP.pm                               File Transfer Protocol Client
-Net/FTP/A.pm
-Net/FTP/E.pm
-Net/FTP/I.pm
-Net/FTP/L.pm
-Net/FTP/dataconn.pm
-Net/NNTP.pm                              Network News Transfer Protocol
-Net/Netrc.pm                             .netrc lookup routines
-Net/POP3.pm                              Post Office Protocol
-Net/SMTP.pm                              Simple Mail Transfer Protocol Client
-Net/Time.pm                              time & nettime protocols
-Net/libnetFAQ.pod
 README
 demos/ftp
 demos/inetd
@@ -28,6 +13,21 @@ demos/pop3
 demos/smtp.self
 demos/time
 install-nomake
+lib/Net/Cmd.pm
+lib/Net/Config.pm
+lib/Net/Domain.pm                        DNS Domain name lookup
+lib/Net/FTP.pm                           File Transfer Protocol Client
+lib/Net/FTP/A.pm
+lib/Net/FTP/E.pm
+lib/Net/FTP/I.pm
+lib/Net/FTP/L.pm
+lib/Net/FTP/dataconn.pm
+lib/Net/NNTP.pm                          Network News Transfer Protocol
+lib/Net/Netrc.pm                         .netrc lookup routines
+lib/Net/POP3.pm                          Post Office Protocol
+lib/Net/SMTP.pm                          Simple Mail Transfer Protocol Client
+lib/Net/Time.pm                          time & nettime protocols
+lib/Net/libnetFAQ.pod
 t/config.t
 t/datasend.t
 t/ftp.t
