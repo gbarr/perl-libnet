@@ -178,14 +178,29 @@ sub auth {
         user     => $username,
         pass     => $password,
         authname => $username,
-      }
+      },
+      debug => $self->debug
     );
   }
 
-  # We should probably allow the user to pass the host, but I don't
-  # currently know and SASL mechanisms that are used by smtp that need it
-  my $client = $sasl->client_new('smtp', ${*$self}{'net_smtp_host'}, 0);
-  my $str    = $client->client_start;
+  my $client;
+  my $str;
+  do {
+    if ($client) {
+      # $client mechanism failed, so we need to exclude this mechanism from list
+      my $failed_mech = $client->mechanism;
+      $self->debug_text ("Auth mechanism failed: $failed_mech")
+        if $self->debug;
+      $mechanisms =~ s/(?:\s|^)$failed_mech(?:\s|$)//;
+    }
+    $sasl->mechanism ($mechanisms);
+    
+    # We should probably allow the user to pass the host, but I don't
+    # currently know and SASL mechanisms that are used by smtp that need it
+
+    $client = $sasl->client_new('smtp', ${*$self}{'net_smtp_host'}, 0);
+    $str    = $client->client_start;
+  } while (!defined $str);
 
   # We don't support sasl mechanisms that encrypt the socket traffic.
   # todo that we would really need to change the ISA hierarchy
