@@ -1,5 +1,7 @@
 libnet 1.28  -- TODO
 
+  * Change Net::SMTP::auth() so that it now falls back to another supported AUTH
+    method if a given AUTH method fails.  [Ivan Baktsheev; closes PR#3]
   * Change Net::SMTP::auth() so that it uses the SMTP AUTH mechanism(s)
     specified in the Authen::SASL object if one is provided instead of a
     username.   If a plain text username is specified then use the first
