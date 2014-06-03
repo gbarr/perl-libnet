@@ -3,6 +3,7 @@ Config.eg
 Configure
 Hostname.pm.eg                           Example replacement for Hostname.pm
 MANIFEST
+MANIFEST.SKIP
 Makefile.PL
 README
 demos/ftp
