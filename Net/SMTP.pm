@@ -189,11 +189,12 @@ sub auth {
     if ($client) {
       # $client mechanism failed, so we need to exclude this mechanism from list
       my $failed_mechanism = $client->mechanism;
-      $self->debug_text ("Auth mechanism failed: $failed_mechanism")
+      $self->debug_text("Auth mechanism failed: $failed_mechanism")
         if $self->debug;
       $mechanisms =~ s/\b\Q$failed_mechanism\E\b//;
+      last unless $mechanisms =~ /\S/;
     }
-    $sasl->mechanism ($mechanisms);
+    $sasl->mechanism($mechanisms);
     
     # We should probably allow the user to pass the host, but I don't
     # currently know and SASL mechanisms that are used by smtp that need it
