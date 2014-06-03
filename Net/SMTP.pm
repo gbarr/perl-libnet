@@ -188,10 +188,10 @@ sub auth {
   do {
     if ($client) {
       # $client mechanism failed, so we need to exclude this mechanism from list
-      my $failed_mech = $client->mechanism;
-      $self->debug_text ("Auth mechanism failed: $failed_mech")
+      my $failed_mechanism = $client->mechanism;
+      $self->debug_text ("Auth mechanism failed: $failed_mechanism")
         if $self->debug;
-      $mechanisms =~ s/(?:\s|^)$failed_mech(?:\s|$)//;
+      $mechanisms =~ s/\b\Q$failed_mechanism\E\b//;
     }
     $sasl->mechanism ($mechanisms);
     
