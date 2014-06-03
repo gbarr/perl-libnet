@@ -165,7 +165,10 @@ sub auth {
 
   if (ref($username) and UNIVERSAL::isa($username, 'Authen::SASL')) {
     $sasl = $username;
-    $sasl->mechanism($mechanisms);
+    my $requested_mechanisms = $sasl->mechanism();
+    if (! defined($requested_mechanisms) || $requested_mechanisms eq '') {
+      $sasl->mechanism($mechanisms);
+    }
   }
   else {
     die "auth(username, password)" if not length $username;

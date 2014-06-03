@@ -1,5 +1,10 @@
 libnet 1.28  -- TODO
 
+  * Change Net::SMTP::auth() so that it uses the SMTP AUTH mechanism(s)
+    specified in the Authen::SASL object if one is provided instead of a
+    username.   If a plain text username is specified then use the first
+    reported SMTP AUTH method supported, as usual.  [Ewen McNeill; resolves CPAN
+    RT#58002]
   * Add support for IPv6 and SSL to Net::SMTP and Net::POP3.  These features are
     only available if the user has
 
