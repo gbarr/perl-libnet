@@ -78,7 +78,7 @@ sub toascii {
 
 
 sub _print_isa {
-  no strict qw(refs);
+  no strict 'refs'; ## no critic (TestingAndDebugging::ProhibitNoStrict)
 
   my $pkg = shift;
   my $cmd = $pkg;
@@ -271,7 +271,7 @@ sub getline {
   my $partial = defined(${*$cmd}{'net_cmd_partial'}) ? ${*$cmd}{'net_cmd_partial'} : "";
   my $fd      = fileno($cmd);
 
-  return undef
+  return
     unless defined $fd;
 
   my $rin = "";
@@ -289,7 +289,7 @@ sub getline {
         carp(ref($cmd) . ": Unexpected EOF on command channel")
           if $cmd->debug;
         $cmd->close;
-        return undef;
+        return;
       }
 
       substr($buf, 0, 0) = $partial;    ## prepend from last sysread
@@ -304,7 +304,7 @@ sub getline {
     else {
       my $msg = $select_ret ? "Error or Interrupted: $!" : "Timeout";
       carp("$cmd: $msg") if ($cmd->debug);
-      return undef;
+      return;
     }
   }
 
@@ -364,7 +364,7 @@ sub response {
     last unless ($more);
   }
 
-  return undef unless defined $code;
+  return unless defined $code;
   substr($code, 0, 1);
 }
 
@@ -375,7 +375,7 @@ sub read_until_dot {
   my $arr = [];
 
   while (1) {
-    my $str = $cmd->getline() or return undef;
+    my $str = $cmd->getline() or return;
 
     $cmd->debug_print(0, $str)
       if ($cmd->debug & 4);
@@ -457,14 +457,14 @@ sub datasend {
       my $w = syswrite($cmd, $line, $len, $offset);
       unless (defined($w)) {
         carp("$cmd: $!") if $cmd->debug;
-        return undef;
+        return;
       }
       $len -= $w;
       $offset += $w;
     }
     else {
       carp("$cmd: Timeout") if ($cmd->debug);
-      return undef;
+      return;
     }
   }
 
@@ -500,14 +500,14 @@ sub rawdatasend {
       my $w = syswrite($cmd, $line, $len, $offset);
       unless (defined($w)) {
         carp("$cmd: $!") if $cmd->debug;
-        return undef;
+        return;
       }
       $len -= $w;
       $offset += $w;
     }
     else {
       carp("$cmd: Timeout") if ($cmd->debug);
-      return undef;
+      return;
     }
   }
 

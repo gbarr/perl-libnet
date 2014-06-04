@@ -66,8 +66,7 @@ sub new {
 
   $arg{Timeout} = 120 if ! defined $arg{Timeout};
 
-  my $h;
-  foreach $h (@{$hosts}) {
+  foreach my $h (@{$hosts}) {
     $obj = $type->SUPER::new(
       PeerAddr => ($host = $h),
       PeerPort => $arg{Port} || 'pop3(110)',
@@ -78,7 +77,7 @@ sub new {
       and last;
   }
 
-  return undef
+  return
     unless defined $obj;
 
   ${*$obj}{'net_pop3_arg'} = \%arg;
@@ -95,7 +94,7 @@ sub new {
 
   unless ($obj->response() == CMD_OK) {
     $obj->close();
-    return undef;
+    return;
   }
 
   ${*$obj}{'net_pop3_banner'} = $obj->message;
@@ -155,10 +154,10 @@ sub apop {
   }
   else {
     carp "You need to install Digest::MD5 or MD5 to use the APOP command";
-    return undef;
+    return;
   }
 
-  return undef
+  return
     unless ($banner = (${*$me}{'net_pop3_banner'} =~ /(<.*>)/)[0]);
 
   if (@_ <= 2) {
@@ -167,7 +166,7 @@ sub apop {
 
   $md->add($banner, $pass);
 
-  return undef
+  return
     unless ($me->_APOP($user, $md->hexdigest));
 
   $me->_get_mailbox_count();
@@ -185,7 +184,7 @@ sub pass {
 
   my ($me, $pass) = @_;
 
-  return undef
+  return
     unless ($me->_PASS($pass));
 
   $me->_get_mailbox_count();
@@ -212,7 +211,7 @@ sub reset {
 sub last {
   @_ == 1 or croak 'usage: $obj->last()';
 
-  return undef
+  return
     unless $_[0]->_LAST && $_[0]->message =~ /(\d+)/;
 
   return $1;
@@ -223,7 +222,7 @@ sub top {
   @_ == 2 || @_ == 3 or croak 'usage: $pop3->top( MSGNUM [, NUMLINES ])';
   my $me = shift;
 
-  return undef
+  return
     unless $me->_TOP($_[0], $_[1] || 0);
 
   $me->read_until_dot;
@@ -245,7 +244,7 @@ sub list {
   @_ == 1 || @_ == 2 or croak 'usage: $pop3->list( [ MSGNUM ] )';
   my $me = shift;
 
-  return undef
+  return
     unless $me->_LIST(@_);
 
   if (@_) {
@@ -254,7 +253,7 @@ sub list {
   }
 
   my $info = $me->read_until_dot
-    or return undef;
+    or return;
 
   my %hash = map { (/(\d+)\D+(\d+)/) } @$info;
 
@@ -266,7 +265,7 @@ sub get {
   @_ == 2 or @_ == 3 or croak 'usage: $pop3->get( MSGNUM [, FH ])';
   my $me = shift;
 
-  return undef
+  return
     unless $me->_RETR(shift);
 
   $me->read_until_dot(@_);
@@ -296,16 +295,15 @@ sub uidl {
   my $uidl;
 
   $me->_UIDL(@_)
-    or return undef;
+    or return;
   if (@_) {
     $uidl = ($me->message =~ /\d+\s+([\041-\176]+)/)[0];
   }
   else {
     my $ref = $me->read_until_dot
-      or return undef;
-    my $ln;
+      or return;
     $uidl = {};
-    foreach $ln (@$ref) {
+    foreach my $ln (@$ref) {
       my ($msg, $uid) = $ln =~ /^\s*(\d+)\s+([\041-\176]+)/;
       $uidl->{$msg} = $uid;
     }
@@ -397,7 +395,7 @@ sub DESTROY {
 
 sub response {
   my $cmd  = shift;
-  my $str  = $cmd->getline() or return undef;
+  my $str  = $cmd->getline() or return;
   my $code = "500";
 
   $cmd->debug_print(0, $str)

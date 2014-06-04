@@ -42,20 +42,18 @@ sub new {
     unless @{$hosts};
 
   my %connect = ( Proto => 'tcp');
-  my $o;
-  foreach $o (qw(LocalAddr Timeout)) {
+  foreach my $o (qw(LocalAddr Timeout)) {
     $connect{$o} = $arg{$o} if exists $arg{$o};
   }
   $connect{Timeout} = 120 unless defined $connect{Timeout};
   $connect{PeerPort} = $arg{Port} || 'nntp(119)';
-  my $h;
-  foreach $h (@{$hosts}) {
+  foreach my $h (@{$hosts}) {
     $connect{PeerAddr} = $h;
     $obj = $type->SUPER::new(%connect)
       and last;
   }
 
-  return undef
+  return
     unless defined $obj;
 
   ${*$obj}{'net_nntp_host'} = $connect{PeerAddr};
@@ -65,7 +63,7 @@ sub new {
 
   unless ($obj->response() == CMD_OK) {
     $obj->close;
-    return undef;
+    return;
   }
 
   my $c = $obj->code;
@@ -405,6 +403,7 @@ sub distribution_patterns {
   my $arr;
   local $_;
 
+  ## no critic (ControlStructures::ProhibitMutatingListFunctions)
   $nntp->_LIST('DISTRIB.PATS')
     && ($arr = $nntp->read_until_dot)
     ? [grep { /^\d/ && (chomp, $_ = [split /:/]) } @$arr]
@@ -513,7 +512,7 @@ sub xpath {
   @_ == 2 or croak 'usage: $nntp->xpath( MESSAGE-ID )';
   my ($nntp, $mid) = @_;
 
-  return undef
+  return
     unless $nntp->_XPATH($mid);
 
   my $m;
@@ -592,12 +591,11 @@ sub _timestr {
 sub _grouplist {
   my $nntp = shift;
   my $arr  = $nntp->read_until_dot
-    or return undef;
+    or return;
 
   my $hash = {};
-  my $ln;
 
-  foreach $ln (@$arr) {
+  foreach my $ln (@$arr) {
     my @a = split(/[\s\n]+/, $ln);
     $hash->{$a[0]} = [@a[1, 2, 3]];
   }
@@ -609,12 +607,11 @@ sub _grouplist {
 sub _fieldlist {
   my $nntp = shift;
   my $arr  = $nntp->read_until_dot
-    or return undef;
+    or return;
 
   my $hash = {};
-  my $ln;
 
-  foreach $ln (@$arr) {
+  foreach my $ln (@$arr) {
     my @a = split(/[\t\n]/, $ln);
     my $m = shift @a;
     $hash->{$m} = [@a];
@@ -638,12 +635,11 @@ sub _articlelist {
 sub _description {
   my $nntp = shift;
   my $arr  = $nntp->read_until_dot
-    or return undef;
+    or return;
 
   my $hash = {};
-  my $ln;
 
-  foreach $ln (@$arr) {
+  foreach my $ln (@$arr) {
     chomp($ln);
 
     $hash->{$1} = $ln

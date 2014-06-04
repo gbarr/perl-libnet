@@ -35,9 +35,9 @@ sub _socket {
 
   my $me;
 
-  foreach $host (@$hosts) {
+  foreach my $addr (@$hosts) {
     $me = IO::Socket::INET->new(
-      PeerAddr => $host,
+      PeerAddr => $addr,
       PeerPort => $port,
       Proto    => $proto
       )
@@ -59,11 +59,11 @@ sub _socket {
 
 
 sub inet_time {
-  my $s      = _socket('time', 37, @_) || return undef;
+  my $s      = _socket('time', 37, @_) || return;
   my $buf    = '';
   my $offset = 0 | 0;
 
-  return undef
+  return
     unless defined $s->recv($buf, length(pack("N", 0)));
 
   # unpack, we | 0 to ensure we have an unsigned
@@ -89,7 +89,7 @@ sub inet_time {
 
 
 sub inet_daytime {
-  my $s   = _socket('daytime', 13, @_) || return undef;
+  my $s   = _socket('daytime', 13, @_) || return;
   my $buf = '';
 
   defined($s->recv($buf, 1024))

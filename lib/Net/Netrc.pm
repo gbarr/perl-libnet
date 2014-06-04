@@ -21,7 +21,7 @@ our $TESTING;
 my %netrc = ();
 
 sub _readrc {
-  my $host = shift;
+  my($class, $host) = @_;
   my ($home, $file);
 
   if ($^O eq "MacOS") {
@@ -60,7 +60,7 @@ sub _readrc {
     my @stat = stat($file);
 
     if (@stat) {
-      if ($stat[2] & 077) {
+      if ($stat[2] & 077) { ## no critic (ValuesAndExpressions::ProhibitLeadingZeros)
         carp "Bad permissions: $file";
         return;
       }
@@ -94,7 +94,7 @@ sub _readrc {
       while (@tok) {
         if ($tok[0] eq "default") {
           shift(@tok);
-          $mach = bless {};
+          $mach = bless {}, $class;
           $netrc{default} = [$mach];
 
           next TOKEN;
@@ -107,7 +107,7 @@ sub _readrc {
 
         if ($tok eq "machine") {
           my $host = shift @tok;
-          $mach = bless {machine => $host};
+          $mach = bless {machine => $host}, $class;
 
           $netrc{$host} = []
             unless exists($netrc{$host});
@@ -136,9 +136,9 @@ sub _readrc {
 
 
 sub lookup {
-  my ($pkg, $mach, $login) = @_;
+  my ($class, $mach, $login) = @_;
 
-  _readrc()
+  $class->_readrc()
     unless exists $netrc{default};
 
   $mach ||= 'default';
@@ -147,12 +147,11 @@ sub lookup {
 
   if (exists $netrc{$mach}) {
     if (defined $login) {
-      my $m;
-      foreach $m (@{$netrc{$mach}}) {
+      foreach my $m (@{$netrc{$mach}}) {
         return $m
           if (exists $m->{login} && $m->{login} eq $login);
       }
-      return undef;
+      return;
     }
     return $netrc{$mach}->[0];
   }
@@ -160,7 +159,7 @@ sub lookup {
   return $netrc{default}->[0]
     if defined $netrc{default};
 
-  return undef;
+  return;
 }
 
 

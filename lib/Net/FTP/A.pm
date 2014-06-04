@@ -46,7 +46,7 @@ sub read {
           : undef;
       }
       else {
-        return undef
+        return
           unless defined $n;
 
         ${*$data}{'net_ftp_eof'} = 1;
@@ -104,7 +104,7 @@ sub write {
 
     $off += $wrote;
     $wrote = syswrite($data, substr($tmp, $off), $len > $blksize ? $blksize : $len);
-    return undef
+    return
       unless defined($wrote);
     $len -= $wrote;
   }

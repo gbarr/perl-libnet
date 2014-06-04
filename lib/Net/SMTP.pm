@@ -67,8 +67,7 @@ sub new {
 
   $arg{Timeout} = 120 if ! defined $arg{Timeout};
 
-  my $h;
-  foreach $h (@{ref($hosts) ? $hosts : [$hosts]}) {
+  foreach my $h (@{ref($hosts) ? $hosts : [$hosts]}) {
     $obj = $type->SUPER::new(
       PeerAddr => ($host = $h),
       PeerPort => $arg{Port} || 'smtp(25)',
@@ -80,7 +79,7 @@ sub new {
       and last;
   }
 
-  return undef
+  return
     unless defined $obj;
 
   ${*$obj}{'net_smtp_arg'} = \%arg;
@@ -97,7 +96,7 @@ sub new {
     my $err = ref($obj) . ": " . $obj->code . " " . $obj->message;
     $obj->close();
     $@ = $err;
-    return undef;
+    return;
   }
 
   ${*$obj}{'net_smtp_exact_addr'} = $arg{ExactAddresses};
@@ -110,7 +109,7 @@ sub new {
     my $err = ref($obj) . ": " . $obj->code . " " . $obj->message;
     $obj->close();
     $@ = $err;
-    return undef;
+    return;
   }
 
   $obj;
@@ -231,8 +230,7 @@ sub hello {
 
   if ($ok) {
     my $h = ${*$me}{'net_smtp_esmtp'} = {};
-    my $ln;
-    foreach $ln (@msg) {
+    foreach my $ln (@msg) {
       $h->{uc $1} = $2
         if $ln =~ /([-\w]+)\b[= \t]*([^\n]*)/;
     }
@@ -242,7 +240,7 @@ sub hello {
       if $ok = $me->_HELO($domain);
   }
 
-  return undef unless $ok;
+  return unless $ok;
   ${*$me}{net_smtp_hello_domain} = $domain;
 
   $msg[0] =~ /\A\s*(\S+)/;
@@ -467,8 +465,7 @@ sub recipient {
   }
 
   my @ok;
-  my $addr;
-  foreach $addr (@_) {
+  foreach my $addr (@_) {
     if ($smtp->_RCPT("TO:" . _addr($smtp, $addr) . $opts)) {
       push(@ok, $addr) if $skip_bad;
     }

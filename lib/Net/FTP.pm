@@ -76,7 +76,7 @@ sub new {
     ? $arg{Timeout}
     : 120
     )
-    or return undef;
+    or return;
 
   ${*$ftp}{'net_ftp_host'}    = $host;                             # Remote hostname
   ${*$ftp}{'net_ftp_type'}    = 'A';                               # ASCII/binary/etc mode
@@ -219,10 +219,9 @@ sub size {
   }
   elsif ($ftp->supported("STAT")) {
     my @msg;
-    return undef
+    return
       unless $ftp->_STAT($file) && (@msg = $ftp->message) == 3;
-    my $line;
-    foreach $line (@msg) {
+    foreach my $line (@msg) {
       return (split(/\s+/, $line))[4]
         if $line =~ /^[-rwxSsTt]{10}/;
     }
@@ -396,7 +395,7 @@ sub type {
   return $oldval
     unless (defined $type);
 
-  return undef
+  return
     unless ($ftp->_TYPE($type, @_));
 
   ${*$ftp}{'net_ftp_type'} = join(" ", $type, @_);
@@ -413,7 +412,7 @@ sub alloc {
   return $oldval
     unless (defined $size);
 
-  return undef
+  return
     unless ($ftp->_ALLO($size, @_));
 
   ${*$ftp}{'net_ftp_allo'} = join(" ", $size, @_);
@@ -459,7 +458,7 @@ sub get {
   delete ${*$ftp}{'net_ftp_pasv'};
 
   $data = $ftp->retr($remote)
-    or return undef;
+    or return;
 
   if ($localfd) {
     $loc = $local;
@@ -470,7 +469,7 @@ sub get {
     unless (sysopen($loc, $local, O_CREAT | O_WRONLY | ($rest ? O_APPEND: O_TRUNC))) {
       carp "Cannot open Local file $local: $!\n";
       $data->abort;
-      return undef;
+      return;
     }
   }
 
@@ -478,7 +477,7 @@ sub get {
     carp "Cannot binmode Local file $local: $!\n";
     $data->abort;
     close($loc) unless $localfd;
-    return undef;
+    return;
   }
 
   $buf = '';
@@ -508,7 +507,7 @@ sub get {
       $data->abort;
       close($loc)
         unless $localfd;
-      return undef;
+      return;
     }
   }
 
@@ -517,14 +516,14 @@ sub get {
   unless ($localfd) {
     unless (close($loc)) {
       carp "Cannot close file $local (perhaps disk space) $!\n";
-      return undef;
+      return;
     }
   }
 
   unless ($data->close())    # implied $ftp->response
   {
     carp "Unable to close datastream";
-    return undef;
+    return;
   }
 
   return $local;
@@ -583,15 +582,14 @@ sub rmdir {
   # Get a list of all the files in the directory
   my @filelist = grep { !/^\.{1,2}$/ } $ftp->ls($dir);
 
-  return undef
+  return
     unless @filelist;    # failed, it is probably not a directory
 
   return $ftp->delete($dir)
     if @filelist == 1 and $dir eq $filelist[0];
 
   # Go thru and delete each file or the directory
-  my $file;
-  foreach $file (map { m,/, ? $_ : "$dir/$_" } @filelist) {
+  foreach my $file (map { m,/, ? $_ : "$dir/$_" } @filelist) {
     next                 # successfully deleted the file
       if $ftp->delete($file);
 
@@ -618,7 +616,7 @@ sub restart {
 
   ${*$ftp}{'net_ftp_rest'} = $where;
 
-  return undef;
+  return;
 }
 
 
@@ -628,7 +626,7 @@ sub mkdir {
   my ($ftp, $dir, $recurse) = @_;
 
   $ftp->_MKD($dir) || $recurse
-    or return undef;
+    or return;
 
   my $path = $dir;
 
@@ -724,20 +722,20 @@ sub _store_cmd {
 
     unless (sysopen($loc, $local, O_RDONLY)) {
       carp "Cannot open Local file $local: $!\n";
-      return undef;
+      return;
     }
   }
 
   if ($ftp->type eq 'I' && !binmode($loc)) {
     carp "Cannot binmode Local file $local: $!\n";
-    return undef;
+    return;
   }
 
   delete ${*$ftp}{'net_ftp_port'};
   delete ${*$ftp}{'net_ftp_pasv'};
 
   $sock = $ftp->_data_cmd($cmd, grep { defined } $remote)
-    or return undef;
+    or return;
 
   $remote = ($ftp->message =~ /\w+\s*:\s*(.*)/)[0]
     if 'STOU' eq uc $cmd;
@@ -769,7 +767,7 @@ sub _store_cmd {
       close($loc)
         unless $localfd;
       print $hashh "\n" if $hashh;
-      return undef;
+      return;
     }
   }
 
@@ -779,7 +777,7 @@ sub _store_cmd {
     unless $localfd;
 
   $sock->close()
-    or return undef;
+    or return;
 
   if ('STOU' eq uc $cmd and $ftp->message =~ m/unique\s+file\s*name\s*:\s*(.*)\)|"(.*)"/) {
     require File::Basename;
@@ -926,7 +924,7 @@ sub _dataconn {
   my $data = undef;
   my $pkg  = "Net::FTP::" . $ftp->type;
 
-  eval "require " . $pkg;
+  eval "require " . $pkg; ## no critic (BuiltinFunctions::ProhibitStringyEval)
 
   $pkg =~ s/ /_/g;
 
@@ -1004,7 +1002,7 @@ sub _data_cmd {
   my $where = delete ${*$ftp}{'net_ftp_rest'} || 0;
   my $arg;
 
-  for $arg (@_) {
+  for my $arg (@_) {
     croak("Bad argument '$arg'\n")
       if $arg =~ /[\r\n]/s;
   }
@@ -1015,14 +1013,14 @@ sub _data_cmd {
   {
     my $data = undef;
 
-    return undef unless defined $ftp->pasv;
-    $data = $ftp->_dataconn() or return undef;
+    return unless defined $ftp->pasv;
+    $data = $ftp->_dataconn() or return;
 
     if ($where and !$ftp->_REST($where)) {
       my ($status, $message) = ($ftp->status, $ftp->message);
       $ftp->abort;
       $ftp->set_status($status, $message);
-      return undef;
+      return;
     }
 
     $ftp->command($cmd, @_);
@@ -1033,7 +1031,7 @@ sub _data_cmd {
     }
     $data->_close;
 
-    return undef;
+    return;
   }
 
   $ok = $ftp->port
@@ -1043,12 +1041,12 @@ sub _data_cmd {
   $ok = $ftp->_REST($where)
     if $ok && $where;
 
-  return undef
+  return
     unless $ok;
 
   if ($cmd =~ /(STOR|APPE|STOU)/ and exists ${*$ftp}{net_ftp_allo}) {
     $ftp->_ALLO(delete ${*$ftp}{net_ftp_allo})
-      or return undef;
+      or return;
   }
 
   $ftp->command($cmd, @_);
@@ -1073,7 +1071,7 @@ sub _data_cmd {
 
   close(delete ${*$ftp}{'net_ftp_listen'});
 
-  return undef;
+  return;
 }
 
 ##
@@ -1135,19 +1133,19 @@ sub pasv_xfer {
     unless (defined $dfile);
 
   my $port = $sftp->pasv
-    or return undef;
+    or return;
 
   $dftp->port($port)
-    or return undef;
+    or return;
 
-  return undef
+  return
     unless ($unique ? $dftp->stou($dfile) : $dftp->stor($dfile));
 
   unless ($sftp->retr($sfile) && $sftp->response == CMD_INFO) {
     $sftp->retr($sfile);
     $dftp->abort;
     $dftp->response();
-    return undef;
+    return;
   }
 
   $dftp->pasv_wait($sftp);
@@ -1166,10 +1164,10 @@ sub pasv_wait {
   my $dres = $ftp->response();
   my $sres = $non_pasv->response();
 
-  return undef
+  return
     unless $dres == CMD_OK && $sres == CMD_OK;
 
-  return undef
+  return
     unless $ftp->ok() && $non_pasv->ok();
 
   return $1

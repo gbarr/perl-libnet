@@ -6,14 +6,10 @@ use strict;
 use warnings;
 
 BEGIN {
-    if ($ENV{PERL_CORE}) {
-        chdir 't' if -d 't';
-        @INC = '../lib';
-    }
-    if (!eval "require Socket") {
+    if (!eval { require Socket; 1 }) {
         print "1..0 # no Socket\n"; exit 0;
     }
-    if (ord('A') == 193 && !eval "require Convert::EBCDIC") {
+    if (ord('A') == 193 && !eval { require Convert::EBCDIC; 1 }) {
         print "1..0 # EBCDIC but no Convert::EBCDIC\n"; exit 0;
     }
 }
@@ -59,8 +55,8 @@ SKIP: {
         };
 
         # add write access for group/other
-        $stat[2] = 077;
-        ok( !defined(Net::Netrc::_readrc()),
+        $stat[2] = 077; ## no critic (ValuesAndExpressions::ProhibitLeadingZeros)
+        ok( !defined(Net::Netrc->_readrc()),
                 '_readrc() should not read world-writable file' );
         ok( scalar($warn =~ /^Bad permissions:/),
                 '... and should warn about it' );
@@ -69,7 +65,7 @@ SKIP: {
         $stat[2] = 0;
 
         if ($<) { 
-          ok( !defined(Net::Netrc::_readrc()), 
+          ok( !defined(Net::Netrc->_readrc()),
               '_readrc() should not read file owned by someone else' ); 
           ok( scalar($warn =~ /^Not owner:/),
                 '... and should warn about it' ); 
@@ -96,7 +92,7 @@ macdef
 LINES
 
 # having set several lines and the uid, this should succeed
-is( Net::Netrc::_readrc(), 1, '_readrc() should succeed now' );
+is( Net::Netrc->_readrc(), 1, '_readrc() should succeed now' );
 
 # on 'foo', the login is 'nigol'
 is( Net::Netrc->lookup('foo')->{login}, 'nigol', 

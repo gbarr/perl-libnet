@@ -34,7 +34,7 @@ sub read {
     $blksize = $size if $size > $blksize;
 
     unless ($n = sysread($data, ${*$data}, $blksize, length ${*$data})) {
-      return undef unless defined $n;
+      return unless defined $n;
       ${*$data}{'net_ftp_eof'} = 1;
     }
   }
@@ -73,7 +73,7 @@ sub write {
       or croak "Timeout";
 
     my $n = syswrite($data, $buf, $sent > $blksize ? $blksize : $sent, $off);
-    return undef unless defined($n);
+    return unless defined($n);
     $sent -= $n;
     $off += $n;
   }

@@ -64,12 +64,12 @@ sub _hostname {
       my $tmp = "\0" x 256;    ## preload scalar
       eval {
         package main;
-        require "syscall.ph";
+        require "syscall.ph"; ## no critic (Modules::RequireBarewordIncludes)
         defined(&main::SYS_gethostname);
         }
         || eval {
         package main;
-        require "sys/syscall.ph";
+        require "sys/syscall.ph"; ## no critic (Modules::RequireBarewordIncludes)
         defined(&main::SYS_gethostname);
         }
         and $host =
@@ -125,15 +125,14 @@ sub _hostdomain {
   # calls to gethostbyname, and therefore DNS lookups. This helps
   # those on dialup systems.
 
-  local *RES;
   local ($_);
 
-  if (open(RES, "/etc/resolv.conf")) {
-    while (<RES>) {
+  if (open(my $res, '<', "/etc/resolv.conf")) {
+    while (<$res>) {
       $domain = $1
         if (/\A\s*(?:domain|search)\s+(\S+)/);
     }
-    close(RES);
+    close($res);
 
     return $domain
       if (defined $domain);
@@ -152,11 +151,11 @@ sub _hostdomain {
       my $tmp = "\0" x 256;    ## preload scalar
       eval {
         package main;
-        require "syscall.ph";
+        require "syscall.ph"; ## no critic (Modules::RequireBarewordIncludes)
         }
         || eval {
         package main;
-        require "sys/syscall.ph";
+        require "sys/syscall.ph"; ## no critic (Modules::RequireBarewordIncludes)
         }
         and $dom =
         (syscall(&main::SYS_getdomainname, $tmp, 256) == 0)
@@ -191,8 +190,7 @@ sub _hostdomain {
     next unless @info;
 
     # look at real name & aliases
-    my $site;
-    foreach $site ($info[0], split(/ /, $info[1])) {
+    foreach my $site ($info[0], split(/ /, $info[1])) {
       if (rindex($site, ".") > 0) {
 
         # Extract domain from FQDN

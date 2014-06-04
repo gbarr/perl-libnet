@@ -41,6 +41,8 @@ our %NetConfig = (
 #
 # Try to get as much configuration info as possible from InternetConfig
 #
+{
+## no critic (BuiltinFunctions::ProhibitStringyEval)
 $^O eq 'MacOS' and eval <<TRY_INTERNET_CONFIG;
 use Mac::InternetConfig;
 
@@ -61,6 +63,7 @@ my %nc = (
 \@NetConfig{keys %nc} = values %nc;
 }
 TRY_INTERNET_CONFIG
+}
 
 my $file = __FILE__;
 my $ref;

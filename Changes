@@ -1,5 +1,6 @@
 libnet 1.28  -- TODO
 
+  * Make code Perl::Critic clean.
   * Move Net/*.pm into lib/Net/ sub-directory within distribution. This is the
     usual layout style these days.
   * Change Net::SMTP::auth() so that it now falls back to another supported AUTH
