@@ -51,7 +51,7 @@ $Net::Netrc::TESTING=$Net::Netrc::TESTING=1;
 
 SKIP: {
         skip('incompatible stat() handling for OS', 4), next SKIP 
-                if ($^O =~ /os2|win32|macos|cygwin/i or $] < 5.005);
+                if $^O =~ /os2|win32|macos|cygwin/i;
 
         my $warn;
         local $SIG{__WARN__} = sub {
