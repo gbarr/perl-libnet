@@ -6,7 +6,7 @@
 
 package Net::Cmd;
 
-require 5.001;
+use 5.008001;
 require Exporter;
 
 use strict;

@@ -8,7 +8,7 @@
 
 package Net::FTP;
 
-require 5.001;
+use 5.008001;
 
 use strict;
 use vars qw(@ISA $VERSION);
@@ -21,7 +21,7 @@ use Net::Cmd;
 use Net::Config;
 use Fcntl qw(O_WRONLY O_RDONLY O_APPEND O_CREAT O_TRUNC);
 
-$VERSION = '2.79';
+$VERSION = '2.80';
 @ISA     = qw(Exporter Net::Cmd IO::Socket::INET);
 
 # Someday I will "use constant", when I am not bothered to much about
