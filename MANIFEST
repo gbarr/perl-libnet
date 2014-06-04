@@ -5,7 +5,6 @@ MANIFEST.SKIP
 Makefile.PL
 README
 demos/ftp
-demos/inetd
 demos/nntp
 demos/nntp.mirror
 demos/pop3
