@@ -1,23 +1,28 @@
-#!/usr/local/bin/perl -w
+#!perl
+
+use 5.008001;
+
+use strict;
+use warnings;
 
 use blib;
-use Net::POP3;
 use Getopt::Long;
+use Net::POP3;
 
-$opt_debug = 0;
-$opt_user = undef;
+my $opt_debug = 0;
+my $opt_user = undef;
 
 GetOptions(qw(debug user=s));
 
-$pop = Net::POP3->new('backup3', Debug => $opt_debug ? 6 : 0);
+my $pop = Net::POP3->new('backup3', Debug => $opt_debug ? 6 : 0);
 
-$user = $opt_user || $ENV{USER} || $ENV{LOGNAME};
+my $user = $opt_user || $ENV{USER} || $ENV{LOGNAME};
 
-$count = $pop->login($user);
+my $count = $pop->login($user);
 
 if($count)
  {
-  $m = $pop->get(1);
+  my $m = $pop->get(1);
   print @$m if $m;
  }
 

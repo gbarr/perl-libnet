@@ -11,33 +11,29 @@ package Net::FTP;
 use 5.008001;
 
 use strict;
-use vars qw(@ISA $VERSION);
+use warnings;
 use Carp;
 
-use Socket 1.3;
+use Fcntl qw(O_WRONLY O_RDONLY O_APPEND O_CREAT O_TRUNC);
 use IO::Socket;
-use Time::Local;
 use Net::Cmd;
 use Net::Config;
-use Fcntl qw(O_WRONLY O_RDONLY O_APPEND O_CREAT O_TRUNC);
+use Socket 1.3;
+use Time::Local;
 
-$VERSION = '2.80';
-@ISA     = qw(Exporter Net::Cmd IO::Socket::INET);
+our $VERSION = '2.80';
+our @ISA     = qw(Exporter Net::Cmd IO::Socket::INET);
 
 # Someday I will "use constant", when I am not bothered to much about
 # compatibility with older releases of perl
 
-use vars qw($TELNET_IAC $TELNET_IP $TELNET_DM);
-($TELNET_IAC, $TELNET_IP, $TELNET_DM) = (255, 244, 242);
-
+our($TELNET_IAC, $TELNET_IP, $TELNET_DM) = (255, 244, 242);
 
 BEGIN {
-
   # make a constant so code is fast'ish
   my $is_os390 = $^O eq 'os390';
   *trEBCDIC = sub () {$is_os390}
 }
-
 
 sub new {
   my $pkg = shift;

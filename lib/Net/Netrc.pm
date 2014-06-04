@@ -6,15 +6,19 @@
 
 package Net::Netrc;
 
-use Carp;
-use strict;
-use FileHandle;
-use vars qw($VERSION $TESTING);
+use 5.008001;
 
-$VERSION = "2.14";
+use strict;
+use warnings;
+
+use Carp;
+use FileHandle;
+
+our $VERSION = "2.15";
+
+our $TESTING;
 
 my %netrc = ();
-
 
 sub _readrc {
   my $host = shift;

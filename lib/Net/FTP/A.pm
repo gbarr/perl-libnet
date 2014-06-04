@@ -3,15 +3,19 @@
 ##
 
 package Net::FTP::A;
+
+use 5.008001;
+
 use strict;
-use vars qw(@ISA $buf $VERSION);
+use warnings;
+
 use Carp;
+use Net::FTP::dataconn;
 
-require Net::FTP::dataconn;
+our @ISA     = qw(Net::FTP::dataconn);
+our $VERSION = "1.20";
 
-@ISA     = qw(Net::FTP::dataconn);
-$VERSION = "1.19";
-
+our $buf;
 
 sub read {
   my $data = shift;

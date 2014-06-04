@@ -6,17 +6,18 @@
 
 package Net::Domain;
 
-require Exporter;
+use 5.008001;
+
+use strict;
+use warnings;
 
 use Carp;
-use strict;
-use vars qw($VERSION @ISA @EXPORT_OK);
+use Exporter;
 use Net::Config;
 
-@ISA       = qw(Exporter);
-@EXPORT_OK = qw(hostname hostdomain hostfqdn domainname);
-
-$VERSION = "2.23";
+our @ISA       = qw(Exporter);
+our @EXPORT_OK = qw(hostname hostdomain hostfqdn domainname);
+our $VERSION = "2.24";
 
 my ($host, $domain, $fqdn) = (undef, undef, undef);
 

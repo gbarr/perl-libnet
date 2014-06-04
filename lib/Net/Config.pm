@@ -6,18 +6,23 @@
 
 package Net::Config;
 
-require Exporter;
-use vars qw(@ISA @EXPORT %NetConfig $VERSION $CONFIGURE $LIBNET_CFG);
-use Socket qw(inet_aton inet_ntoa);
-use strict;
+use 5.008001;
 
-@EXPORT  = qw(%NetConfig);
-@ISA     = qw(Net::LocalCfg Exporter);
-$VERSION = "1.14";
+use strict;
+use warnings;
+
+use Exporter;
+use Socket qw(inet_aton inet_ntoa);
+
+our @EXPORT  = qw(%NetConfig);
+our @ISA     = qw(Net::LocalCfg Exporter);
+our $VERSION = "1.15";
+
+our($CONFIGURE, $LIBNET_CFG);
 
 eval { local $SIG{__DIE__}; require Net::LocalCfg };
 
-%NetConfig = (
+our %NetConfig = (
   nntp_hosts      => [],
   snpp_hosts      => [],
   pop3_hosts      => [],
@@ -112,7 +117,6 @@ sub requires_firewall {
   return 0;
 }
 
-use vars qw(*is_external);
 *is_external = \&requires_firewall;
 
 1;

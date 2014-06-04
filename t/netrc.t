@@ -1,4 +1,9 @@
-#!./perl
+#!perl
+
+use 5.008001;
+
+use strict;
+use warnings;
 
 BEGIN {
     if ($ENV{PERL_CORE}) {
@@ -12,8 +17,6 @@ BEGIN {
         print "1..0 # EBCDIC but no Convert::EBCDIC\n"; exit 0;
     }
 }
-
-use strict;
 
 use Cwd;
 print "1..20\n";

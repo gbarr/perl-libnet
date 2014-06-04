@@ -1,4 +1,9 @@
-#!./perl -w
+#!perl
+
+use 5.008001;
+
+use strict;
+use warnings;
 
 BEGIN {
     unless (-d 'blib') {
@@ -25,7 +30,7 @@ print "1..3\n";
 
 my $i = 1;
 
-$smtp = Net::SMTP->new(Debug => 0)
+my $smtp = Net::SMTP->new(Debug => 0)
         or (print("not ok 1\n"), exit);
 
 print "ok 1\n";

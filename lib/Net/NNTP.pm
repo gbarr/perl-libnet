@@ -6,17 +6,19 @@
 
 package Net::NNTP;
 
+use 5.008001;
+
 use strict;
-use vars qw(@ISA $VERSION $debug);
+use warnings;
+
+use Carp;
 use IO::Socket;
 use Net::Cmd;
-use Carp;
-use Time::Local;
 use Net::Config;
+use Time::Local;
 
-$VERSION = "2.26";
-@ISA     = qw(Net::Cmd IO::Socket::INET);
-
+our $VERSION = "2.27";
+our @ISA     = qw(Net::Cmd IO::Socket::INET);
 
 sub new {
   my $self = shift;

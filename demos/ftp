@@ -1,19 +1,24 @@
-#!/usr/local/bin/perl
+#!perl
+
+use 5.008001;
+
+use strict;
+use warnings;
 
 use blib;
-use Net::FTP;
 use Getopt::Long;
+use Net::FTP;
 
-$opt_debug = undef;
-$opt_firewall = undef;
+our $opt_debug = undef;
+our $opt_firewall = undef;
 
 GetOptions(qw(debug firewall=s));
 
-@firewall = defined $opt_firewall ? (Firewall => $opt_firewall) : ();
+my @firewall = defined $opt_firewall ? (Firewall => $opt_firewall) : ();
 
-foreach $host (@ARGV)
+foreach my $host (@ARGV)
  {
-  $ftp = Net::FTP->new($host, @firewall, Debug => $opt_debug ? 1 : 0);
+  my $ftp = Net::FTP->new($host, @firewall, Debug => $opt_debug ? 1 : 0);
   $ftp->login();
   print $ftp->pwd,"\n";
   $ftp->quit;

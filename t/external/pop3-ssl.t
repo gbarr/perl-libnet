@@ -1,6 +1,10 @@
+#!perl
+
+use 5.008001;
 
 use strict;
 use warnings;
+
 use Net::POP3;
 use Test::More;
 

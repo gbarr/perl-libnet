@@ -1,4 +1,9 @@
-#!./perl -w
+#!perl
+
+use 5.008001;
+
+use strict;
+use warnings;
 
 BEGIN {
     unless (-d 'blib') {
@@ -26,13 +31,13 @@ print "1..4\n";
 
 my $i = 1;
 
-$nntp = Net::NNTP->new(Debug => 0)
+my $nntp = Net::NNTP->new(Debug => 0)
         or (print("not ok 1\n"), exit);
 
 print "ok 1\n";
 
-my $grp;
-foreach $grp (qw(test alt.test control news.announce.newusers)) {
+my @grp;
+foreach my $grp (qw(test alt.test control news.announce.newusers)) {
     @grp = $nntp->group($grp);
     last if @grp;
 }

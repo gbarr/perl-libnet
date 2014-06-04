@@ -1,8 +1,13 @@
-#!/usr/local/bin/perl -w
+#!perl
+
+use 5.008001;
+
+use strict;
+use warnings;
 
 use blib;
-use Net::SMTP;
 use Getopt::Long;
+use Net::SMTP;
 
 =head1 NAME
 
@@ -38,9 +43,9 @@ Send the message to C<USERNAME>
 
 =cut
 
-$opt_debug = undef;
-$opt_user = undef;
-$opt_help = undef;
+my $opt_debug = undef;
+my $opt_user = undef;
+my $opt_help = undef;
 GetOptions(qw(debug user=s help));
 
 exec("pod2text $0")
@@ -48,9 +53,9 @@ exec("pod2text $0")
 
 Net::SMTP->debug(1) if $opt_debug;
 
-$smtp = Net::SMTP->new("mailhost");
+my $smtp = Net::SMTP->new("mailhost");
 
-$user = $opt_user || $ENV{USER} || $ENV{LOGNAME};
+my $user = $opt_user || $ENV{USER} || $ENV{LOGNAME};
 
 $smtp->mail($user) && $smtp->to($user);
 $smtp->reset;
@@ -59,6 +64,7 @@ if($smtp->mail($user) && $smtp->to($user))
  {
   $smtp->data();
 
+  my @data;
   map { s/-USER-/$user/g } @data=<DATA>;
 
   $smtp->datasend(@data);

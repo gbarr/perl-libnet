@@ -7,11 +7,12 @@
 package Net::Cmd;
 
 use 5.008001;
-require Exporter;
 
 use strict;
-use vars qw(@ISA @EXPORT $VERSION);
+use warnings;
+
 use Carp;
+use Exporter;
 use Symbol 'gensym';
 
 BEGIN {
@@ -37,9 +38,9 @@ BEGIN {
   }
 }
 
-$VERSION = "2.31";
-@ISA     = qw(Exporter);
-@EXPORT  = qw(CMD_INFO CMD_OK CMD_MORE CMD_REJECT CMD_ERROR CMD_PENDING);
+our $VERSION = "2.31";
+our @ISA     = qw(Exporter);
+our @EXPORT  = qw(CMD_INFO CMD_OK CMD_MORE CMD_REJECT CMD_ERROR CMD_PENDING);
 
 
 sub CMD_INFO    {1}

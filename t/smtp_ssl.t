@@ -1,8 +1,13 @@
+#!perl
+
+use 5.008001;
+
 use strict;
 use warnings;
-use Test::More;
+
 use File::Temp 'tempfile';
 use Net::SMTP;
+use Test::More;
 
 my $debug = 0; # Net::SMTP Debug => ..
 

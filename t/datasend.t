@@ -1,4 +1,9 @@
-#!./perl -w
+#!perl
+
+use 5.008001;
+
+use strict;
+use warnings;
 
 BEGIN {
     if ($ENV{PERL_CORE}) {
@@ -18,7 +23,7 @@ BEGIN {
 
   use IO::File;
   use Net::Cmd;
-  @ISA = qw(Net::Cmd IO::File);
+  our @ISA = qw(Net::Cmd IO::File);
 
   sub timeout { 0 }
 

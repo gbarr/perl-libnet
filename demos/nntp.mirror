@@ -1,4 +1,4 @@
-#!/usr/bin/perl5
+#!perl
 
 ### Subject: Re: Fuller example of Net::NNTP?
 ### Date:  Tue, 4 Feb 1997 10:37:58 -0800
@@ -20,9 +20,14 @@
 ### work on every system
 ###
 
+use 5.008001;
+
+use strict;
+use warnings;
+
 use Net::NNTP;
 
-$BaseDir = '/usr/usenet';
+my $BaseDir = '/usr/usenet';
 chdir($BaseDir) or die "Could not cd to $BaseDir\n";
 
 # Format of grouplist is:
@@ -31,17 +36,18 @@ chdir($BaseDir) or die "Could not cd to $BaseDir\n";
 #    set it to 0 if you want the articles to stay forever
 # If the groupname starts with a #, it is skipped
 open(GROUPLIST, 'grouplist.txt') or die "Could not open grouplist.txt\n";
+my @Groups;
 while(<GROUPLIST>) {
-        $Line = $_; chomp($Line);
+        my $Line = $_; chomp($Line);
         if($Line eq '') { next };  # Skip blank lines
         if(substr($Line, 0, 1) eq '#') { next };  # Skip comments
         push(@Groups, $Line)
 }
 
-$NntpPtr = Net::NNTP->new('news.server.com');
+my $NntpPtr = Net::NNTP->new('news.server.com');
 
-foreach $GroupLine (@Groups) {
-        ($GroupName, $GroupExp) = split(/\s/, $GroupLine, 2);
+foreach my $GroupLine (@Groups) {
+        my($GroupName, $GroupExp) = split(/\s/, $GroupLine, 2);
         # Process the expiration first (still to be done...)
 
         # See if this is a new group
@@ -51,25 +57,27 @@ foreach $GroupLine (@Groups) {
         }
         chdir("$BaseDir/$GroupName") or die "Couldn't chdir to $GroupName\n";
         # Find the last article in the directory
-        @AllInDir = <*>; @RevSortedAllInDir = reverse(sort(@AllInDir));
-        $LenArr = @RevSortedAllInDir;
+        my @AllInDir = <*>; my @RevSortedAllInDir = reverse(sort(@AllInDir));
+        my $LenArr = @RevSortedAllInDir;
+        my $NumLastInDir;
         if($LenArr > 0) { $NumLastInDir = $RevSortedAllInDir[0] }
         else { $NumLastInDir = 0 }
-        ($NumArt, $NumFirst, $NumLast, $XGroupName) =
-$NntpPtr->group($GroupName);
+        my($NumArt, $NumFirst, $NumLast, $XGroupName) =
+                $NntpPtr->group($GroupName);
 
         if($NumLast == $NumLastInDir) { next }  # No new articles
         if($NumLast < $NumLastInDir)
                 { die "In $GroupName, the last number was $NumLast, but the " .
                         " last number in the directory was $NumLastInDir\n" }
         # Figure out which article to start from
+        my $GetArtNum;
         if($NumLastInDir == 0) { $GetArtNum = $NumFirst }
         else { $GetArtNum = $NumLastInDir + 1 }
 
         # Now read each of the new articles
         while(1) {  # Loop until "last" is called
-                $ArtRef = $NntpPtr->article($GetArtNum);
-                @ArtArr = @$ArtRef; $ArtArrLen = @ArtArr;
+                my $ArtRef = $NntpPtr->article($GetArtNum);
+                my @ArtArr = @$ArtRef; my $ArtArrLen = @ArtArr;
                 if($ArtArrLen > 0 ) {  # Skip article numbers that had 0 len
                         open(OUT, ">$GetArtNum") or
                                 die "Could not create $GroupName/$GetArtNum\n";

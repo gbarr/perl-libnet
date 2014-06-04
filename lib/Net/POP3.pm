@@ -6,42 +6,41 @@
 
 package Net::POP3;
 
+use 5.008001;
+
 use strict;
-use IO::Socket;
-use vars qw(@ISA $VERSION $debug);
-use Net::Cmd;
+use warnings;
+
 use Carp;
+use IO::Socket;
+use Net::Cmd;
 use Net::Config;
 
-$VERSION = "2.32";
+our $VERSION = "2.32";
 
-@ISA = qw(Net::Cmd IO::Socket::INET);
 # Code for detecting if we can use SSL
 my $ssl_class = eval {
   require IO::Socket::SSL;
   # first version with default CA on most platforms
   IO::Socket::SSL->VERSION(1.968);
 } && 'IO::Socket::SSL';
+
 my $nossl_warn = !$ssl_class &&
   'To use SSL please install IO::Socket::SSL with version>=1.968';
 
 # Code for detecting if we can use IPv6
-my $inet6_class =
-  eval {
-    require IO::Socket::IP;
-    IO::Socket::IP->VERSION(0.20);
-  } && 'IO::Socket::IP' ||
-  eval {
-    require IO::Socket::INET6;
-    IO::Socket::INET6->VERSION(2.62);
-  } && 'IO::Socket::INET6';
+my $inet6_class = eval {
+  require IO::Socket::IP;
+  IO::Socket::IP->VERSION(0.20);
+} && 'IO::Socket::IP' || eval {
+  require IO::Socket::INET6;
+  IO::Socket::INET6->VERSION(2.62);
+} && 'IO::Socket::INET6';
 
 sub can_ssl   { $ssl_class };
 sub can_inet6 { $inet6_class };
 
-
-@ISA = ( 'Net::Cmd', $inet6_class || 'IO::Socket::INET' );
-
+our @ISA = ('Net::Cmd', $inet6_class || 'IO::Socket::INET');
 
 sub new {
   my $self = shift;

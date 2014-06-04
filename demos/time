@@ -1,4 +1,9 @@
-#!/usr/local/bin/perl -w
+#!perl
+
+use 5.008001;
+
+use strict;
+use warnings;
 
 use blib;
 use Net::Time qw(inet_time inet_daytime);

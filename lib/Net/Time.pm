@@ -6,21 +6,23 @@
 
 package Net::Time;
 
+use 5.008001;
+
 use strict;
-use vars qw($VERSION @ISA @EXPORT_OK $TIMEOUT);
+use warnings;
+
 use Carp;
-use IO::Socket;
-require Exporter;
-use Net::Config;
+use Exporter;
 use IO::Select;
+use IO::Socket;
+use Net::Config;
 
-@ISA       = qw(Exporter);
-@EXPORT_OK = qw(inet_time inet_daytime);
+our @ISA       = qw(Exporter);
+our @EXPORT_OK = qw(inet_time inet_daytime);
 
-$VERSION = "2.11";
+our $VERSION = "2.12";
 
-$TIMEOUT = 120;
-
+our $TIMEOUT = 120;
 
 sub _socket {
   my ($pname, $pnum, $host, $proto, $timeout) = @_;

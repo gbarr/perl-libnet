@@ -4,14 +4,18 @@
 
 package Net::FTP::I;
 
-use vars qw(@ISA $buf $VERSION);
+use 5.008001;
+
+use strict;
+use warnings;
+
 use Carp;
+use Net::FTP::dataconn;
 
-require Net::FTP::dataconn;
+our @ISA     = qw(Net::FTP::dataconn);
+our $VERSION = "1.13";
 
-@ISA     = qw(Net::FTP::dataconn);
-$VERSION = "1.12";
-
+our $buf;
 
 sub read {
   my $data = shift;

@@ -1,4 +1,9 @@
-#!./perl -w
+#!perl
+
+use 5.008001;
+
+use strict;
+use warnings;
 
 BEGIN {
     unless (-d 'blib') {
@@ -23,7 +28,7 @@ unless($NetConfig{test_hosts}) {
 
 print "1..5\n";
 
-$domain = domainname();
+my $domain = domainname();
 
 if(defined $domain && $domain ne "") {
  print "ok 1 - defined, non-empty domainname\n";
@@ -52,7 +57,7 @@ my @dummy = grep { defined hostname() and hostname() eq $_ } @domain;
   : print "not ok 3\n";
 
 my $name = hostname();
-my $domain = hostdomain();
+$domain = hostdomain();
 if(defined $domain && defined $name && $name ne "" && $domain ne "") {
     hostfqdn() eq $name . "." . $domain ? print "ok 4\n" : print "not ok 4\n";
     domainname() eq $name . "." . $domain ? print "ok 5\n" : print "not ok 5\n";} else {

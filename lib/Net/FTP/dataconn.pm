@@ -4,14 +4,17 @@
 
 package Net::FTP::dataconn;
 
+use 5.008001;
+
+use strict;
+use warnings;
+
 use Carp;
-use vars qw(@ISA $timeout $VERSION);
-use Net::Cmd;
 use Errno;
+use Net::Cmd;
 
-$VERSION = '0.12';
-@ISA     = qw(IO::Socket::INET);
-
+our $VERSION = '0.13';
+our @ISA     = qw(IO::Socket::INET);
 
 sub reading {
   my $data = shift;

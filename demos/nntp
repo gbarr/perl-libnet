@@ -1,17 +1,23 @@
-#!/usr/local/bin/perl
+#!perl
+
+use 5.008001;
+
+use strict;
+use warnings;
 
 use blib;
 use Getopt::Long;
 use Net::NNTP;
 
-$opt_debug = undef;
+our $opt_debug = undef;
 
 GetOptions(qw(debug));
 
-@groups = @ARGV;
+my @groups = @ARGV;
 
-$nntp = Net::NNTP->new('news', Debug => $opt_debug ? 1 : 0);
+my $nntp = Net::NNTP->new('news', Debug => $opt_debug ? 1 : 0);
 
+my $subs;
 if($subs = $nntp->newsgroups)
  {
   print join("\n",(keys %$subs)[0 .. 10]),"\n";
@@ -21,14 +27,14 @@ if($subs = $nntp->newsgroups)
   warn $nntp->message;
  }
 
-foreach $group (@groups)
+foreach my $group (@groups)
  {
-  $new = $nntp->newnews(time - 3600, lc $group);
+  my $news = $nntp->newnews(time - 3600, lc $group);
 
-  if(ref($new) && scalar(@$new))
+  if(ref($news) && scalar(@$news))
    {
-    print@{$news}[0..3],"\n"
-        if $news = $nntp->article($new->[-1]);
+    print @{$news}[0..3],"\n"
+        if $news = $nntp->article($news->[-1]);
 
     warn $nntp->message
          unless $news;
