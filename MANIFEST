@@ -1,7 +1,6 @@
 Changes
 Config.eg
 Configure
-Hostname.pm.eg                           Example replacement for Hostname.pm
 MANIFEST
 MANIFEST.SKIP
 Makefile.PL
@@ -13,7 +12,6 @@ demos/nntp.mirror
 demos/pop3
 demos/smtp.self
 demos/time
-install-nomake
 lib/Net/Cmd.pm
 lib/Net/Config.pm
 lib/Net/Domain.pm                        DNS Domain name lookup
@@ -31,6 +29,8 @@ lib/Net/Time.pm                          time & nettime protocols
 lib/Net/libnetFAQ.pod
 t/config.t
 t/datasend.t
+t/external/smtp-ssl.t
+t/external/pop3-ssl.t
 t/ftp.t
 t/hostname.t
 t/libnet_t.pl
@@ -43,5 +43,3 @@ t/smtp_ipv6.t
 t/pop3_ssl.t
 t/pop3_ipv6.t
 t/time.t
-t/external/smtp-ssl.t
-t/external/pop3-ssl.t
