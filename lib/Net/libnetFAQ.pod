@@ -50,8 +50,14 @@ This version of libnet requires Perl 5.8.1 or higher.
 =head2 What other modules do I need ?
 
 No non-core modules are required for normal use, except on os390,
-which requires Convert::EBCDIC.  Authen::SASL is required for AUTH
-support.
+which requires Convert::EBCDIC.
+
+Authen::SASL is required for AUTH support.
+
+IO::Socket::SSL version 1.968 or higher is required for SSL support.
+
+IO::Socket::IP version 0.20 or IO::Socket::INET6 version 2.62 is
+required for IPv6 support.
 
 =head2 What machines support libnet ?
 

@@ -92,6 +92,29 @@ MAIN: {
                             }
                         }
                     }
+                },
+
+                SSL => {
+                    description => 'SSL support',
+                    prereqs => {
+                        runtime => {
+                            requires => {
+                                'IO::Socket::SSL' => '1.968'
+                            }
+                        }
+                    }
+                },
+
+                IPv6 => {
+                    description => 'IPv6 support',
+                    prereqs => {
+                        runtime => {
+                            requires => {
+                                'IO::Socket::IP' => '0.20'
+                            # or IO::Socket::INET6 2.62
+                            }
+                        }
+                    }
                 }
             }
         },
