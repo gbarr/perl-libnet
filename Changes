@@ -1,6 +1,7 @@
 libnet 1.28  -- TODO
 
   * Add optional POD testing.
+  * Add optional Perl::Critic testing.
   * Make code Perl::Critic clean.
   * Move Net/*.pm into lib/Net/ sub-directory within distribution. This is the
     usual layout style these days.

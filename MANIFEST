@@ -26,6 +26,7 @@ lib/Net/SMTP.pm                          Simple Mail Transfer Protocol Client
 lib/Net/Time.pm                          time & nettime protocols
 lib/Net/libnetFAQ.pod
 t/config.t
+t/critic.t
 t/datasend.t
 t/external/smtp-ssl.t
 t/external/pop3-ssl.t
