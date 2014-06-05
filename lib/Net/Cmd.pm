@@ -1,6 +1,9 @@
 # Net::Cmd.pm
 #
-# Copyright (c) 1995-2006 Graham Barr <gbarr@pobox.com>. All rights reserved.
+# Versions up to 2.29_1 Copyright (c) 1995-2006 Graham Barr <gbarr@pobox.com>.
+# All rights reserved.
+# Changes in Version 2.29_2 onwards Copyright (C) 2013-2014 Steve Hay.  All
+# rights reserved.
 # This program is free software; you can redistribute it and/or
 # modify it under the same terms as Perl itself.
 
@@ -782,11 +785,17 @@ of C<response> and C<status>. The sixth is C<CMD_PENDING>.
 
 =head1 AUTHOR
 
-Graham Barr <gbarr@pobox.com>
+Graham Barr E<lt>F<gbarr@pobox.com>E<gt>
+
+Steve Hay E<lt>F<shay@cpan.org>E<gt> is now maintaining libnet as of version
+1.22_02
 
 =head1 COPYRIGHT
 
-Copyright (c) 1995-2006 Graham Barr. All rights reserved.
+Versions up to 2.29_1 Copyright (c) 1995-2006 Graham Barr. All rights reserved.
+Changes in Version 2.29_2 onwards Copyright (C) 2013-2014 Steve Hay.  All rights
+reserved.
+
 This program is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
 

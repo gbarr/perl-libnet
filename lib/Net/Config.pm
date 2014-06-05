@@ -1,6 +1,9 @@
 # Net::Config.pm
 #
-# Copyright (c) 2000 Graham Barr <gbarr@pobox.com>. All rights reserved.
+# Versions up to 1.11 Copyright (c) 2000 Graham Barr <gbarr@pobox.com>.
+# All rights reserved.
+# Changes in Version 1.11_01 onwards Copyright (C) 2013-2014 Steve Hay.  All
+# rights reserved.
 # This program is free software; you can redistribute it and/or
 # modify it under the same terms as Perl itself.
 

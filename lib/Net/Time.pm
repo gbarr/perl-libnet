@@ -1,6 +1,9 @@
 # Net::Time.pm
 #
-# Copyright (c) 1995-2004 Graham Barr <gbarr@pobox.com>. All rights reserved.
+# Versions up to 2.10 Copyright (c) 1995-2004 Graham Barr <gbarr@pobox.com>.
+# All rights reserved.
+# Changes in Version 2.11 onwards Copyright (C) 2014 Steve Hay.  All rights
+# reserved.
 # This program is free software; you can redistribute it and/or
 # modify it under the same terms as Perl itself.
 
@@ -142,11 +145,17 @@ C<udp>. The result will be an ASCII string or I<undef> upon failure.
 
 =head1 AUTHOR
 
-Graham Barr <gbarr@pobox.com>
+Graham Barr E<lt>F<gbarr@pobox.com>E<gt>
+
+Steve Hay E<lt>F<shay@cpan.org>E<gt> is now maintaining libnet as of version
+1.22_02
 
 =head1 COPYRIGHT
 
-Copyright (c) 1995-2004 Graham Barr. All rights reserved.
+Versions up to 2.11 Copyright (c) 1995-2004 Graham Barr. All rights reserved.
+Changes in Version 2.11 onwards Copyright (C) 2014 Steve Hay.  All rights
+reserved.
+
 This program is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
 

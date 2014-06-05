@@ -1,6 +1,9 @@
 # Net::Domain.pm
 #
-# Copyright (c) 1995-1998 Graham Barr <gbarr@pobox.com>. All rights reserved.
+# Versions up to 2.21 Copyright (c) 1995-1998 Graham Barr <gbarr@pobox.com>.
+# All rights reserved.
+# Changes in Version 2.22 onwards Copyright (C) 2013-2014 Steve Hay.  All rights
+# reserved.
 # This program is free software; you can redistribute it and/or
 # modify it under the same terms as Perl itself.
 
@@ -341,12 +344,18 @@ Returns the remainder of the FQDN after the I<hostname> has been removed.
 
 =head1 AUTHOR
 
-Graham Barr <gbarr@pobox.com>.
-Adapted from Sys::Hostname by David Sundstrom <sunds@asictest.sc.ti.com>
+Graham Barr E<lt>F<gbarr@pobox.com>E<gt>.
+Adapted from Sys::Hostname by David Sundstrom E<lt>F<sunds@asictest.sc.ti.com>E<gt>
+
+Steve Hay E<lt>F<shay@cpan.org>E<gt> is now maintaining libnet as of version
+1.22_02
 
 =head1 COPYRIGHT
 
-Copyright (c) 1995-1998 Graham Barr. All rights reserved.
+Versions up to 2.21 Copyright (c) 1995-1998 Graham Barr. All rights reserved.
+Changes in Version 2.22 onwards Copyright (C) 2013-2014 Steve Hay.  All rights
+reserved.
+
 This program is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
 

@@ -1,6 +1,9 @@
 # Net::FTP.pm
 #
-# Copyright (c) 1995-2004 Graham Barr <gbarr@pobox.com>. All rights reserved.
+# Versions up to 2.77_2 Copyright (c) 1995-2004 Graham Barr <gbarr@pobox.com>.
+# All rights reserved.
+# Changes in Version 2.77_3 onwards Copyright (C) 2013-2014 Steve Hay.  All
+# rights reserved.
 # This program is free software; you can redistribute it and/or
 # modify it under the same terms as Perl itself.
 #
@@ -1814,7 +1817,10 @@ run of your program which does yield the problem.
 
 =head1 AUTHOR
 
-Graham Barr <gbarr@pobox.com>
+Graham Barr E<lt>F<gbarr@pobox.com>E<gt>
+
+Steve Hay E<lt>F<shay@cpan.org>E<gt> is now maintaining libnet as of version
+1.22_02
 
 =head1 SEE ALSO
 
@@ -1848,7 +1854,10 @@ Roderick Schertler <roderick@gate.net> - for various inputs
 
 =head1 COPYRIGHT
 
-Copyright (c) 1995-2004 Graham Barr. All rights reserved.
+Versions up to 2.77_2 Copyright (c) 1995-2004 Graham Barr. All rights reserved.
+Changes in Version 2.77_3 onwards Copyright (C) 2013-2014 Steve Hay.  All rights
+reserved.
+
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.
 

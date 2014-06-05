@@ -103,11 +103,11 @@ include a transcript of a run.
 
 COPYRIGHT
 
-  (C) 1996-2007 Graham Barr. All rights reserved.
+  Versions up to 1.22_01 (C) 1996-2007 Graham Barr. All rights reserved.
+  Changes in Version 1.22_02 onwards Copyright (C) 2013-2014 Steve Hay.
+  All rights reserved.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
-
-Currently maintained by Steve Hay <shay@cpan.org>.
 
 Share and Enjoy!

@@ -1,6 +1,9 @@
 # Net::POP3.pm
 #
-# Copyright (c) 1995-2004 Graham Barr <gbarr@pobox.com>. All rights reserved.
+# Versions up to 2.29 Copyright (c) 1995-2004 Graham Barr <gbarr@pobox.com>.
+# All rights reserved.
+# Changes in Version 2.29_01 onwards Copyright (C) 2013-2014 Steve Hay.  All
+# rights reserved.
 # This program is free software; you can redistribute it and/or
 # modify it under the same terms as Perl itself.
 
@@ -813,11 +816,17 @@ L<IO::Socket::SSL>
 
 =head1 AUTHOR
 
-Graham Barr <gbarr@pobox.com>
+Graham Barr E<lt>F<gbarr@pobox.com>E<gt>
+
+Steve Hay E<lt>F<shay@cpan.org>E<gt> is now maintaining libnet as of version
+1.22_02
 
 =head1 COPYRIGHT
 
-Copyright (c) 1995-2003 Graham Barr. All rights reserved.
+Versions up to 2.29 Copyright (c) 1995-2004 Graham Barr. All rights reserved.
+Changes in Version 2.29_01 onwards Copyright (C) 2013-2014 Steve Hay.  All
+rights reserved.
+
 This program is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
 
