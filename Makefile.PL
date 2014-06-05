@@ -115,6 +115,17 @@ MAIN: {
                             }
                         }
                     }
+                },
+
+                podtest => {
+                    description => 'POD testing',
+                    prereqs => {
+                        test => {
+                            requires => {
+                                'Test::Pod' => '1.00'
+                            }
+                        }
+                    }
                 }
             }
         },
