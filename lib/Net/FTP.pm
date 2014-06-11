@@ -27,16 +27,11 @@ use Time::Local;
 our $VERSION = '2.80';
 our @ISA     = qw(Exporter Net::Cmd IO::Socket::INET);
 
-# Someday I will "use constant", when I am not bothered to much about
-# compatibility with older releases of perl
+use constant TELNET_IAC => 255;
+use constant TELNET_IP  => 244;
+use constant TELNET_DM  => 242;
 
-our($TELNET_IAC, $TELNET_IP, $TELNET_DM) = (255, 244, 242);
-
-BEGIN {
-  # make a constant so code is fast'ish
-  my $is_os390 = $^O eq 'os390';
-  *trEBCDIC = sub () {$is_os390}
-}
+use constant EBCDIC => $^O eq 'os390';
 
 sub new {
   my $pkg = shift;
@@ -427,9 +422,9 @@ sub alloc {
 sub abort {
   my $ftp = shift;
 
-  send($ftp, pack("CCC", $TELNET_IAC, $TELNET_IP, $TELNET_IAC), MSG_OOB);
+  send($ftp, pack("CCC", TELNET_IAC, TELNET_IP, TELNET_IAC), MSG_OOB);
 
-  $ftp->command(pack("C", $TELNET_DM) . "ABOR");
+  $ftp->command(pack("C", TELNET_DM) . "ABOR");
 
   ${*$ftp}{'net_ftp_dataconn'}->close()
     if defined ${*$ftp}{'net_ftp_dataconn'};
@@ -495,7 +490,7 @@ sub get {
   while (1) {
     last unless $len = $data->read($buf, $blksize);
 
-    if (trEBCDIC && $ftp->type ne 'I') {
+    if (EBCDIC && $ftp->type ne 'I') {
       $buf = $ftp->toebcdic($buf);
       $len = length($buf);
     }
@@ -753,7 +748,7 @@ sub _store_cmd {
   while (1) {
     last unless $len = read($loc, $buf = "", $blksize);
 
-    if (trEBCDIC && $ftp->type ne 'I') {
+    if (EBCDIC && $ftp->type ne 'I') {
       $buf = $ftp->toascii($buf);
       $len = length($buf);
     }
@@ -988,7 +983,7 @@ sub _list_cmd {
 
   $data->close();
 
-  if (trEBCDIC) {
+  if (EBCDIC) {
     for (@$list) { $_ = $ftp->toebcdic($_) }
   }
 
@@ -1327,7 +1322,9 @@ EBCDIC format.  Binary (also known as image) format sends the data as
 a contiguous bit stream.  Byte format transfers the data as bytes, the
 values of which remain the same regardless of differences in byte size
 between the two machines (in theory - in practice you should only use
-this if you really know what you're doing).
+this if you really know what you're doing).  This class does not support
+the EBCDIC or byte formats, and will default to binary instead if they
+are attempted.
 
 =head1 CONSTRUCTOR
 
@@ -1348,7 +1345,6 @@ B<Host> - FTP host to connect to. It may be a single scalar, as defined for
 the C<PeerAddr> option in L<IO::Socket::INET>, or a reference to
 an array with hosts to try in turn. The L</host> method will return the value
 which was used to connect to the host.
-
 
 B<Firewall> - The name of a machine which acts as an FTP firewall. This can be
 overridden by an environment variable C<FTP_FIREWALL>. If specified, and the
@@ -1424,6 +1420,15 @@ will be used for password.
 If the connection is via a firewall then the C<authorize> method will
 be called with no arguments.
 
+=item host ()
+
+Returns the value used by the constructor, and passed to IO::Socket::INET,
+to connect to the host.
+
+=item account( ACCT )
+
+Set a string identifying the user's account.
+
 =item authorize ( [AUTH [, RESP]])
 
 This is a protocol used by some firewall ftp proxies. It is used
@@ -1436,16 +1441,20 @@ Send a SITE command to the remote server and wait for a response.
 
 Returns most significant digit of the response code.
 
-=item ascii
+=item ascii ()
 
 Transfer file in ASCII. CRLF translation will be done if required
 
-=item binary
+=item binary ()
 
 Transfer file in binary mode. No transformation will be done.
 
 B<Hint>: If both server and client machines use the same line ending for
 text files, then it will be faster to transfer all files in binary mode.
+
+=item type ( [ TYPE ] )
+
+Set or get if files will be transferred in ASCII or binary mode.
 
 =item rename ( OLDNAME, NEWNAME )
 
@@ -1725,44 +1734,8 @@ data connections. Misuse of this method can hang the connection.
 =head1 THE dataconn CLASS
 
 Some of the methods defined in C<Net::FTP> return an object which will
-be derived from this class.The dataconn class itself is derived from
-the C<IO::Socket::INET> class, so any normal IO operations can be performed.
-However the following methods are defined in the dataconn class and IO should
-be performed using these.
-
-=over 4
-
-=item read ( BUFFER, SIZE [, TIMEOUT ] )
-
-Read C<SIZE> bytes of data from the server and place it into C<BUFFER>, also
-performing any <CRLF> translation necessary. C<TIMEOUT> is optional, if not
-given, the timeout value from the command connection will be used.
-
-Returns the number of bytes read before any <CRLF> translation.
-
-=item write ( BUFFER, SIZE [, TIMEOUT ] )
-
-Write C<SIZE> bytes of data from C<BUFFER> to the server, also
-performing any <CRLF> translation necessary. C<TIMEOUT> is optional, if not
-given, the timeout value from the command connection will be used.
-
-Returns the number of bytes written before any <CRLF> translation.
-
-=item bytes_read ()
-
-Returns the number of bytes read so far.
-
-=item abort ()
-
-Abort the current data transfer.
-
-=item close ()
-
-Close the data connection and get a response from the FTP server. Returns
-I<true> if the connection was closed successfully and the first digit of
-the response from the server was a '2'.
-
-=back
+be derived from the C<Net::FTP::dataconn> class. See L<Net::FTP::dataconn> for
+more details.
 
 =head1 UNIMPLEMENTED
 

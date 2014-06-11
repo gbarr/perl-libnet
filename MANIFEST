@@ -36,6 +36,7 @@ t/libnet_t.pl
 t/netrc.t
 t/nntp.t
 t/pod.t
+t/pod_coverage.t
 t/require.t
 t/smtp.t
 t/smtp_ssl.t

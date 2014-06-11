@@ -128,3 +128,53 @@ sub bytes_read {
 }
 
 1;
+
+__END__
+
+=head1 NAME
+
+Net::FTP::dataconn - FTP Client data connection class
+
+=head1 DESCRIPTION
+
+Some of the methods defined in C<Net::FTP> return an object which will
+be derived from this class. The dataconn class itself is derived from
+the C<IO::Socket::INET> class, so any normal IO operations can be performed.
+However the following methods are defined in the dataconn class and IO should
+be performed using these.
+
+=over 4
+
+=item read ( BUFFER, SIZE [, TIMEOUT ] )
+
+Read C<SIZE> bytes of data from the server and place it into C<BUFFER>, also
+performing any <CRLF> translation necessary. C<TIMEOUT> is optional, if not
+given, the timeout value from the command connection will be used.
+
+Returns the number of bytes read before any <CRLF> translation.
+
+=item write ( BUFFER, SIZE [, TIMEOUT ] )
+
+Write C<SIZE> bytes of data from C<BUFFER> to the server, also
+performing any <CRLF> translation necessary. C<TIMEOUT> is optional, if not
+given, the timeout value from the command connection will be used.
+
+Returns the number of bytes written before any <CRLF> translation.
+
+=item bytes_read ()
+
+Returns the number of bytes read so far.
+
+=item abort ()
+
+Abort the current data transfer.
+
+=item close ()
+
+Close the data connection and get a response from the FTP server. Returns
+I<true> if the connection was closed successfully and the first digit of
+the response from the server was a '2'.
+
+=back
+
+=cut

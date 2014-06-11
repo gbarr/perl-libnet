@@ -137,6 +137,17 @@ MAIN: {
                             }
                         }
                     }
+                },
+
+                podcoveragetest => {
+                    description => 'POD coverage testing',
+                    prereqs => {
+                        test => {
+                            requires => {
+                                'Test::Pod::Coverage' => '0.08'
+                            }
+                        }
+                    }
                 }
             }
         },
@@ -171,6 +182,7 @@ MAIN: {
             'Socket'         => '1.3',
             'Symbol'         => '0',
             'Time::Local'    => '0',
+            'constant'       => '0',
             'strict'         => '0',
             'vars'           => '0'
         },

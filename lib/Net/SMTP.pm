@@ -936,6 +936,13 @@ If C<DATA> is not specified then the result will indicate that the server
 wishes the data to be sent. The data must then be sent using the C<datasend>
 and C<dataend> methods described in L<Net::Cmd>.
 
+=item bdat ( DATA )
+
+=item bdatlast ( DATA )
+
+Use the alternate DATA command "BDAT" of the data chunking service extension
+defined in RFC1830 for efficiently sending large MIME messages.
+
 =item expand ( ADDRESS )
 
 Request the server to expand the given address Returns an array
@@ -955,6 +962,14 @@ Request help text from the server. Returns the text or undef upon failure
 =item quit ()
 
 Send the QUIT command to the remote SMTP server and close the socket connection.
+
+=item can_inet6 ()
+
+Returns whether we can use IPv6.
+
+=item can_ssl ()
+
+Returns whether we can use SSL.
 
 =back
 

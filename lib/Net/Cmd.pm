@@ -45,13 +45,12 @@ our $VERSION = "2.31";
 our @ISA     = qw(Exporter);
 our @EXPORT  = qw(CMD_INFO CMD_OK CMD_MORE CMD_REJECT CMD_ERROR CMD_PENDING);
 
-
-sub CMD_INFO    {1}
-sub CMD_OK      {2}
-sub CMD_MORE    {3}
-sub CMD_REJECT  {4}
-sub CMD_ERROR   {5}
-sub CMD_PENDING {0}
+use constant CMD_INFO    => 1;
+use constant CMD_OK      => 2;
+use constant CMD_MORE    => 3;
+use constant CMD_REJECT  => 4;
+use constant CMD_ERROR   => 5;
+use constant CMD_PENDING => 0;
 
 my %debug = ();
 

@@ -680,6 +680,11 @@ documented here.
 
 =over 4
 
+=item host ()
+
+Returns the value used by the constructor, and passed to IO::Socket::INET,
+to connect to the host.
+
 =item auth ( USERNAME, PASSWORD )
 
 Attempt SASL authentication.
@@ -799,6 +804,14 @@ status of all messages to not be deleted.
 
 Quit and close the connection to the remote POP3 server. Any messages marked
 as deleted will be deleted from the remote mailbox.
+
+=item can_inet6 ()
+
+Returns whether we can use IPv6.
+
+=item can_ssl ()
+
+Returns whether we can use SSL.
 
 =back
 

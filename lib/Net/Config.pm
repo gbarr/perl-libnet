@@ -163,7 +163,7 @@ C<Net::LocalCfg> so you can override these methods if you want.
 
 =over 4
 
-=item requires_firewall HOST
+=item requires_firewall ( HOST )
 
 Attempts to determine if a given host is outside your firewall. Possible
 return values are.

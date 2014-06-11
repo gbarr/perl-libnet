@@ -773,6 +773,11 @@ documented here.
 
 =over 4
 
+=item host ()
+
+Returns the value used by the constructor, and passed to IO::Socket::INET,
+to connect to the host.
+
 =item article ( [ MSGID|MSGNUM ], [FH] )
 
 Retrieve the header, a blank line, then the body (text) of the
@@ -838,6 +843,11 @@ In an array context the return value is a list containing, the number
 of articles in the group, the number of the first article, the number
 of the last article and the group name.
 
+=item help ( )
+
+Request help text (a short summary of commands that are understood by this
+implementation) from the server. Returns the text or undef upon failure.
+
 =item ihave ( MSGID [, MESSAGE ])
 
 The C<ihave> command informs the server that the client has an article
@@ -871,11 +881,17 @@ that it will allow posting.
 
 =item authinfo ( USER, PASS )
 
-Authenticates to the server (using AUTHINFO USER / AUTHINFO PASS)
-using the supplied username and password.  Please note that the
-password is sent in clear text to the server.  This command should not
-be used with valuable passwords unless the connection to the server is
-somehow protected.
+Authenticates to the server (using the original AUTHINFO USER / AUTHINFO PASS
+form, defined in RFC2980) using the supplied username and password.  Please
+note that the password is sent in clear text to the server.  This command
+should not be used with valuable passwords unless the connection to the server
+is somehow protected.
+
+=item authinfo_simple ( USER, PASS )
+
+Authenticates to the server (using the proposed NNTP V2 AUTHINFO SIMPLE form,
+defined and deprecated in RFC2980) using the supplied username and password.
+As with L</authinfo> the password is sent in clear text.
 
 =item list ()
 
@@ -961,6 +977,13 @@ each value contains the description text for the group.
 Returns a reference to a hash where the keys are all the possible
 distribution names and the values are the distribution descriptions.
 
+=item distribution_patterns ()
+
+Returns a reference to an array where each element, itself an array
+reference, consists of the three fields of a line of the distrib.pats list
+maintained by some NNTP servers, namely: a weight, a wildmat and a value
+which the client may use to construct a Distribution header.
+
 =item subscriptions ()
 
 Returns a reference to a list which contains a list of groups which
@@ -1014,7 +1037,7 @@ message.
 The result is the same as C<xhdr> except the is will be restricted to
 headers where the text of the header matches C<PATTERN>
 
-=item xrover
+=item xrover ()
 
 The XROVER command returns reference information for the article(s)
 specified.
@@ -1027,7 +1050,7 @@ values are the References: lines from the articles
 Returns a reference to a list of all the active messages in C<GROUP>, or
 the current group if C<GROUP> is not specified.
 
-=item reader
+=item reader ()
 
 Tell the server that you are a reader and not another server.
 

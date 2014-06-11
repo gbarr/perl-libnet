@@ -1,5 +1,6 @@
 libnet 1.28  -- TODO
 
+  * Add optional POD coverage testing.
   * Add optional POD testing.
   * Add optional Perl::Critic testing.
   * Make code Perl::Critic clean.
