@@ -1,5 +1,8 @@
 libnet 1.28  -- TODO
 
+  * Stop Makefile.PL from requiring interactive configuration when running via
+    cpan, cpanp or cpanm: just accept all defaults in these cases, as when
+    running non-interactively.  [Resolves CPAN RT#48966]
   * Add optional POD coverage testing.
   * Add optional POD testing.
   * Add optional Perl::Critic testing.

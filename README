@@ -57,20 +57,21 @@ together with libnet.  These packages should be available on CPAN
 
 CONFIGURE
 
-Normally when perl Makefile.PL is run it will run Configure which will
+Normally when Makefile.PL is run it will run Configure which will
 ask some questions about your system. The results of these questions
 will be stored in a file called libnet.cfg which will be installed
-alongside the other perl modules in this distribution. The Makefile.PL
+alongside the other perl modules in this distribution. Makefile.PL
 will run Configure in an interactive mode unless these exists a file
-called libnet.cfg in the build directory.
+called libnet.cfg in the build directory or Makefile.PL itself is being
+run non-interactively or via cpan, cpanp or cpanm.
 
 If you are on a system which cannot run this script you can create an
 empty file to make Makefile.PL skip running Configure. If you want to
-keep your existing settings and not run interactivly the simple run
+keep your existing settings and not run interactivly then simply run
 
-  Configure -d
+  perl Configure -d
 
-before running the Makefile.PL.
+before running Makefile.PL.
 
 DOCUMENTATION
 

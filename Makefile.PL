@@ -23,6 +23,8 @@ use warnings;
 use ExtUtils::MakeMaker 6.64;
 use ExtUtils::MakeMaker qw(WriteMakefile);
 
+sub running_under_cpan();
+
 #===============================================================================
 # INITIALIZATION
 #===============================================================================
@@ -42,10 +44,14 @@ MAIN: {
     my %prereq_pms = ();
     $prereq_pms{'Convert::EBCDIC'} = '0.06' if $^O eq 'os390';
 
-    my $xt = prompt("Should I do external tests?\n" .
-        "These tests will fail if there is no internet connection or if a firewall\n" .
-        "blocks or modifies some traffic.\n" .
-        "[y/N]", 'n');
+    my $xt = 'n';
+    if (not running_under_cpan()) {
+        $xt = prompt("Should I do external tests?\n" .
+                     "These tests will fail if there is no internet" .
+                     " connection or if a firewall\n" .
+                     "blocks or modifies some traffic.\n" .
+                     "[y/N]", 'n');
+    }
 
     my $tests = 't/*.t';
     $tests .= ' t/external/*.t' if $xt =~ m/^y/io;
@@ -211,10 +217,30 @@ MAIN: {
 
 sub MY::post_initialize {
     my $self = shift;
+
     return '' if $self->{PERL_CORE};
-    system(($^O eq 'VMS' ? 'mcr ': ()), $^X, 'Configure') unless -f $CfgFile;
+
+    if (not -f $CfgFile) {
+        my @args = qw(Configure);
+        push @args, '-d' if $ENV{PERL5_CPAN_IS_RUNNING}     ||
+                            $ENV{PERL5_CPANPLUS_IS_RUNNING} ||
+                            $ENV{PERL5_CPANM_IS_RUNNING};
+        system(($^O eq 'VMS' ? 'mcr ': ()), $^X, @args)
+    }
+
     $self->{PM}{$CfgFile} = $self->catfile('$(INST_LIBDIR)',$CfgPath);
+
     return '';
+}
+
+#===============================================================================
+# SUBROUTINES
+#===============================================================================
+
+sub running_under_cpan() {
+    return $ENV{PERL5_CPAN_IS_RUNNING}     || # cpan
+           $ENV{PERL5_CPANPLUS_IS_RUNNING} || # cpanp
+           $ENV{PERL5_CPANM_IS_RUNNING};      # cpanm
 }
 
 #===============================================================================
