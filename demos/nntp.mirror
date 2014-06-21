@@ -35,14 +35,16 @@ chdir($BaseDir) or die "Could not cd to $BaseDir\n";
 # expirationdays is the number of days to leave the articles around;
 #    set it to 0 if you want the articles to stay forever
 # If the groupname starts with a #, it is skipped
-open(GROUPLIST, 'grouplist.txt') or die "Could not open grouplist.txt\n";
+my $GroupList;
+open($GroupList, '<', 'grouplist.txt') or die "Could not open grouplist.txt\n";
 my @Groups;
-while(<GROUPLIST>) {
+while(<$GroupList>) {
         my $Line = $_; chomp($Line);
         if($Line eq '') { next };  # Skip blank lines
         if(substr($Line, 0, 1) eq '#') { next };  # Skip comments
         push(@Groups, $Line)
 }
+close $GroupList;
 
 my $NntpPtr = Net::NNTP->new('news.server.com');
 
@@ -57,7 +59,7 @@ foreach my $GroupLine (@Groups) {
         }
         chdir("$BaseDir/$GroupName") or die "Couldn't chdir to $GroupName\n";
         # Find the last article in the directory
-        my @AllInDir = <*>; my @RevSortedAllInDir = reverse(sort(@AllInDir));
+        my @AllInDir = glob('*'); my @RevSortedAllInDir = reverse(sort(@AllInDir));
         my $LenArr = @RevSortedAllInDir;
         my $NumLastInDir;
         if($LenArr > 0) { $NumLastInDir = $RevSortedAllInDir[0] }
@@ -79,9 +81,10 @@ foreach my $GroupLine (@Groups) {
                 my $ArtRef = $NntpPtr->article($GetArtNum);
                 my @ArtArr = @$ArtRef; my $ArtArrLen = @ArtArr;
                 if($ArtArrLen > 0 ) {  # Skip article numbers that had 0 len
-                        open(OUT, ">$GetArtNum") or
+                        my $Out;
+                        open($Out, '>', $GetArtNum) or
                                 die "Could not create $GroupName/$GetArtNum\n";
-                        print OUT @$ArtRef; close(OUT);
+                        print $Out @$ArtRef; close($Out);
                 }
 
                 # Check if we're at the end

@@ -37,7 +37,7 @@ MAIN: {
         plan skip_all => 'Test::Perl::Critic required to test with Perl::Critic';
     }
     else {
-        all_critic_ok();
+        all_critic_ok('.');
     }
 }
 

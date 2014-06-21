@@ -11,6 +11,8 @@ use ExtUtils::MakeMaker qw(prompt);
 use Getopt::Std;
 use IO::File;
 
+## no critic (Subroutines::ProhibitSubroutinePrototypes)
+
 our($opt_d, $opt_o);
 
 ##
@@ -41,10 +43,9 @@ sub test_hostnames (\@)
 {
  my $hlist = shift;
  my @h = ();
- my $host;
  my $err = 0;
 
- foreach $host (@$hlist)
+ foreach my $host (@$hlist)
   {
    if(valid_host($host))
     {
@@ -217,10 +218,9 @@ MASK:
 
 sub default_hostname
 {
- my $host;
  my @host;
 
- foreach $host (@_)
+ foreach my $host (@_)
   {
    if(defined($host) && valid_host($host))
     {
@@ -577,8 +577,7 @@ print "Writing $libnet_cfg\n";
 
 print $fh "{\n";
 
-my $key;
-foreach $key (keys %cfg) {
+foreach my $key (keys %cfg) {
     my $val = $cfg{$key};
     if(!defined($val)) {
         $val = "undef";

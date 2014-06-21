@@ -23,6 +23,8 @@ use warnings;
 use ExtUtils::MakeMaker 6.64;
 use ExtUtils::MakeMaker qw(WriteMakefile);
 
+## no critic (Subroutines::ProhibitSubroutinePrototypes)
+
 sub running_under_cpan();
 
 #===============================================================================

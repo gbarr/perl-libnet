@@ -65,7 +65,7 @@ if($smtp->mail($user) && $smtp->to($user))
   $smtp->data();
 
   my @data;
-  map { s/-USER-/$user/g } @data=<DATA>;
+  map { s/-USER-/$user/g } @data=<DATA>; ## no critic (ControlStructures::ProhibitMutatingListFunctions)
 
   $smtp->datasend(@data);
   $smtp->dataend;
