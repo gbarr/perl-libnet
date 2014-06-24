@@ -14,7 +14,9 @@ use Errno;
 use Net::Cmd;
 
 our $VERSION = '0.13';
-our @ISA     = qw(IO::Socket::INET);
+
+$Net::FTP::IOCLASS or die "please load Net::FTP before Net::FTP::dataconn";
+our @ISA = $Net::FTP::IOCLASS;
 
 sub reading {
   my $data = shift;

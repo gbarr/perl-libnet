@@ -16,8 +16,8 @@ libnet 1.28  -- TODO
     username.   If a plain text username is specified then use the first
     reported SMTP AUTH method supported, as usual.  [Ewen McNeill; resolves CPAN
     RT#58002]
-  * Add support for IPv6 and SSL to Net::SMTP and Net::POP3.  These features are
-    only available if the user has
+  * Add support for IPv6 and SSL to Net::SMTP, Net::POP3 and Net::FTP.  
+    These features are only available if the user has
 
       a recent IO::Socket::SSL for SSL support
       a recent IO::Socket::IP or an older IO::Socket::INET6 for IPv6 support
