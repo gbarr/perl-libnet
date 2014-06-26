@@ -15,8 +15,8 @@ use 5.008001;
 
 use strict;
 use warnings;
-use Carp;
 
+use Carp;
 use Fcntl qw(O_WRONLY O_RDONLY O_APPEND O_CREAT O_TRUNC);
 use IO::Socket;
 use Net::Cmd;
