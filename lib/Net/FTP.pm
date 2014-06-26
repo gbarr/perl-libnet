@@ -1558,18 +1558,23 @@ will be used for password.
 If the connection is via a firewall then the C<authorize> method will
 be called with no arguments.
 
-=item starttls
+=item starttls ()
 
 Upgrade existing plain connection to SSL.
 The SSL arguments have to be given in C<new> already because they are needed for
 data connections too.
 
-=item stoptls
+=item stoptls ()
 
 Downgrade existing SSL connection back to plain.
 This is needed to work with some FTP helpers at firewalls, which need to see the
 PORT and PASV commands and responses to dynamically open the necessary ports.
 In this case C<starttls> is usually only done to protect the authorization.
+
+=item prot ( LEVEL )
+
+Set what type of data channel protection the client and server will be using.
+Only C<LEVEL>s "C" (clear) and "P" (private) are supported.
 
 =item host ()
 
@@ -1821,16 +1826,19 @@ C<put_unique> and those that do not require data connections.
 =over 4
 
 =item port ( [ PORT ] )
+=item eprt ( [ PORT ] )
 
-Send a C<PORT> command to the server. If C<PORT> is specified then it is sent
-to the server. If not, then a listen socket is created and the correct information
-sent to the server.
+Send a C<PORT> (IPv4) or C<EPRT> (IPv6) command to the server. If C<PORT> is
+specified then it is sent to the server. If not, then a listen socket is created
+and the correct information sent to the server.
 
 =item pasv ()
+=item epsv ()
 
-Tell the server to go into passive mode. Returns the text that represents the
-port on which the server is listening, this text is in a suitable form to
-sent to another ftp server using the C<port> method.
+Tell the server to go into passive mode (C<pasv> for IPv4, C<epsv> for IPv6).
+Returns the text that represents the port on which the server is listening, this
+text is in a suitable form to send to another ftp server using the C<port> or
+C<eprt> method.
 
 =back
 
