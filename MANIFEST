@@ -30,6 +30,7 @@ t/critic.t
 t/datasend.t
 t/external/smtp-ssl.t
 t/external/pop3-ssl.t
+t/external/ftp-ssl.t
 t/ftp.t
 t/hostname.t
 t/libnet_t.pl
