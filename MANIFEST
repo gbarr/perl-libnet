@@ -36,6 +36,8 @@ t/hostname.t
 t/libnet_t.pl
 t/netrc.t
 t/nntp.t
+t/nntp_ssl.t
+t/nntp_ipv6.t
 t/pod.t
 t/pod_coverage.t
 t/require.t
