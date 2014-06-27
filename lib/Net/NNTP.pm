@@ -1234,7 +1234,7 @@ with a and ends with d.
 
 =head1 SEE ALSO
 
-L<Net::Cmd>
+L<Net::Cmd>,
 L<IO::Socket::SSL>
 
 =head1 AUTHOR

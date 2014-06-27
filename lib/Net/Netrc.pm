@@ -330,7 +330,7 @@ Steve Hay E<lt>F<shay@cpan.org>E<gt> is now maintaining libnet as of version
 
 =head1 SEE ALSO
 
-L<Net::Netrc>
+L<Net::Netrc>,
 L<Net::Cmd>
 
 =head1 COPYRIGHT

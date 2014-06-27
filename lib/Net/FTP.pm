@@ -1964,8 +1964,8 @@ Steve Hay E<lt>F<shay@cpan.org>E<gt> is now maintaining libnet as of version
 
 =head1 SEE ALSO
 
-L<Net::Netrc>
-L<Net::Cmd>
+L<Net::Netrc>,
+L<Net::Cmd>,
 L<IO::Socket::SSL>
 
 ftp(1), ftpd(8), RFC 959, RFC 2428, RFC 4217
