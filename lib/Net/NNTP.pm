@@ -1028,6 +1028,14 @@ news server.
 
 Quit the remote server and close the socket connection.
 
+=item can_inet6 ()
+
+Returns whether we can use IPv6.
+
+=item can_ssl ()
+
+Returns whether we can use SSL.
+
 =back
 
 =head2 Extension methods
