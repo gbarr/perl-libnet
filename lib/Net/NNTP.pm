@@ -21,7 +21,31 @@ use Net::Config;
 use Time::Local;
 
 our $VERSION = "2.27";
-our @ISA     = qw(Net::Cmd IO::Socket::INET);
+
+# Code for detecting if we can use SSL
+my $ssl_class = eval {
+  require IO::Socket::SSL;
+  # first version with default CA on most platforms
+  IO::Socket::SSL->VERSION(1.994);
+} && 'IO::Socket::SSL';
+
+my $nossl_warn = !$ssl_class &&
+  'To use SSL please install IO::Socket::SSL with version>=1.994';
+
+# Code for detecting if we can use IPv6
+my $inet6_class = eval {
+  require IO::Socket::IP;
+  IO::Socket::IP->VERSION(0.20);
+} && 'IO::Socket::IP' || eval {
+  require IO::Socket::INET6;
+  IO::Socket::INET6->VERSION(2.62);
+} && 'IO::Socket::INET6';
+
+sub can_ssl   { $ssl_class };
+sub can_inet6 { $inet6_class };
+
+our @ISA = ('Net::Cmd', $ssl_class || $inet6_class || 'IO::Socket::INET');
+
 
 sub new {
   my $self = shift;
@@ -45,6 +69,21 @@ sub new {
     unless @{$hosts};
 
   my %connect = ( Proto => 'tcp');
+
+  if ($ssl_class) {
+    $connect{SSL_verifycn_scheme} = 'nntp';
+    $connect{$_} = $arg{$_} for(grep { m{^SSL_} } keys %arg);
+    if ($arg{SSL}) {
+      # SSL from start
+      $arg{Port} ||= 563;
+    } else {
+      # upgrade later with STARTTLS
+      $connect{SSL_startHandshake} = 0;
+    }
+  } elsif ($arg{SSL}) {
+    die $nossl_warn;
+  }
+
   foreach my $o (qw(LocalAddr Timeout)) {
     $connect{$o} = $arg{$o} if exists $arg{$o};
   }
@@ -52,6 +91,7 @@ sub new {
   $connect{PeerPort} = $arg{Port} || 'nntp(119)';
   foreach my $h (@{$hosts}) {
     $connect{PeerAddr} = $h;
+    $connect{SSL_verifycn_name} = $arg{SSL_verifycn_name} || $h if $ssl_class;
     $obj = $type->SUPER::new(%connect)
       and last;
   }
@@ -119,6 +159,15 @@ sub postok {
   @_ == 1 or croak 'usage: $nntp->postok()';
   my $nntp = shift;
   ${*$nntp}{'net_nntp_post'} || 0;
+}
+
+
+sub starttls {
+  my $self = shift;
+  $ssl_class or die $nossl_warn;
+  $self->is_SSL and croak("NNTP connection is already in SSL mode");
+  $self->_STARTTLS or return;
+  $self->connect_SSL;
 }
 
 
@@ -675,6 +724,7 @@ sub _NEXT      { shift->command('NEXT')->response == CMD_OK }
 sub _POST      { shift->command('POST', @_)->response == CMD_MORE }
 sub _QUIT      { shift->command('QUIT', @_)->response == CMD_OK }
 sub _SLAVE     { shift->command('SLAVE', @_)->response == CMD_OK }
+sub _STARTTLS  { shift->command("STARTTLS")->response() == CMD_MORE }
 sub _STAT      { shift->command('STAT', @_)->response == CMD_OK }
 sub _MODE      { shift->command('MODE', @_)->response == CMD_OK }
 sub _XGTITLE   { shift->command('XGTITLE', @_)->response == CMD_OK }
@@ -713,10 +763,18 @@ Net::NNTP - NNTP Client class
     $nntp = Net::NNTP->new("some.host.name");
     $nntp->quit;
 
+    # start with SSL, e.g. nntps
+    $nntp = Net::NNTP->new("some.host.name", SSL => 1);
+
+    # start with plain and upgrade to SSL
+    $nntp = Net::NNTP->new("some.host.name");
+    $nntp->starttls;
+
+
 =head1 DESCRIPTION
 
 C<Net::NNTP> is a class implementing a simple NNTP client in Perl as described
-in RFC977.
+in RFC977 and RFC4642.
 
 The Net::NNTP class is a subclass of Net::Cmd and IO::Socket::INET.
 
@@ -740,6 +798,14 @@ B<Host> - NNTP host to connect to. It may be a single scalar, as defined for
 the C<PeerAddr> option in L<IO::Socket::INET>, or a reference to
 an array with hosts to try in turn. The L</host> method will return the value
 which was used to connect to the host.
+
+B<Port> - port to connect to.
+Default - 119 for plain NNTP and 563 for immediate SSL (nntps).
+
+B<SSL> - If the connection should be done from start with SSL, contrary to later
+upgrade with C<starttls>.
+You can use SSL arguments as documented in L<IO::Socket::SSL>, but it will
+usually use the right arguments already.
 
 B<Timeout> - Maximum time, in seconds, to wait for a response from the
 NNTP server, a value of zero will cause all IO operations to block.
@@ -777,6 +843,11 @@ documented here.
 
 Returns the value used by the constructor, and passed to IO::Socket::INET,
 to connect to the host.
+
+=item starttls ()
+
+Upgrade existing plain connection to SSL.
+Any arguments necessary for SSL must be given in C<new> already.
 
 =item article ( [ MSGID|MSGNUM ], [FH] )
 
@@ -1164,6 +1235,7 @@ with a and ends with d.
 =head1 SEE ALSO
 
 L<Net::Cmd>
+L<IO::Socket::SSL>
 
 =head1 AUTHOR
 
